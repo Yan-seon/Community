@@ -17,7 +17,7 @@ The previous deployed interface supported the two core activities but did not su
 | Agency and community culture | Risk of a forced AI path | Direct member-reply route, self-authored contributions, AI rejection, optional thanks and personal recognition retained; no automatic gratitude or merit scoring |
 | Responsibility reconstruction | Only a broad reflection | Four separate questions plus broad reflection and six individual ratings (N/A retained as null); answers copied into immutable phase snapshots |
 | Break/reset | Next activity began immediately | Explicit break; fresh second-case workspace; prior snapshot preserved |
-| Case C transfer | Only available as another exploratory post | Separate uncoached hand-swatch task after both activities; response, optional anchor, voluntary skip recorded separately from the two condition outcomes |
+| Case C transfer | Only available as another exploratory post | Case C story/reply is withheld from research orientation; separate uncoached hand-swatch task after both activities; response, optional anchor, voluntary skip recorded separately from the two condition outcomes |
 | Comparative interview | Not captured in the site | Five theme fields and overall preference, including neither/unsure; optional written-comparison skip retained; spoken recording consent remains outside the site |
 | Debrief and completion | Completed after activity 2 | Explicit fixed-script debrief; full completion only after debrief; cloud completion flag follows the full procedure |
 | Facilitator assistance | No structured capture | Observer notes with fixed assistance ladder and interruption category; no scoring feedback in participant UI |
