@@ -1,6 +1,6 @@
 import {useEffect,useRef,useState} from 'react';
 import {Sparkles} from 'lucide-react';
-import {database,loadComments,messageForError,onlineConfigured,publishContribution,roomId,type CommentRow} from '@/lib/online';
+import {database,userId,loadComments,messageForError,onlineConfigured,publishContribution,roomId,type CommentRow} from '@/lib/online';
 import {photos,say,type Anchor,type Lang,type StoryId,type Study} from '@/lib/community-v3';
 import {Button} from '@/components/ui/button';
 
@@ -15,7 +15,7 @@ export function SharedThread({story,lang,study,anchor,onQuote,onPublish}:{story:
   const merge=(row:CommentRow)=>{if(stopped||row.post_id!==story)return;setRows(old=>[...old.filter(r=>r.id!==row.id),row].sort((a,b)=>a.created_at.localeCompare(b.created_at)||a.id.localeCompare(b.id)));};
   let activeRoom='';const local=(event:Event)=>{const row=(event as CustomEvent<CommentRow>).detail;if(row.room_id===activeRoom)merge(row);};
   window.addEventListener('community:comment',local);
-  (async()=>{try{activeRoom=await roomId(study);if(stopped)return;setRoom(activeRoom);
+  (async()=>{try{await userId();activeRoom=await roomId(study);if(stopped)return;setRoom(activeRoom);
    const refresh=async()=>{try{const list=await loadComments(story,activeRoom);if(!stopped){list.forEach(merge);setLoading(false);}}catch{if(!stopped){setError(messageForError(lang));setLoading(false);}}};
    channel=database().channel(`comments-${story}-${activeRoom}-${crypto.randomUUID()}`).on('postgres_changes',{event:'INSERT',schema:'public',table:'comments',filter:`room_id=eq.${activeRoom}`},payload=>merge(payload.new as CommentRow)).subscribe(status=>{if(status==='SUBSCRIBED')void refresh();});
    await refresh();

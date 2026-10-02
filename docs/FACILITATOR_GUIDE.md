@@ -1,8 +1,8 @@
 # Moderated pilot guide / 主持人试测指南
 
-Prototype: https://beautyhouse-community-study.netlify.app/?lang=en
+Prototype: https://beautyhouse-community-study.netlify.app/?study=1&lang=en
 
-中文版: https://beautyhouse-community-study.netlify.app/?lang=zh
+中文版: https://beautyhouse-community-study.netlify.app/?study=1&lang=zh
 
 Use desktop Web. Enter via the flask **Study session / 研究会话** control. Public browsing/commenting is not the research protocol. Use a unique P plus 3–6 digits participant code, select the assigned sequence and keep one language for the whole session.
 
