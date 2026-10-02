@@ -1,0 +1,1 @@
+{"compilerOptions":{"target":"ES2022","lib":["DOM","DOM.Iterable","ESNext"],"strict":true,"skipLibCheck":true,"noEmit":true,"esModuleInterop":true,"module":"ESNext","moduleResolution":"Bundler","jsx":"react-jsx","types":["vite/client"],"paths":{"@/*":["./*"]},"allowImportingTsExtensions":true},"files":["main.tsx","vite.netlify.config.ts"]}

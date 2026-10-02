@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="860" viewBox="0 0 1400 860">
+<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10" fill="none" stroke="#735345" stroke-width="1.4"/></marker></defs>
+<rect width="1400" height="860" rx="24" fill="#fcfaf6"/>
+<g font-family="Arial, sans-serif" fill="#172337">
+<text x="60" y="65" font-size="18" letter-spacing="3">COMMON GROUND · DESIGN CONCEPT</text>
+<text x="60" y="120" font-size="39" font-weight="700">Knowledge grows through people, pictures and return visits.</text>
+<text x="60" y="165" font-size="21" fill="#636970">A proposed interaction cycle — effects remain to be tested.</text>
+<g fill="#fff" stroke="#d8cec1" stroke-width="2">
+<rect x="60" y="215" width="290" height="195" rx="18"/><rect x="390" y="215" width="290" height="195" rx="18"/><rect x="720" y="215" width="290" height="195" rx="18"/><rect x="1050" y="215" width="290" height="195" rx="18"/>
+</g>
+<g font-size="15" letter-spacing="2" fill="#7e3048"><text x="82" y="249">01 · NOTICE</text><text x="412" y="249">02 · LEARN TOGETHER</text><text x="742" y="249">03 · COME BACK</text><text x="1072" y="249">04 · PASS IT ON</text></g>
+<g font-size="26" font-weight="700"><text x="82" y="293">Point to an image</text><text x="412" y="293">A member responds</text><text x="742" y="293">Return with a story</text><text x="1072" y="293">Keep a shared album</text></g>
+<g font-size="20"><text x="82" y="336">A detail + a small question</text><text x="82" y="371">Lower the threshold to join</text><text x="412" y="336">Guidance + personal context</text><text x="412" y="371">Make learning relational</text><text x="742" y="336">An update + optional thanks</text><text x="742" y="371">Make participation visible</text><text x="1072" y="336">People + limits + revisions</text><text x="1072" y="371">Help the next newcomer</text></g>
+<g stroke="#735345" stroke-width="2" fill="none"><path d="M352 310H382M375 303L382 310L375 317"/><path d="M682 310H712M705 303L712 310L705 317"/><path d="M1012 310H1042M1035 303L1042 310L1035 317"/><path d="M1195 415V462H205V420M198 427L205 420L212 427"/></g>
+<rect x="453" y="440" width="500" height="41" rx="20" fill="#fcfaf6"/><text x="703" y="468" text-anchor="middle" font-size="20" fill="#735345">The helped newcomer becomes a helper</text>
+<rect x="60" y="518" width="1280" height="141" rx="18" fill="#f1edf6"/>
+<text x="84" y="553" font-size="16" letter-spacing="2" fill="#51408c">OPTIONAL AI · SUPPORT THE CONVERSATION</text>
+<text x="84" y="592" font-size="23" font-weight="700">At the question: offer a starting prompt</text><text x="735" y="592" font-size="23" font-weight="700">At the album: arrange existing words</text>
+<text x="84" y="628" font-size="19">The member asks, edits, rejects or restores.</text><text x="735" y="628" font-size="19">The member reviews before adding a version.</text>
+<path d="M205 516V487" fill="none" stroke="#51408c" stroke-width="2" stroke-dasharray="5 5"/><path d="M1195 516V487" fill="none" stroke="#51408c" stroke-width="2" stroke-dasharray="5 5"/>
+<text x="60" y="716" font-size="22" font-weight="700">Shared knowledge = image + situated explanation + contribution history</text>
+<text x="60" y="757" font-size="20">Design values: welcoming participation · mutual help · return rituals · contribution recognition</text>
+<text x="60" y="800" font-size="18" fill="#636970">In the prototype: scripted members, generated image props and local records; no claim of observed reciprocity.</text>
+</g></svg>
