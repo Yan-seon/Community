@@ -1,5 +1,5 @@
 import {createClient, type SupabaseClient} from '@supabase/supabase-js';
-import type {Anchor, Lang, StoryId, Study} from './community-v3';
+import {researchComplete,type Anchor,type Lang,type StoryId,type Study} from './community-v3';
 
 let client:SupabaseClient|null=null;
 let identity:Promise<string>|null=null;
@@ -47,7 +47,7 @@ export function saveStudy(study:Study){const next=studyQueue.catch(()=>{}).then(
 async function writeStudy(study:Study){
   const uid=await userId();const key=`community-session-${uid}-${study.startedAt}`;
   let id=localStorage.getItem(key);if(!id){id=crypto.randomUUID();localStorage.setItem(key,id);}
-  const {error}=await database().from('study_sessions').upsert({id,user_id:uid,participant_code:study.participant,completed:study.completed,payload:study},{onConflict:'id'});
+  const {error}=await database().from('study_sessions').upsert({id,user_id:uid,participant_code:study.participant,completed:researchComplete(study),payload:study},{onConflict:'id'});
   if(error)throw error;
 }
 export function messageForError(lang:Lang){return lang==='en'?'Could not save online. Your draft is kept; please retry.':'暂时无法保存到网站。草稿已保留，请重试。';}

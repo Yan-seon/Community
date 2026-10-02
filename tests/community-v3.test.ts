@@ -11,3 +11,40 @@ test('album revisions retain sources and preserve earlier entries',()=>{let w=co
 test('image anchors are clamped and remain attached to their image',()=>{assert.deepEqual(clampAnchor(-2,4,'blush'),{x:.03,y:.97,photo:'blush'});});
 test('restore rejects malformed or expired data, accepts current drafts',()=>{const saved={version:VERSION,savedAt:Date.now(),lang:'en',story:'A',mode:'embedded',works:{A:completedWork(),B:emptyWork('B'),C:emptyWork('C')},study:null};assert(restore(JSON.stringify(saved)));assert.equal(restore('broken'),null);assert.equal(restore(JSON.stringify({...saved,savedAt:Date.now()-8*24*3600000})),null);assert.equal(restore(JSON.stringify({...saved,version:'old'})),null);});
 test('CSV quotes commas, quotes and newlines inside event details',()=>{const s=log(startStudy('P999','en',0),'developer_check',{text:'one, "two"\nthree'});const csv=exportCsv(s.events);assert(csv.includes('developer_check'));assert(csv.includes('""text""'));assert.equal(s.events[0].phase,0);assert.equal(s.events[0].story,'A');});
+
+test('full protocol prevents skipped gates and requires reconstruction',async()=>{
+ const {advanceResearch,updateResearch}=await import('../lib/community-v3.ts');
+ let s=startStudy('P990001','en',0,true);
+ assert.throws(()=>advanceResearch(s,'activity'));
+ assert.throws(()=>advanceResearch(s,'fidelity'));
+ s=updateResearch(s,{background:{community:'read',participation:'reader',aiUse:'sometimes'}},'background');
+ s=advanceResearch(s,'fidelity');assert.throws(()=>advanceResearch(s,'activity'));
+ s=updateResearch(s,{fidelity:{rating:'3',mismatch:'Gallery expectations differ',visits:['album']}},'fidelity');
+ s=advanceResearch(s,'activity');
+ assert.throws(()=>finishPhase(s,completedWork(),'Reflection',[4,4,4,4,4,4]));
+ const reconstruction={pin:'cheek',human:'Ari',ai:'Did not use AI',member:'I wrote and published'};
+ s=finishPhase(s,completedWork(),'Reflection',[4,4,null,4,4,4],reconstruction);
+ assert.equal(s.research?.stage,'break');assert.throws(()=>finishPhase(s,completedWork(),'x',[4,4,4,4,4,4],reconstruction));
+});
+test('transfer and interview remain separate and logged after both paired activities',async()=>{
+ const {advanceResearch,updateResearch,researchComplete}=await import('../lib/community-v3.ts');
+ let s=startStudy('P990002','en',2,true);
+ s=updateResearch(s,{background:{community:'read',participation:'reader',aiUse:'never'}},'background');s=advanceResearch(s,'fidelity');
+ s=updateResearch(s,{fidelity:{rating:'na',mismatch:'Unfamiliar',visits:[]}},'fidelity');s=advanceResearch(s,'activity');
+ const recon={pin:'location',human:'member',ai:'unused',member:'my words'};
+ s=finishPhase(s,completedWork(),'First',[4,4,null,4,4,4],recon);s=advanceResearch(s,'activity');
+ s=finishPhase(s,completedWork(),'Second',[4,4,null,4,4,4],recon);
+ assert.equal(s.completed,true);assert.equal(researchComplete(s),false);assert.equal(s.research?.stage,'transfer');
+ assert.throws(()=>advanceResearch(s,'interview'));
+ s=updateResearch(s,{transfer:{answer:'A hand swatch in one light cannot establish a face result.',anchor:{x:.4,y:.6,photo:'swatches'},skipped:false}},'transfer_response');
+ assert.equal(s.events.at(-1)?.story,'C');assert.equal(s.events.at(-1)?.detail.paired,false);
+ s=advanceResearch(s,'interview');assert.throws(()=>advanceResearch(s,'debrief'));
+ s=updateResearch(s,{interview:{timing:'Both have trade-offs.',references:'',culture:'',control:'',ecosystem:'',preference:'unsure',skipped:false}},'comparison');
+ s=advanceResearch(s,'debrief');s=advanceResearch(s,'finished');
+ assert.equal(s.responses.length,2);assert.equal(researchComplete(s),true);assert(s.research?.finalizedAt);assert.equal(log(s,'late'),s);
+});
+test('changed return photo preserves original visual anchor and human contribution',()=>{
+ let w=completedWork();w.anchor={x:.25,y:.65,photo:'base'};w.selectedQuote='Change one thing at a time.';w.selectedQuoteAuthor='Ari';w.updates[0].photo='swatches';
+ assert(albumProposal(w,'en').includes('Ari'));w=publishAlbum(w,'A');const a=w.versions.at(-1)!;
+ assert.equal(a.photo,'swatches');assert.equal(a.anchor?.photo,'base');assert.equal(a.quotedLine,w.selectedQuote);
+});

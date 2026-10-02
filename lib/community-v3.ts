@@ -4,7 +4,8 @@ export const say = (l: Lang, b: Bi) => b[l === 'en' ? 0 : 1];
 export type StoryId = 'A' | 'B' | 'C';
 export type PhotoId = 'base' | 'blush' | 'swatches';
 export type Mode = 'embedded' | 'separate';
-export const VERSION = '4.0.0-ai-community-weave';
+export const VERSION = '4.1.0-study-ready';
+const COMPATIBLE_VERSIONS=[VERSION,'4.0.0-ai-community-weave'];
 export const STORAGE = 'common-ground-v3';
 export const photos: Record<PhotoId, {src:string; alt:Bi}> = {
   base:{src:'/v3/base.png',alt:['Fictional member pointing to her cheek in window light','虚构成员在窗边指向面颊的示意照片']},
@@ -21,7 +22,7 @@ export type Anchor = {x:number;y:number;photo:PhotoId};
 export const clampAnchor=(x:number,y:number,photo:PhotoId):Anchor=>({x:Math.max(0.03,Math.min(.97,x)),y:Math.max(.03,Math.min(.97,y)),photo});
 export type Update = {id:string;text:string;photo:PhotoId;context:string;limits:string;at:string};
 export type Album = {version:number;title:string;text:string;limits:string;photo:PhotoId;anchor:Anchor|null;quotedLine:string;authors:string[];sourceIds:string[];updateId:string;at:string};
-export type AiTrace = {kind:'question'|'route'|'quote'|'album'|'pass';reference:string;at:string};
+export type AiTrace = {kind:'question'|'route'|'quote'|'album'|'pass';reference:string;at:string;proposal?:string};
 export type Work = {anchor:Anchor|null;questionDraft:string;question:string;responseShown:boolean;selectedQuote:string;selectedQuoteAuthor?:string;selectedQuoteId?:string;routeNote:string;plan:string;updateDraft:string;context:string;limits:string;updatePhoto:PhotoId;updates:Update[];thanksDraft:string;thanks:string;albumDraft:string;albumTitle:string;albumLimits:string;versions:Album[];passDraft:string;passed:string;bookmarked:boolean;aiTrace:AiTrace[]};
 export const emptyWork=(id:StoryId='A'):Work=>({anchor:null,questionDraft:'',question:'',responseShown:false,selectedQuote:'',routeNote:'',plan:'',updateDraft:'',context:'',limits:'',updatePhoto:stories[id].photo,updates:[],thanksDraft:'',thanks:'',albumDraft:'',albumTitle:'',albumLimits:'',versions:[],passDraft:'',passed:'',bookmarked:false,aiTrace:[]});
 export const sequenceAssignments = [
@@ -31,23 +32,41 @@ export const sequenceAssignments = [
   [{mode:'separate',story:'B'},{mode:'embedded',story:'A'}],
 ] as const;
 export type ActivityEvent={n:number;at:string;elapsedMs:number;phase:number;story:StoryId;mode:Mode;type:string;detail:Record<string,unknown>};
-export type Study={version:string;participant:string;lang:Lang;sequence:number;phase:number;startedAt:number;consent:true;completed:boolean;events:ActivityEvent[];responses:{phase:number;story:StoryId;mode:Mode;answer:string;ratings:(number|null)[];work:Work;at:string}[]};
+export type Reconstruction={pin:string;human:string;ai:string;member:string};
+export const emptyReconstruction=():Reconstruction=>({pin:'',human:'',ai:'',member:''});
+export type ResearchStage='background'|'fidelity'|'activity'|'break'|'transfer'|'interview'|'debrief'|'finished';
+export type ResearchSession={protocolVersion:string;stage:ResearchStage;device:{width:number;height:number;browser?:string;input?:string};background:{community:string;participation:string;aiUse:string};fidelity:{rating:string;mismatch:string;visits:string[]};transfer:{answer:string;anchor:Anchor|null;skipped:boolean};interview:{timing:string;references:string;culture:string;control:string;ecosystem:string;preference:string;skipped:boolean};reflectionDraft?:{phase:number;answer:string;ratings:string[];reconstruction:Reconstruction};observations:{at:string;stage:string;phase:number;level:string;note:string}[];finalizedAt?:string};
+export function createResearchSession():ResearchSession{return {protocolVersion:'2026-10-02-chapter8-v1',stage:'background',device:{width:0,height:0},background:{community:'',participation:'',aiUse:''},fidelity:{rating:'',mismatch:'',visits:[]},transfer:{answer:'',anchor:null,skipped:false},interview:{timing:'',references:'',culture:'',control:'',ecosystem:'',preference:'',skipped:false},observations:[]};}
+export const researchComplete=(s:Study)=>s.research?s.research.stage==='finished':s.completed;
+export function updateResearch(s:Study,patch:Partial<ResearchSession>,type:string,detail:Record<string,unknown>={}):Study {if(!s.research||researchComplete(s))return s;return {...log(s,type,detail),research:{...s.research,...patch}};}
+export function advanceResearch(s:Study,next:ResearchStage):Study{
+ const r=s.research;if(!r)throw Error('Missing full protocol');
+ const expected:Partial<Record<ResearchStage,ResearchStage>>={background:'fidelity',fidelity:'activity',break:'activity',transfer:'interview',interview:'debrief',debrief:'finished'};
+ if(expected[r.stage]!==next)throw Error('Invalid stage transition');
+ if(r.stage==='background'&&Object.values(r.background).some(v=>!v))throw Error('Background incomplete');
+ if(r.stage==='fidelity'&&(!r.fidelity.rating||!r.fidelity.mismatch.trim()))throw Error('Fidelity check incomplete');
+ if(r.stage==='transfer'&&!r.transfer.skipped&&!r.transfer.answer.trim())throw Error('Transfer incomplete');
+ if(r.stage==='interview'&&!r.interview.skipped&&(!r.interview.preference||![r.interview.timing,r.interview.references,r.interview.culture,r.interview.control,r.interview.ecosystem].some(v=>v.trim())))throw Error('Interview incomplete');
+ return updateResearch(s,{stage:next,...(next==='finished'?{finalizedAt:new Date().toISOString()}: {})},'research_stage_completed',{stage:r.stage,next});
+}
+export type Study={version:string;participant:string;lang:Lang;sequence:number;phase:number;startedAt:number;consent:true;completed:boolean;events:ActivityEvent[];research?:ResearchSession;responses:{phase:number;story:StoryId;mode:Mode;answer:string;ratings:(number|null)[];work:Work;at:string;reconstruction?:Reconstruction}[]};
 export const assignment=(s:Study)=>sequenceAssignments[s.sequence][s.phase===0?0:1];
-export function startStudy(participant:string,lang:Lang,sequence:number):Study{
+export function startStudy(participant:string,lang:Lang,sequence:number,fullProtocol=false):Study{
   if(!/^P\d{3,6}$/.test(participant)||!Number.isInteger(sequence)||sequence<0||sequence>3)throw Error('Invalid study setup');
-  return {version:VERSION,participant,lang,sequence,phase:0,startedAt:Date.now(),consent:true,completed:false,events:[],responses:[]};
+  return {version:VERSION,participant,lang,sequence,phase:0,startedAt:Date.now(),consent:true,completed:false,events:[],responses:[],...(fullProtocol?{research:createResearchSession()}: {})};
 }
 export function log(s:Study,type:string,detail:Record<string,unknown>={}):Study{
-  if(s.completed)return s;
-  const a=assignment(s);return {...s,events:[...s.events,{n:s.events.length+1,at:new Date().toISOString(),elapsedMs:Date.now()-s.startedAt,phase:s.phase,story:a.story,mode:a.mode,type,detail}]};
+  if(researchComplete(s))return s;
+  const a=assignment(s);return {...s,events:[...s.events,{n:s.events.length+1,at:new Date().toISOString(),elapsedMs:Date.now()-s.startedAt,phase:s.phase,story:s.research?.stage==='transfer'?'C':a.story,mode:a.mode,type,detail:{stage:s.research?.stage||'activity',paired:!s.research||s.research.stage==='activity',...detail}}]};
 }
 export const canFinish=(w:Work)=>!!(w.question&&w.responseShown&&w.updates.length&&w.versions.length&&w.passed);
-export function finishPhase(s:Study,w:Work,answer:string,ratings:(number|null)[]):Study{
+export function finishPhase(s:Study,w:Work,answer:string,ratings:(number|null)[],reconstruction?:Reconstruction):Study{
   if(s.completed||!canFinish(w)||!answer.trim()||ratings.length!==6||ratings.some(x=>x!==null&&(!Number.isInteger(x)||x<1||x>7)))throw Error('Incomplete activity');
-  const next=log(s,'phase_complete');return {...next,phase:s.phase===0?1:1,completed:s.phase===1,responses:[...s.responses,{phase:s.phase,...assignment(s),answer:answer.trim(),ratings,work:structuredClone(w),at:new Date().toISOString()}]};
+  if(s.research&&(s.research.stage!=='activity'||!reconstruction||Object.values(reconstruction).some(v=>!v.trim())))throw Error('Reconstruction incomplete');
+ const next=log(s,'phase_complete');return {...next,phase:s.phase===0?1:1,completed:s.phase===1,responses:[...s.responses,{phase:s.phase,...assignment(s),answer:answer.trim(),ratings,work:structuredClone(w),at:new Date().toISOString(),...(reconstruction?{reconstruction:{...reconstruction}}: {})}],...(s.research?{research:{...s.research,stage:s.phase===0?'break':'transfer'}}: {})};
 }
 export function albumProposal(w:Work,l:Lang):string{
-  const u=w.updates.at(-1);return u?say(l,['What I tried','这次尝试'])+': '+u.text+(u.context?'\n'+say(l,['Context','情境'])+': '+u.context:'')+(u.limits?'\n'+say(l,['Still open','仍在摸索'])+': '+u.limits:''):'';
+  const u=w.updates.at(-1);return u?say(l,['What I tried','这次尝试'])+': '+u.text+(u.context?'\n'+say(l,['Context','情境'])+': '+u.context:'')+(u.limits?'\n'+say(l,['Still open','仍在摸索'])+': '+u.limits:'')+(w.selectedQuote?'\n'+say(l,['Human contribution','成员贡献'])+' ('+(w.selectedQuoteAuthor||say(l,['member','成员']))+'): '+w.selectedQuote:''):'';
 }
 export function publishAlbum(w:Work,id:StoryId):Work{
   const u=w.updates.at(-1);if(!u||!w.albumDraft.trim()||!w.albumTitle.trim())throw Error('An update, title and text are required');
@@ -60,7 +79,7 @@ export type Saved = {version:string;savedAt:number;lang:Lang;story:StoryId;mode:
 export function restore(raw:string):Saved|null{
  try{
   const x=JSON.parse(raw);
-  if(!x||x.version!==VERSION||!Number.isFinite(x.savedAt)||x.savedAt>Date.now()+60000||Date.now()-x.savedAt>7*24*3600*1000||!['A','B','C'].includes(x.story)||!['en','zh'].includes(x.lang)||!['embedded','separate'].includes(x.mode)||!x.works)return null;
+  if(!x||!COMPATIBLE_VERSIONS.includes(x.version)||!Number.isFinite(x.savedAt)||x.savedAt>Date.now()+60000||Date.now()-x.savedAt>7*24*3600*1000||!['A','B','C'].includes(x.story)||!['en','zh'].includes(x.lang)||!['embedded','separate'].includes(x.mode)||!x.works)return null;
   for(const id of ['A','B','C'] as const){
    const w=x.works[id],base=emptyWork(id);if(!w)return null;
    for(const [key,value] of Object.entries(base)){if(typeof value==='string'&&typeof w[key]!=='string')return null;if(typeof value==='boolean'&&typeof w[key]!=='boolean')return null;}
@@ -69,8 +88,8 @@ export function restore(raw:string):Saved|null{
    if(w.updates.some((u:Update)=>!u||typeof u.text!=='string'||!['base','blush','swatches'].includes(u.photo)))return null;
    if(w.versions.some((v:Album)=>!v||typeof v.text!=='string'||typeof v.quotedLine!=='string'||!Array.isArray(v.authors)||!Array.isArray(v.sourceIds)||!['base','blush','swatches'].includes(v.photo)||v.anchor!==null&&(!v.anchor||!Number.isFinite(v.anchor.x)||!Number.isFinite(v.anchor.y)||!['base','blush','swatches'].includes(v.anchor.photo))))return null;
   }
-  if(x.study!==null){const s=x.study;if(!s||s.version!==VERSION||!/^P\d{3,6}$/.test(s.participant)||!Number.isInteger(s.sequence)||s.sequence<0||s.sequence>3||![0,1].includes(s.phase)||s.consent!==true||typeof s.completed!=='boolean'||!Number.isFinite(s.startedAt)||!['en','zh'].includes(s.lang)||!Array.isArray(s.events)||!Array.isArray(s.responses))return null;if(!s.completed){const a=assignment(s);if(x.story!==a.story||x.mode!==a.mode||x.lang!==s.lang)return null;}}
+  if(x.study!==null){const s=x.study;if(!s||!COMPATIBLE_VERSIONS.includes(s.version)||!/^P\d{3,6}$/.test(s.participant)||!Number.isInteger(s.sequence)||s.sequence<0||s.sequence>3||![0,1].includes(s.phase)||s.consent!==true||typeof s.completed!=='boolean'||!Number.isFinite(s.startedAt)||!['en','zh'].includes(s.lang)||!Array.isArray(s.events)||!Array.isArray(s.responses))return null;if(s.research&&(!['background','fidelity','activity','break','transfer','interview','debrief','finished'].includes(s.research.stage)||!s.research.background||!s.research.fidelity||!s.research.transfer||!s.research.interview||!Array.isArray(s.research.observations)))return null;if(!s.completed&&(!s.research||['activity','break','background'].includes(s.research.stage))){const a=assignment(s);if(x.story!==a.story||x.mode!==a.mode||x.lang!==s.lang)return null;}}
   for(const id of ['A','B','C'] as const){if(!Array.isArray(x.works[id].aiTrace))x.works[id].aiTrace=[];}
-  return x;
+  x.version=VERSION;return x;
  }catch{return null;}
 }
