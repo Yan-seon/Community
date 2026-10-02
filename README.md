@@ -19,7 +19,7 @@ npm run dev
 
 ## Supabase
 
-Anonymous sign-in must be enabled. `supabase/setup.sql` creates comments, owner-only study sessions, row-level policies, and the Realtime publication. Exploration comments use the shared room. A consented paired study uses an identity-specific room, keeping other participants' contributions out of the comparison.
+Anonymous sign-in must be enabled. `supabase/setup.sql` creates comments, owner-only study sessions, row-level policies, and the Realtime publication. Exploration comments use the shared room. Starting a consented paired study creates a fresh anonymous identity, including when a computer is reused. The study uses an identity-specific room, keeping other participants' contributions out of the comparison.
 
 ## Testing
 
