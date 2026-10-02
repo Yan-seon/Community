@@ -4,3 +4,5 @@ dist-netlify/
 .env*
 !.env.example
 .DS_Store
+
+test-*.png

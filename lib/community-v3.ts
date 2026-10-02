@@ -51,7 +51,7 @@ export function albumProposal(w:Work,l:Lang):string{
 }
 export function publishAlbum(w:Work,id:StoryId):Work{
   const u=w.updates.at(-1);if(!u||!w.albumDraft.trim()||!w.albumTitle.trim())throw Error('An update, title and text are required');
-  const st=stories[id];const record:Album={version:w.versions.length+1,title:w.albumTitle.trim(),text:w.albumDraft.trim(),limits:w.albumLimits.trim(),photo:u.photo,anchor:w.anchor?{...w.anchor}:null,quotedLine:w.selectedQuote,authors:[st.member,...(w.responseShown?[st.guide]:[]),'You'],sourceIds:[...st.sourceIds],updateId:u.id,at:new Date().toISOString()};
+  const st=stories[id];const record:Album={version:w.versions.length+1,title:w.albumTitle.trim(),text:w.albumDraft.trim(),limits:w.albumLimits.trim(),photo:u.photo,anchor:w.anchor?{...w.anchor}:null,quotedLine:w.selectedQuote,authors:[...new Set([st.member,...(w.responseShown?[st.guide]:[]),...(w.selectedQuoteAuthor?[w.selectedQuoteAuthor]:[]),'You'])],sourceIds:[...st.sourceIds,...(w.selectedQuoteId?['comment:'+w.selectedQuoteId]:[])],updateId:u.id,at:new Date().toISOString()};
   return {...w,versions:[...w.versions,record]};
 }
 export function moments(w:Work):string[]{return [w.question?'first-share':'',w.updates.length?'return':'',w.thanks?'thanks':'',w.versions.length?'album':'',w.passed?'pass-on':''].filter(Boolean);}
