@@ -41,7 +41,9 @@ export async function loadComments(story:StoryId,room:string){
   await userId();const {data,error}=await database().from('comments').select('*').eq('post_id',story).eq('room_id',room).order('created_at').order('id');
   if(error)throw error;return data as CommentRow[];
 }
-export async function saveStudy(study:Study){
+let studyQueue:Promise<unknown>=Promise.resolve();
+export function saveStudy(study:Study){const next=studyQueue.catch(()=>{}).then(()=>writeStudy(study));studyQueue=next;return next;}
+async function writeStudy(study:Study){
   const uid=await userId();const key=`community-session-${uid}-${study.startedAt}`;
   let id=localStorage.getItem(key);if(!id){id=crypto.randomUUID();localStorage.setItem(key,id);}
   const {error}=await database().from('study_sessions').upsert({id,user_id:uid,participant_code:study.participant,completed:study.completed,payload:study},{onConflict:'id'});
