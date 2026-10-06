@@ -1,11 +1,12 @@
+import type {WeekStudy} from './free-community';
 export type Lang = 'en' | 'zh';
 export type Bi = [string, string];
 export const say = (l: Lang, b: Bi) => b[l === 'en' ? 0 : 1];
 export type StoryId = 'A' | 'B' | 'C';
 export type PhotoId = 'base' | 'blush' | 'swatches';
 export type Mode = 'embedded' | 'separate';
-export const VERSION = '4.1.0-study-ready';
-const COMPATIBLE_VERSIONS=[VERSION,'4.0.0-ai-community-weave'];
+export const VERSION = '4.2.0-free-community';
+const COMPATIBLE_VERSIONS=[VERSION,'4.1.0-study-ready','4.0.0-ai-community-weave'];
 export const STORAGE = 'common-ground-v3';
 export const photos: Record<PhotoId, {src:string; alt:Bi}> = {
   base:{src:'/v3/base.png',alt:['Fictional member pointing to her cheek in window light','虚构成员在窗边指向面颊的示意照片']},
@@ -44,42 +45,42 @@ export function advanceResearch(s:Study,next:ResearchStage):Study{
  const expected:Partial<Record<ResearchStage,ResearchStage>>={background:'fidelity',fidelity:'activity',break:'activity',transfer:'interview',interview:'debrief',debrief:'finished'};
  if(expected[r.stage]!==next)throw Error('Invalid stage transition');
  if(r.stage==='background'&&Object.values(r.background).some(v=>!v))throw Error('Background incomplete');
- if(r.stage==='fidelity'&&(!r.fidelity.rating||!r.fidelity.mismatch.trim()))throw Error('Fidelity check incomplete');
- if(r.stage==='transfer'&&!r.transfer.skipped&&!r.transfer.answer.trim())throw Error('Transfer incomplete');
- if(r.stage==='interview'&&!r.interview.skipped&&(!r.interview.preference||![r.interview.timing,r.interview.references,r.interview.culture,r.interview.control,r.interview.ecosystem].some(v=>v.trim())))throw Error('Interview incomplete');
+ if(r.stage==='fidelity'&&!r.fidelity.rating)throw Error('Fidelity check incomplete');
+
+
  return updateResearch(s,{stage:next,...(next==='finished'?{finalizedAt:new Date().toISOString()}: {})},'research_stage_completed',{stage:r.stage,next});
 }
-export type Study={version:string;participant:string;lang:Lang;sequence:number;phase:number;startedAt:number;consent:true;completed:boolean;events:ActivityEvent[];research?:ResearchSession;responses:{phase:number;story:StoryId;mode:Mode;answer:string;ratings:(number|null)[];work:Work;at:string;reconstruction?:Reconstruction}[]};
+export type Study={week?:WeekStudy;version:string;participant:string;lang:Lang;sequence:number;phase:number;startedAt:number;consent:true;completed:boolean;events:ActivityEvent[];research?:ResearchSession;responses:{phase:number;story:StoryId;mode:Mode;answer:string;ratings:(number|null)[];work:Work;at:string;reconstruction?:Reconstruction}[]};
 export const assignment=(s:Study)=>sequenceAssignments[s.sequence][s.phase===0?0:1];
 export function startStudy(participant:string,lang:Lang,sequence:number,fullProtocol=false):Study{
   if(!/^P\d{3,6}$/.test(participant)||!Number.isInteger(sequence)||sequence<0||sequence>3)throw Error('Invalid study setup');
   return {version:VERSION,participant,lang,sequence,phase:0,startedAt:Date.now(),consent:true,completed:false,events:[],responses:[],...(fullProtocol?{research:createResearchSession()}: {})};
 }
 export function log(s:Study,type:string,detail:Record<string,unknown>={}):Study{
-  if(researchComplete(s))return s;
-  const a=assignment(s);return {...s,events:[...s.events,{n:s.events.length+1,at:new Date().toISOString(),elapsedMs:Date.now()-s.startedAt,phase:s.phase,story:s.research?.stage==='transfer'?'C':a.story,mode:a.mode,type,detail:{stage:s.research?.stage||'activity',paired:!s.research||s.research.stage==='activity',...detail}}]};
+  if(researchComplete(s)||s.week&&Date.now()>s.week.endsAt)return s;
+  const a=assignment(s);return {...s,events:[...s.events,{n:s.events.length+1,at:new Date().toISOString(),elapsedMs:Date.now()-s.startedAt,phase:s.phase,story:s.week&&['A','B','C'].includes(String(detail.actualStory))?detail.actualStory as StoryId:s.research?.stage==='transfer'?'C':a.story,mode:s.week?.condition||a.mode,type,detail:{stage:s.week?'free-community':s.research?.stage||'activity',paired:!s.week&&(!s.research||s.research.stage==='activity'),...detail}}]};
 }
 export const canFinish=(w:Work)=>!!(w.question&&w.responseShown&&w.updates.length&&w.versions.length&&w.passed);
 export function finishPhase(s:Study,w:Work,answer:string,ratings:(number|null)[],reconstruction?:Reconstruction):Study{
-  if(s.completed||!canFinish(w)||!answer.trim()||ratings.length!==6||ratings.some(x=>x!==null&&(!Number.isInteger(x)||x<1||x>7)))throw Error('Incomplete activity');
-  if(s.research&&(s.research.stage!=='activity'||!reconstruction||Object.values(reconstruction).some(v=>!v.trim())))throw Error('Reconstruction incomplete');
+  if(s.completed||!canFinish(w)||ratings.length!==6||ratings.some(x=>x!==null&&(!Number.isInteger(x)||x<1||x>7)))throw Error('Incomplete activity');
+  if(s.research&&(s.research.stage!=='activity'||!reconstruction))throw Error('Reconstruction incomplete');
  const next=log(s,'phase_complete');return {...next,phase:s.phase===0?1:1,completed:s.phase===1,responses:[...s.responses,{phase:s.phase,...assignment(s),answer:answer.trim(),ratings,work:structuredClone(w),at:new Date().toISOString(),...(reconstruction?{reconstruction:{...reconstruction}}: {})}],...(s.research?{research:{...s.research,stage:s.phase===0?'break':'transfer'}}: {})};
 }
 export function albumProposal(w:Work,l:Lang):string{
   const u=w.updates.at(-1);return u?say(l,['What I tried','这次尝试'])+': '+u.text+(u.context?'\n'+say(l,['Context','情境'])+': '+u.context:'')+(u.limits?'\n'+say(l,['Still open','仍在摸索'])+': '+u.limits:'')+(w.selectedQuote?'\n'+say(l,['Human contribution','成员贡献'])+' ('+(w.selectedQuoteAuthor||say(l,['member','成员']))+'): '+w.selectedQuote:''):'';
 }
-export function publishAlbum(w:Work,id:StoryId):Work{
+export function publishAlbum(w:Work,id:StoryId,context?:{author:string;sourceIds:string[]}):Work{
   const u=w.updates.at(-1);if(!u||!w.albumDraft.trim()||!w.albumTitle.trim())throw Error('An update, title and text are required');
-  const st=stories[id];const record:Album={version:w.versions.length+1,title:w.albumTitle.trim(),text:w.albumDraft.trim(),limits:w.albumLimits.trim(),photo:u.photo,anchor:w.anchor?{...w.anchor}:null,quotedLine:w.selectedQuote,authors:[...new Set([st.member,...(w.responseShown?[st.guide]:[]),...(w.selectedQuoteAuthor?[w.selectedQuoteAuthor]:[]),'You'])],sourceIds:[...st.sourceIds,...(w.selectedQuoteId?['comment:'+w.selectedQuoteId]:[])],updateId:u.id,at:new Date().toISOString()};
+  const st=stories[id];const record:Album={version:w.versions.length+1,title:w.albumTitle.trim(),text:w.albumDraft.trim(),limits:w.albumLimits.trim(),photo:u.photo,anchor:w.anchor?{...w.anchor}:null,quotedLine:w.selectedQuote,authors:[...new Set([context?.author||st.member,...(!context&&w.responseShown?[st.guide]:[]),...(w.selectedQuoteAuthor?[w.selectedQuoteAuthor]:[]),'You'])],sourceIds:[...(context?.sourceIds||st.sourceIds),...(w.selectedQuoteId?['comment:'+w.selectedQuoteId]:[])],updateId:u.id,at:new Date().toISOString()};
   return {...w,versions:[...w.versions,record]};
 }
 export function moments(w:Work):string[]{return [w.question?'first-share':'',w.updates.length?'return':'',w.thanks?'thanks':'',w.versions.length?'album':'',w.passed?'pass-on':''].filter(Boolean);}
 export function exportCsv(events:ActivityEvent[]):string{const keys=['n','at','elapsedMs','phase','story','mode','type','detail'] as const;const q=(x:unknown)=>'"'+String(typeof x==='object'?JSON.stringify(x):x).replace(/"/g,'""')+'"';return '\uFEFF'+keys.join(',')+'\n'+events.map(e=>keys.map(k=>q(e[k])).join(',')).join('\n');}
-export type Saved = {version:string;savedAt:number;lang:Lang;story:StoryId;mode:Mode;works:Record<StoryId,Work>;study:Study|null};
+export type Saved = {threadWorks?:Record<string,Work>;activePost?:string;version:string;savedAt:number;lang:Lang;story:StoryId;mode:Mode;works:Record<StoryId,Work>;study:Study|null};
 export function restore(raw:string):Saved|null{
  try{
   const x=JSON.parse(raw);
-  if(!x||!COMPATIBLE_VERSIONS.includes(x.version)||!Number.isFinite(x.savedAt)||x.savedAt>Date.now()+60000||Date.now()-x.savedAt>7*24*3600*1000||!['A','B','C'].includes(x.story)||!['en','zh'].includes(x.lang)||!['embedded','separate'].includes(x.mode)||!x.works)return null;
+  if(!x||!COMPATIBLE_VERSIONS.includes(x.version)||!Number.isFinite(x.savedAt)||x.savedAt>Date.now()+60000||Date.now()-x.savedAt>(x.study?.week?30:7)*24*3600*1000||!['A','B','C'].includes(x.story)||!['en','zh'].includes(x.lang)||!['embedded','separate'].includes(x.mode)||!x.works)return null;
   for(const id of ['A','B','C'] as const){
    const w=x.works[id],base=emptyWork(id);if(!w)return null;
    for(const [key,value] of Object.entries(base)){if(typeof value==='string'&&typeof w[key]!=='string')return null;if(typeof value==='boolean'&&typeof w[key]!=='boolean')return null;}
@@ -88,7 +89,7 @@ export function restore(raw:string):Saved|null{
    if(w.updates.some((u:Update)=>!u||typeof u.text!=='string'||!['base','blush','swatches'].includes(u.photo)))return null;
    if(w.versions.some((v:Album)=>!v||typeof v.text!=='string'||typeof v.quotedLine!=='string'||!Array.isArray(v.authors)||!Array.isArray(v.sourceIds)||!['base','blush','swatches'].includes(v.photo)||v.anchor!==null&&(!v.anchor||!Number.isFinite(v.anchor.x)||!Number.isFinite(v.anchor.y)||!['base','blush','swatches'].includes(v.anchor.photo))))return null;
   }
-  if(x.study!==null){const s=x.study;if(!s||!COMPATIBLE_VERSIONS.includes(s.version)||!/^P\d{3,6}$/.test(s.participant)||!Number.isInteger(s.sequence)||s.sequence<0||s.sequence>3||![0,1].includes(s.phase)||s.consent!==true||typeof s.completed!=='boolean'||!Number.isFinite(s.startedAt)||!['en','zh'].includes(s.lang)||!Array.isArray(s.events)||!Array.isArray(s.responses))return null;if(s.research&&(!['background','fidelity','activity','break','transfer','interview','debrief','finished'].includes(s.research.stage)||!s.research.background||!s.research.fidelity||!s.research.transfer||!s.research.interview||!Array.isArray(s.research.observations)))return null;if(!s.completed&&(!s.research||['activity','break','background'].includes(s.research.stage))){const a=assignment(s);if(x.story!==a.story||x.mode!==a.mode||x.lang!==s.lang)return null;}}
+  if(x.study!==null){const s=x.study;if(!s||!COMPATIBLE_VERSIONS.includes(s.version)||!/^P\d{3,6}$/.test(s.participant)||!Number.isInteger(s.sequence)||s.sequence<0||s.sequence>3||![0,1].includes(s.phase)||s.consent!==true||typeof s.completed!=='boolean'||!Number.isFinite(s.startedAt)||!['en','zh'].includes(s.lang)||!Array.isArray(s.events)||!Array.isArray(s.responses))return null;if(s.week&&(!['embedded','separate'].includes(s.week.condition)||!Number.isFinite(s.week.endsAt)||!Array.isArray(s.week.activeDays)||!Array.isArray(s.week.feedback)))return null;if(s.research&&(!['background','fidelity','activity','break','transfer','interview','debrief','finished'].includes(s.research.stage)||!s.research.background||!s.research.fidelity||!s.research.transfer||!s.research.interview||!Array.isArray(s.research.observations)))return null;if(!s.week&&!s.completed&&(!s.research||['activity','break','background'].includes(s.research.stage))){const a=assignment(s);if(x.story!==a.story||x.mode!==a.mode||x.lang!==s.lang)return null;}}
   for(const id of ['A','B','C'] as const){if(!Array.isArray(x.works[id].aiTrace))x.works[id].aiTrace=[];}
   x.version=VERSION;return x;
  }catch{return null;}

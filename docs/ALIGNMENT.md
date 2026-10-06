@@ -1,3 +1,5 @@
+> Archived procedure, October 2. The default site now supports one-week free community use. See [revised evaluation plan](WEEK_STUDY_PROTOCOL.md). Do not use the task sequence below for new participants.
+
 # Prototype–evaluation alignment review
 
 Reviewed 2 October 2026 against the latest `outputs/Thesis_Integrated_EN.docx`, Chapters 6–8, and their verified manuscript sources. Prototype release: `4.1.0-study-ready`. This is a design-study readiness review, not participant evidence or an effectiveness finding.

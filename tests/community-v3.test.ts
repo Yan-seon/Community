@@ -35,10 +35,10 @@ test('transfer and interview remain separate and logged after both paired activi
  s=finishPhase(s,completedWork(),'First',[4,4,null,4,4,4],recon);s=advanceResearch(s,'activity');
  s=finishPhase(s,completedWork(),'Second',[4,4,null,4,4,4],recon);
  assert.equal(s.completed,true);assert.equal(researchComplete(s),false);assert.equal(s.research?.stage,'transfer');
- assert.throws(()=>advanceResearch(s,'interview'));
+ assert.equal(advanceResearch(s,'interview').research?.stage,'interview');
  s=updateResearch(s,{transfer:{answer:'A hand swatch in one light cannot establish a face result.',anchor:{x:.4,y:.6,photo:'swatches'},skipped:false}},'transfer_response');
  assert.equal(s.events.at(-1)?.story,'C');assert.equal(s.events.at(-1)?.detail.paired,false);
- s=advanceResearch(s,'interview');assert.throws(()=>advanceResearch(s,'debrief'));
+ s=advanceResearch(s,'interview');assert.equal(advanceResearch(s,'debrief').research?.stage,'debrief');
  s=updateResearch(s,{interview:{timing:'Both have trade-offs.',references:'',culture:'',control:'',ecosystem:'',preference:'unsure',skipped:false}},'comparison');
  s=advanceResearch(s,'debrief');s=advanceResearch(s,'finished');
  assert.equal(s.responses.length,2);assert.equal(researchComplete(s),true);assert(s.research?.finalizedAt);assert.equal(log(s,'late'),s);

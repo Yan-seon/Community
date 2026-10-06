@@ -22,11 +22,11 @@ export async function userId(){
 export type ContributionKind='comment'|'question'|'update'|'thanks'|'album'|'handoff';
 export type CommentRow={id:string;post_id:StoryId;room_id:string;user_id:string;display_name:string;body:string;image_anchor:Anchor|null;quoted_text:string|null;quoted_comment_id:string|null;kind:ContributionKind;metadata:Record<string,unknown>;created_at:string};
 export type Contribution={story:StoryId;study:Study|null;body:string;kind?:ContributionKind;anchor?:Anchor|null;quote?:string;quoteId?:string;metadata?:Record<string,unknown>;displayName?:string;id?:string};
-export async function roomId(study:Study|null){return study?await userId():'shared';}
+export async function roomId(study:Study|null){return study&&!study.week?await userId():'shared';}
 export async function publishContribution(input:Contribution){
   if(!input.body.trim())throw new Error('Write a contribution before publishing.');
   const uid=await userId();const id=input.id??crypto.randomUUID();
-  const row={id,post_id:input.story,room_id:input.study?uid:'shared',user_id:uid,display_name:input.study?.participant||input.displayName?.trim()||`Member-${uid.slice(0,6)}`,body:input.body.trim(),kind:input.kind||'comment',image_anchor:input.anchor||null,quoted_text:input.quote||null,quoted_comment_id:input.quoteId||null,metadata:input.metadata||{}};
+  const row={id,post_id:input.story,room_id:input.study&&!input.study.week?uid:'shared',user_id:uid,display_name:input.study?.participant||input.displayName?.trim()||`Member-${uid.slice(0,6)}`,body:input.body.trim(),kind:input.kind||'comment',image_anchor:input.anchor||null,quoted_text:input.quote||null,quoted_comment_id:input.quoteId||null,metadata:input.metadata||{}};
   const result=await database().from('comments').insert(row).select().single();
   // Retrying an uncertain network result with the same id must not duplicate it.
   if(result.error?.code==='23505'){

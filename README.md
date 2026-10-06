@@ -17,22 +17,26 @@ npm run dev
 
 `npm run build:netlify` produces `dist-netlify`. Netlify reads `netlify.toml`; add `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` to build environment variables. Never use a secret/service-role key in the browser.
 
-## Supabase
+## Community and week observation
 
-Anonymous sign-in must be enabled. `supabase/setup.sql` creates comments, owner-only study sessions, row-level policies, and the Realtime publication. Exploration comments use the shared room. Starting a consented paired study creates a fresh anonymous identity, including when a computer is reused. The study uses an identity-specific room, keeping other participants' contributions out of the comparison.
+Default entry is a freely navigable community, with shared topics/comments, gallery, groups, search, appreciation, saved posts and optional five-moment AI help. There is no required task sequence. Text questions need no image pin; selected pins and sentence authors remain visible after publication. Images show loading/retry states. Post/comment drafts survive interrupted browsing.
+
+Anonymous Supabase sign-in must be enabled. Public week-study contributions use the shared room; consented research records use owner-only `study_sessions`. Existing A/B/C database categories are retained, and `metadata.thread_id` separates additional topics. No new schema migration is required for this release.
+
+Use `/?lang=en` or `/?lang=zh` to browse; `/?post=A&lang=en` opens a case. For seven-day observation, assign a unique P code and send `/?study=1&lang=en&condition=embedded` or `condition=separate`. The condition/language stay fixed during the observation. All feedback writing fields are optional; blank notes remain missing in the data. JSON exports include week metadata, feedback and per-thread work; CSV exports events. Earlier moderated records are retained separately and must not be pooled with this protocol.
 
 ## Testing
 
-- `npm run typecheck`
-- `node --experimental-strip-types --test tests/community-v3.test.ts`
-- Two independent browsers: publish a comment, observe it in the other browser, reload, and inspect sentence/image references.
+```sh
+npm run typecheck
+node --experimental-strip-types --test tests/community-v3.test.ts tests/week-community.test.ts
+npm run build:netlify
+```
 
-Open `/?study=1&lang=en&sequence=0` for a direct research-session entry (sequence 0–3), or `/?post=A&lang=en` (or B/C, zh) for a direct conversation link. The flask icon starts the full moderated study (background → AI-free fidelity gate → activity 1 and reconstruction/ratings → break → activity 2 and reflection → Case C → comparative interview → debrief/export); use anonymous P codes and the researcher's assigned sequence. JSON exports contain both activity snapshots, four reconstruction answers per activity, six ratings with N/A, all research stages, facilitator notes and event logs. CSV exports events only. Full completion is recorded after debrief, rather than after the two paired activities. Drafts and unfinished reflections resume after refresh. Completed records are also saved in Supabase's `study_sessions` table. Technical smoke tests use TEST names and P900xxx codes and are not participant findings.
+With Playwright available, run `tests/week-community.browser.cjs` and `tests/week-ui.browser.cjs` (`TEST_URL` defaults to localhost:4180). Checks use TEST content/P998xxx codes, not participant evidence. Default views hide TEST fixtures; `?qa=1` exposes them for inspection. The earlier full-study browser script is an archived procedure, not the current default.
 
-## Participant data
+## Evaluation and participant data
 
-Do not enter personal or sensitive information. Shared comments are visible to site visitors. Study records are visible to their session owner and the project administrator. Clearing browser drafts does not delete database records; participants can request deletion from the researcher using their participant code. The researcher manages consent, recruitment, moderation, and retention before formal collection.
+See [week plan](docs/WEEK_STUDY_PROTOCOL.md) and [Chinese reading version](docs/WEEK_STUDY_PROTOCOL_ZH.md). The method is natural use over seven days, with an exploratory between-participant condition comparison. It replaces the thesis's earlier forced within-participant activity sequence. Shared social encounters and condition spillover must be reported; technical passing checks are not findings of fidelity or effectiveness.
 
-## Study preparation
-
-See [facilitator guide](docs/FACILITATOR_GUIDE.md) and [alignment review](docs/ALIGNMENT.md). Pilot with 4–6 participants before the provisional main study. Technical browser checks are optional Playwright scripts and write labelled TEST fixtures: set `TEST_URL`, `PLAYWRIGHT_PATH` and `TEST_ARTIFACTS`, then run `node tests/full-study.browser.cjs`. The site does not score effectiveness or record audio/screens. Historical screenshot sources are attributed inside the pre-AI gate.
+The researcher supplies the actual approved information sheet, contact, withdrawal route and retention period before recruitment. Do not enter personal/sensitive information. Public contributions are visible to visitors; private records are accessible to the owner and project administrator. Browser clearing does not remove database records. Product/service pathways describe the ecosystem but do not perform real checkout, diagnosis or loyalty transactions. No invitation messages, reminders or recording are configured.

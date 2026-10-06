@@ -1,3 +1,5 @@
+> Archived procedure, October 2. The default site now supports one-week free community use. See [revised evaluation plan](WEEK_STUDY_PROTOCOL.md). Do not use the task sequence below for new participants.
+
 # Moderated pilot guide / 主持人试测指南
 
 Prototype: https://beautyhouse-community-study.netlify.app/?study=1&lang=en
