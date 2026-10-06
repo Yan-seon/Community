@@ -1,4 +1,4 @@
-import {stories,VERSION,startStudy,log,type Study,type Lang,type Mode,type StoryId,type PhotoId,type Bi} from './community-v3.ts';
+import {stories,VERSION,startStudy,log,type Study,type Lang,type Mode,type StoryId,type PhotoId,type Bi,type Album} from './community-v3.ts';
 export type WeekStudy={protocolVersion:string;endsAt:number;condition:Mode;activeDays:string[];visits:number;lastVisitAt:number;feedback:{at:string;ratings:(number|null)[];notes:string;answered:boolean;context:string}[]};
 export const localDay=(at:number)=>{const d=new Date(at);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
 export function startWeek(participant:string,lang:Lang,condition:Mode,at=Date.now()):Study{
@@ -6,7 +6,7 @@ export function startWeek(participant:string,lang:Lang,condition:Mode,at=Date.no
 }
 export function visitWeek(s:Study,at=Date.now()):Study{if(!s.week||s.completed)return s;if(at>s.week.endsAt)return {...s,completed:true};const day=localDay(at);return {...log(s,'community_visit',{localDay:day}),week:{...s.week,activeDays:[...new Set([...s.week.activeDays,day])],visits:s.week.visits+1,lastVisitAt:at}};}
 export function weekFeedback(s:Study,ratings:(number|null)[],notes:string,context:string):Study{if(!s.week)return s;if(ratings.length!==6||ratings.some(v=>v!==null&&(!Number.isInteger(v)||v<1||v>7)))throw Error('Invalid rating');return {...log(s,'optional_feedback_saved',{context,answered:!!notes.trim()}),week:{...s.week,feedback:[...s.week.feedback,{at:new Date().toISOString(),ratings,notes:notes.trim(),answered:!!notes.trim(),context}]}};}
-export type CommunityPost={id:string;story:StoryId;title:Bi;body:Bi;author:string;photo:PhotoId|null;createdAt:string;seed:boolean};
+export type CommunityPost={id:string;story:StoryId;title:Bi;body:Bi;author:string;photo:PhotoId|null;createdAt:string;seed:boolean;album?:Album;albumQuoteAuthor?:string};
 const authored:(CommunityPost)[]=[
  {id:'primer-return',story:'A',author:'Mia',photo:'base',title:['A smaller amount, one attempt later','少一点用量，一次尝试之后'],body:['I changed just the amount of primer. The pilling seemed less noticeable once, but I cannot separate the amount from the conditions that day. Has anyone kept a useful comparison diary?','我只改变了妆前用量。一次观察中搓泥似乎少了，但无法把用量与当天条件分开。有人记录过有用的对比小记吗？']},
  {id:'first-post',story:'A',author:'Mia',photo:null,title:['A quiet reader finally saying hello','一直潜水，今天打个招呼'],body:['I usually read without posting. Seeing someone explain what they tried, including what did not change, made it easier to join. What made you feel welcome here?','我通常只阅读不发帖。看到有人连没改善的部分也分享，让我更容易参与。是什么让你觉得这里欢迎新人？']},
