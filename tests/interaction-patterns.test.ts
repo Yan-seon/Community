@@ -1,0 +1,8 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {relatedPosts,arrangeExperience,prepareHandoff} from '../lib/interaction-patterns.ts';
+import {seedPosts} from '../lib/free-community.ts';
+import {emptyWork,publishAlbum} from '../lib/community-v3.ts';
+test('related cards exclude origin and explain actual deterministic matches',()=>{const p=seedPosts[0],r=relatedPosts(p,seedPosts,'en');assert(r.length>0&&r.length<=3);for(const x of r){assert.notEqual(x.post.id,p.id);assert(x.reasons.length);if(x.reasons.includes('Same discussion group'))assert.equal(x.post.story,p.story);}});
+test('arrangement uses selected supplied material and never invents missing context',()=>{const w=emptyWork();w.updates=[{id:'u',text:'One observation',context:'',limits:'Only once',photo:'base',at:'now'}];w.selectedQuote='Other member wording';w.selectedQuoteAuthor='Ari';assert.equal(arrangeExperience(w,['return','context']),'What I noticed: One observation');assert(!arrangeExperience(w,['return','limits']).includes('Other member'));assert(arrangeExperience(w,['return','quote']).includes('(Ari)'));});
+test('qualified handoff preserves source version and user-supplied differences',()=>{let w=emptyWork();w.updates=[{id:'u',text:'One observation',context:'',limits:'Only once',photo:'base',at:'now'}];w.albumTitle='Diary';w.albumDraft='One observation';w.albumLimits='Only once';w=publishAlbum(w,'A');const reply=prepareHandoff({key:'source',threadId:'case:A',author:'Mia',album:w.versions[0]},'New question','','Different light');assert(reply.includes('Different light'));assert(reply.includes('Only once'));assert(reply.includes('version 1'));assert(reply.includes('not a result promised'));});

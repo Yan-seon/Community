@@ -1,122 +1,3499 @@
-'use client';
-import {useEffect,useRef,useState} from 'react';
-import {ArrowLeft,ArrowRight,Bookmark,Check,Heart,MessageCircle,Plus,Sparkles,Users,X,History,FlaskConical,Search,Bell,ShoppingBag,Store,Camera,Mail,ChevronDown,LoaderCircle} from 'lucide-react';
-import {Button} from '@/components/ui/button';
-import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
-import {Checkbox} from '@/components/ui/checkbox';
-import {RadioGroup,RadioGroupItem} from '@/components/ui/radio-group';
-import {VERSION,STORAGE,stories,photos,say,emptyWork,clampAnchor,startStudy,assignment,log,canFinish,finishPhase,albumProposal,publishAlbum,moments,exportCsv,restore,type Lang,type Bi,type StoryId,type PhotoId,type Work,type Saved,emptyReconstruction,researchComplete,updateResearch,advanceResearch,type ResearchSession,type ResearchStage} from '@/lib/community-v3';
-import './community-v3.css';
-import './community-case-shell.css';
-import './online.css';
-import {LoadingImage} from '@/components/loading-image';
-import {CommunityFeed,useCommunity} from '@/components/community-feed';
-import {startWeek,visitWeek,weekFeedback,groupNames,seedPosts,type CommunityPost,threadOf} from '@/lib/free-community';
-import './community-polish.css';
-import {StudySessionPanel} from '@/components/study-session';
-import {SharedThread} from '@/components/shared-thread';
-import {onlineConfigured,publishContribution,saveStudy,beginStudyIdentity,messageForError,type ContributionKind} from '@/lib/online';
-type View='home'|'together'|'detail'|'ask'|'reply'|'return'|'thanks'|'draft'|'album'|'pass'|'profile'|'assistant'|'done';
-type AssistKind='question'|'route'|'quote'|'album'|'pass';
-type Modal=''|'about'|'original'|'assist'|'review'|'history'|'study'|'ratings'|'erase'|'ecosystem'|'newpost'|'references'|'notifications';
-const cleanWorks=()=>({A:emptyWork('A'),B:emptyWork('B'),C:emptyWork('C')});
-const ratingLabels:Bi[]=[['I felt able to ask a question in my own words.','我觉得可以用自己的话开口提问。'],['I could see whose help shaped the shared story.','我能看出共同故事中包含了谁的帮助。'],['I could trace AI suggestions back to the image, comment or member source they used.','我能追溯 AI 建议所使用的图片、评论或成员来源。'],['I could continue the community activity without losing the selected reference or person.','我能继续社区活动，而不丢失选中的指代或相关成员。'],['My contribution still felt like mine.','我仍然觉得这份贡献属于自己的表达。'],['I would feel comfortable passing this experience to another newcomer.','我愿意将这段经验分享给另一位新人。']];
-const momentNames:Record<string,Bi>={'first-share':['My first contribution','第一次参与'],return:['I came back','一次回访'],thanks:['A personal thank-you','一句亲自表达的感谢'],album:['A shared story','一段共同故事'],'pass-on':['Passing help on','把帮助传下去']};
-const caseTopics:Record<StoryId,{group:Bi;product:Bi}>={A:{group:['Complexion discussions','底妆讨论'],product:['Foundation and primer','粉底与妆前']},B:{group:['Makeup techniques','彩妆技巧'],product:['Blush and cheek colour','腮红与面颊色彩']},C:{group:['Swatches and shades','试色与色号'],product:['Colour cosmetics','彩妆产品']}};
-function Photo({id,lang,className='',onClick}:{id:PhotoId;lang:Lang;className?:string;onClick?:()=>void}){return <span onClick={onClick}><LoadingImage className={'cg-photo '+className} src={photos[id].src} alt={say(lang,photos[id].alt)}/></span>;}
-function VisualRef({id,lang,anchor,mini=false}:{id:PhotoId;lang:Lang;anchor:Work['anchor'];mini?:boolean}){return <div className={'cg-visual-ref '+(mini?'is-mini':'')}><Photo id={id} lang={lang}/>{anchor&&anchor.photo===id&&<span className="cg-pin" style={{left:anchor.x*100+'%',top:anchor.y*100+'%'}}>1</span>}</div>;}
-const sentences=(text:string)=>(text.match(/[^.!?。！？]+[.!?。！？]?/g)||[text]).map(x=>x.trim()).filter(Boolean);
-export default function CommunityV3(){
- const [data,setData]=useState<Saved|null>(null);const [view,setView]=useState<View>('home');const [modal,setModal]=useState<Modal>('');const [notice,setNotice]=useState('');
- const community=useCommunity();const [group,setGroup]=useState<StoryId|''>('');const [newTitle,setNewTitle]=useState(''),[newBody,setNewBody]=useState(''),[newGroup,setNewGroup]=useState<StoryId>('A'),[newPhoto,setNewPhoto]=useState<PhotoId|''>('');const [newBusy,setNewBusy]=useState(false),[newError,setNewError]=useState('');const [condition,setCondition]=useState<'embedded'|'separate'>('embedded');
- const [participant,setParticipant]=useState('');const [sequence,setSequence]=useState('0');const [consent,setConsent]=useState(false);const [answer,setAnswer]=useState('');const [ratings,setRatings]=useState<string[]>(Array(6).fill(''));const [reviewed,setReviewed]=useState(false);
- const [reconstruction,setReconstruction]=useState(emptyReconstruction());
- const [searchTerm,setSearchTerm]=useState('');const [publishing,setPublishing]=useState(false);const [cloudStatus,setCloudStatus]=useState('');const pendingShare=useRef<{key:string;id:string}|null>(null);
- const [assistKind,setAssistKind]=useState<AssistKind>('question');const [inlineAssist,setInlineAssist]=useState<AssistKind|null>(null);const [separateContextLoaded,setSeparateContextLoaded]=useState(false);const [origin,setOrigin]=useState<View>('ask');const [originalDrafts,setOriginalDrafts]=useState<Record<string,string>>({});const [originalPhoto,setOriginalPhoto]=useState<PhotoId>('base');const [ecosystemKind,setEcosystemKind]=useState<'shop'|'profile'|'recognition'|'governance'>('shop');
- useEffect(()=>{let saved:Saved|null=null;try{saved=restore(localStorage.getItem(STORAGE)||'');}catch{}const query=new URLSearchParams(location.search);const q=query.get('lang');if(query.get('protocol')!=='moderated'&&saved?.study&&!saved.study.week){localStorage.setItem('common-ground-archived-'+saved.study.startedAt,JSON.stringify(saved));saved={...saved,study:null};}setCondition(query.get('condition')==='separate'?'separate':'embedded');if(saved?.study?.week){saved={...saved,mode:saved.study.week.condition,study:visitWeek(saved.study)};}const lang:Lang=saved?.study&&!researchComplete(saved.study)?saved.study.lang:q==='en'?'en':q==='zh'?'zh':saved?.lang||'zh';setData(saved?{...saved,lang}:{version:VERSION,savedAt:Date.now(),lang,story:'A',mode:query.get('condition')==='separate'?'separate':'embedded',works:cleanWorks(),study:null});if(!saved?.study&&query.get('study')==='1'){setModal('study');const seq=query.get('sequence');if(seq&&/^[0-3]$/.test(seq))setSequence(seq);} if(saved?.study?.research?.reflectionDraft){const f=saved.study.research.reflectionDraft;if(f.phase===saved.study.phase){setAnswer(f.answer);setRatings(f.ratings);setReconstruction(f.reconstruction);}}if(query.get('protocol')==='moderated'&&saved?.study&&researchComplete(saved.study))setView('done');else if(query.get('protocol')==='moderated'&&saved?.study?.research?.stage==='activity')setView('detail');else if(['A','B','C'].includes(query.get('post')||'')){setData(d=>d?{...d,story:query.get('post') as StoryId,activePost:'case:'+query.get('post')}:d);setView('detail');}},[]);
- useEffect(()=>{try{const d=JSON.parse(localStorage.getItem('common-ground-post-draft')||'null');if(d){setNewTitle(d.title||'');setNewBody(d.body||'');if(['A','B','C'].includes(d.group))setNewGroup(d.group);if(['base','blush','swatches',''].includes(d.photo))setNewPhoto(d.photo);}}catch{}},[]);
- useEffect(()=>{if(!data)return;localStorage.setItem('common-ground-post-draft',JSON.stringify({title:newTitle,body:newBody,group:newGroup,photo:newPhoto}));},[newTitle,newBody,newGroup,newPhoto,!!data]);
- useEffect(()=>{if(!data?.study?.week||data.study.completed)return;const check=()=>{setData(d=>d?.study?.week&&!d.study.completed&&Date.now()>d.study.week.endsAt?{...d,study:{...d.study,completed:true}}:d);};check();const timer=setInterval(check,60000);return()=>clearInterval(timer);},[data?.study?.startedAt,data?.study?.completed]);
- useEffect(()=>{if(!data)return;document.documentElement.lang=data.lang;try{localStorage.setItem(STORAGE,JSON.stringify({...data,savedAt:Date.now()}));}catch{setNotice(data.lang==='en'?'Local storage is unavailable. Export before leaving.':'本地保存不可用，请在离开前导出。');}},[data]);
- useEffect(()=>{if(!notice)return;const id=setTimeout(()=>setNotice(''),5000);return()=>clearTimeout(id);},[notice]);
- useEffect(()=>{if(!onlineConfigured||!data?.study||!data.study.week&&new URLSearchParams(location.search).get('protocol')!=='moderated')return;let current=true;setCloudStatus('pending');const id=setTimeout(()=>{saveStudy(data.study!).then(()=>{if(current)setCloudStatus('saved');}).catch(()=>{if(current)setCloudStatus('error');});},800);return()=>{current=false;clearTimeout(id);};},[data?.study]);
- useEffect(()=>{if(new URLSearchParams(location.search).get('protocol')!=='moderated'||data?.study?.research?.stage!=='activity')return;const f={phase:data.study.phase,answer,ratings,reconstruction};if(JSON.stringify(data.study.research.reflectionDraft)===JSON.stringify(f))return;setData(d=>d?.study?.research?.stage==='activity'?{...d,study:{...d.study,research:{...d.study.research,reflectionDraft:f}}}:d);},[answer,ratings,reconstruction,data?.study?.phase,data?.study?.research?.stage]);
- if(!data)return <main className="cg-loading"><LoaderCircle className="fc-spin"/> Common Ground</main>;
- const {lang,story,study}=data;const moderated=new URLSearchParams(location.search).get('protocol')==='moderated',weekly=!!study?.week,focusId=data.activePost||'case:'+story,focus=community.posts.find(p=>p.id===focusId)||seedPosts.find(p=>p.id===focusId),custom=!!focus&&!focus.id.startsWith('case:'),hasPhoto=focus?!!focus.photo:true;const st=focus?{...stories[story],member:focus.author,title:focus.title,caption:focus.body,photo:focus.photo||stories[story].photo,...(!focus.id.startsWith('case:')?{sourceIds:['community-post:'+focus.id],source:'#',origin:focus.seed?['Authored fictional community post. Images are generated simulation props.','编写的虚构社区帖子，图片为生成的模拟道具。'] as Bi:['Participant-authored post in this simulation. Preset AI uses its text and any selected reference; it does not infer product effects.','参与者在模拟社区中发布的帖子。预设 AI 使用帖子文字与选中指代，不推断产品效果。'] as Bi}: {})}:stories[story];const works=custom?{...data.works,[story]:data.threadWorks?.[focusId]||emptyWork(story)}:data.works;const w=works[story],stage=moderated?study?.research?.stage:undefined,active=moderated&&!!study&&!study.completed&&(!stage||stage==='activity'),sessionRunning=!!study&&!researchComplete(study)&&(weekly||moderated),fidelity=stage==='fidelity',blocked=moderated&&!!stage&&!['activity','fidelity','finished'].includes(stage);const t=(en:string,zh:string)=>say(lang,[en,zh]);const tx=(b:Bi)=>say(lang,b);const last=w.updates.at(-1);const album=w.versions.at(-1);const availableStories:StoryId[]=moderated&&sessionRunning?['A','B']:['A','B','C'];const displayStories:StoryId[]=active?[story]:availableStories;
- const earnedMoments=new Set(community.ownContributions.flatMap(r=>[r.kind==='update'?'return':r.kind==='thanks'?'thanks':r.kind==='album'?'album':r.kind==='handoff'?'pass-on':'first-share']));if(community.ownContributions.length)earnedMoments.add('first-share');
- const followedThreads=new Set([...community.posts.filter(p=>p.author===study?.participant||community.comments.some(r=>r.user_id===community.uid&&threadOf(r.metadata,r.post_id)===p.id)||bookmarkedThread(p.id)).map(p=>p.id)]);function bookmarkedThread(id:string){return id.startsWith('case:')?data!.works[id.slice(-1) as StoryId]?.bookmarked:data!.threadWorks?.[id]?.bookmarked;}const notifications=community.comments.filter(r=>r.user_id!==community.uid&&followedThreads.has(threadOf(r.metadata,r.post_id))).sort((a,b)=>b.created_at.localeCompare(a.created_at)).slice(0,20);
- const event=(type:string,detail:Record<string,unknown>={})=>setData(d=>d?{...d,study:d.study&&(d.study.week||moderated)?log(d.study,type,{actualStory:d.story,threadId:d.activePost||'case:'+d.story,...detail}):null}:d);
- const researchChange=(patch:Partial<ResearchSession>,type:string,detail:Record<string,unknown>={})=>setData(d=>d?.study?{...d,study:type.endsWith('_draft_changed')||type==='interview_note_changed'||type==='fidelity_comment'?{...d.study,research:d.study.research?{...d.study.research,...patch}:undefined}:updateResearch(d.study,patch,type,detail)}:d);
- const advance=(next:ResearchStage)=>{if(!study)return;try{const ns=advanceResearch(study,next),a=assignment(ns);setData({...data,study:ns,...(next==='activity'?{story:a.story,mode:a.mode,works:cleanWorks()}: {})});setInlineAssist(null);setModal('');setView(next==='activity'?'detail':next==='finished'?'done':'home');window.scrollTo(0,0);}catch{setNotice(t('Complete the current section first.','请先完成当前环节。'));}};
- const inspectSource=(e:React.MouseEvent<HTMLAnchorElement>)=>{event('source_link_inspected',{source:st.source,deferred:active});if(active){e.preventDefault();setNotice(t('The source URL and scenario provenance are available here. Open the historical site after the paired activities.','此处可核对来源网址与情境来历，请在两组活动结束后打开历史网站。'));}};
- const draftEdited=(kind:AssistKind,value:string)=>{const proposal=[...w.aiTrace].reverse().find(x=>x.kind===kind)?.proposal;event('draft_reviewed',{kind,value,changedFromProposal:proposal===undefined?null:value!==proposal});};
- const change=(patch:Partial<Work>,type?:string,detail:Record<string,unknown>={})=>setData(d=>d?{...d,...(custom?{threadWorks:{...d.threadWorks,[focusId]:{...(d.threadWorks?.[focusId]||emptyWork(d.story)),...patch}}}:{works:{...d.works,[d.story]:{...d.works[d.story],...patch}}}),study:d.study&&(d.study.week||moderated)&&type?log(d.study,type,{actualStory:d.story,threadId:focusId,...detail}):d.study}:d);
- const share=async(kind:ContributionKind,body:string,done:()=>void,metadata:Record<string,unknown>={})=>{if(publishing)return;if(stage&&stage!=='activity'&&stage!=='finished'){setNotice(t('This is the orientation section; contributions start in the assigned activities.','当前为熟悉界面环节；请在分配的活动中发布贡献。'));return;}setPublishing(true);try{const key=JSON.stringify([story,study?.startedAt,kind,body,w.anchor,w.selectedQuote,metadata]);if(pendingShare.current?.key!==key)pendingShare.current={key,id:crypto.randomUUID()};if(onlineConfigured)await publishContribution({id:pendingShare.current.id,story,study:weekly||moderated?study:null,kind,body,anchor:w.anchor,quote:w.selectedQuote,quoteId:w.selectedQuoteId,metadata:{...metadata,thread_id:focusId,ai_simulated:w.aiTrace.length>0,ai_trace:w.aiTrace,quote_author:w.selectedQuoteAuthor||st.guide}});pendingShare.current=null;done();}catch{setNotice(messageForError(lang));}finally{setPublishing(false);}};
- const sharedThread=(!stage||stage==='activity'||stage==='finished')?<SharedThread story={story} lang={lang} study={weekly||moderated?study:null} threadId={focusId} anchor={w.anchor} quoteContext={w.selectedQuote?{text:w.selectedQuote,author:w.selectedQuoteAuthor||st.guide,id:w.selectedQuoteId}:null} proposedDraft={w.plan} onHelpQuote={()=>ai('quote')} renderQuoteHelp={()=>inlinePanel('quote')} onQuote={(text,row)=>change({selectedQuote:text,selectedQuoteAuthor:text?row.display_name:undefined,selectedQuoteId:text?row.id:undefined},'comment_sentence_selected',{commentId:row.id,author:row.display_name})} onPublish={id=>event('real_comment_published',{id})}/>:null;
- const go=(v:View)=>{if(v==='reply'&&!custom)change({responseShown:true});setView(v);window.scrollTo({top:0,behavior:'instant'});if(fidelity&&study?.research){researchChange({fidelity:{...study.research.fidelity,visits:[...study.research.fidelity.visits,v]}},'fidelity_route',{from:view,view:v,story});}else event('navigate',{from:view,view:v,actualStory:story});};
- const openStory=(id:StoryId)=>{if(moderated&&sessionRunning&&id==='C'){event('reserved_case_attempt');setNotice(t('This case is reserved for a later task.','此案例保留用于稍后的任务。'));return;}if(active&&id!==story){event('outside_case_attempt',{requested:id});setNotice(t('Stay with your assigned story during this activity.','本组活动请使用分配的故事。'));return;}setData(d=>d?{...d,story:id,activePost:'case:'+id,study:d.study?(fidelity&&d.study.research?updateResearch(d.study,{fidelity:{...d.study.research.fidelity,visits:[...d.study.research.fidelity.visits,'detail:'+id]}},'fidelity_route',{from:view,view:'detail',actualStory:id}):log(d.study,'story_opened',{id})):null}:d);setView('detail');window.scrollTo(0,0);};
- const openPost=(post:CommunityPost)=>{setData(d=>d?{...d,story:post.story,activePost:post.id,study:d.study&&(d.study.week||moderated)?log(d.study,'post_opened',{actualStory:post.story,threadId:post.id}):null}:d);setInlineAssist(null);setView('detail');window.scrollTo(0,0);};
- const bookmarked=(id:string)=>id.startsWith('case:')?data.works[id.slice(-1) as StoryId]?.bookmarked||false:data.threadWorks?.[id]?.bookmarked||false;
- const bookmarkPost=(post:CommunityPost)=>{setData(d=>{if(!d)return d;const saved=!bookmarked(post.id);return {...d,...(post.id.startsWith('case:')?{works:{...d.works,[post.story]:{...d.works[post.story],bookmarked:saved}}}:{threadWorks:{...d.threadWorks,[post.id]:{...(d.threadWorks?.[post.id]||emptyWork(post.story)),bookmarked:saved}}}),study:d.study&&(d.study.week||moderated)?log(d.study,'bookmark_changed',{threadId:post.id,saved}):null};});};
- const reactPost=async(post:CommunityPost)=>{try{await community.react(post,weekly?study:null);event('post_appreciated',{threadId:post.id});}catch{setNotice(messageForError(lang));}};
- const createPost=async()=>{if(newBusy)return;setNewBusy(true);setNewError('');try{const post=await community.addPost(newTitle.trim(),newBody.trim(),newGroup,newPhoto||null,weekly?study:null);event('community_post_published',{threadId:post.id,group:newGroup,hasImage:!!newPhoto});setNewTitle('');setNewBody('');setNewPhoto('');setModal('');openPost(post);}catch{setNewError(messageForError(lang));}finally{setNewBusy(false);}};
- const feed=(variant:'posts'|'gallery'|'saved'='posts')=><CommunityFeed lang={lang} community={community} search={searchTerm} onSearch={setSearchTerm} onOpen={openPost} onCreate={()=>setModal('newpost')} bookmarked={bookmarked} onBookmark={bookmarkPost} onReact={reactPost} variant={variant} group={group} setGroup={setGroup}/>;
- const ai=(kind:AssistKind)=>{if(stage&&stage!=='activity')return;setAssistKind(kind);setOrigin(view);if(kind==='question'||kind==='album'||kind==='pass')setOriginalDrafts(d=>({...d,[story+':'+kind]:kind==='question'?w.questionDraft:kind==='album'?w.albumDraft:w.passDraft}));event('assistance_requested',{kind,photo:st.photo,anchor:w.anchor,quote:w.selectedQuote,sourceIds:st.sourceIds});if(data.mode==='embedded'){setInlineAssist(kind);event('assistance_opened_in_context',{kind,view});}else{setInlineAssist(null);setSeparateContextLoaded(false);go('assistant');}};
- const assistance=assistKind==='question'?(custom?t((w.questionDraft.trim()?w.questionDraft.trim()+'\n':'')+'What context would help me understand “'+tx(st.title)+'”?',(w.questionDraft.trim()?w.questionDraft.trim()+'\n':'')+'关于“'+tx(st.title)+'”，补充什么情境会帮助理解？'):(w.questionDraft.trim()?w.questionDraft.trim()+'\n'+tx(st.prompt):tx(st.prompt))):assistKind==='route'?(custom?t(`A related conversation: “${tx(stories[story].title)}”. It is a fictional scenario, not a new reply to your post. You can inspect it before deciding whether it is relevant.`,`相关讨论：“${tx(stories[story].title)}”。这是虚构情境，不是针对你帖子的新增回应。可以先查看，再判断是否相关。`):t(`${st.guide} has responded to a related ${tx(st.tag).toLowerCase()} discussion. Open the member reply and keep the source visible.`,`${st.guide} 曾参与相近的“${tx(st.tag)}”讨论。可以展开成员回应，并保留来源。`)):assistKind==='quote'?t(`Follow-up: when ${w.selectedQuoteAuthor||st.guide} says “${w.selectedQuote}”, what ${w.anchor?'image detail or ':''}context would help me understand this experience?`,`追问：${w.selectedQuoteAuthor||st.guide} 说“${w.selectedQuote}”时，补充什么${w.anchor?'图片细节或':''}情境会帮助我理解这段经历？`):assistKind==='album'?albumProposal(w,lang):album?t(`I can share our experience with its context:\n${album.text}\n${album.limits?`Limits: ${album.limits}`:'Your situation may differ.'}\nThis experience does not establish what works for everyone.`,`我可以分享我们的经历和当时的情境：\n${album.text}\n${album.limits?`适用边界：${album.limits}`:'你的情境也可能不同。'}\n这段经历不能证明某种做法适合所有人。`):'';
- const applyAssist=()=>{const reference=assistKind==='quote'?`${w.selectedQuoteAuthor||st.guide}: ${w.selectedQuote}`:assistKind==='album'?t('Detail 1, the selected human sentence and my return','细节 1、选中的成员原句与我的回访'):assistKind==='pass'?t('Reviewed album and its limits','已审阅图册及适用边界'):assistKind==='route'?t('Question and related member source','问题与相关成员来源'):t('Selected post context and my draft','选中的帖子情境与我的草稿');const patch:Partial<Work>=assistKind==='question'?{questionDraft:assistance}:assistKind==='route'?{routeNote:assistance}:assistKind==='quote'?{plan:assistance}:assistKind==='album'?{albumDraft:assistance}:{passDraft:assistance};change({...patch,aiTrace:[...w.aiTrace,{kind:assistKind,reference,at:new Date().toISOString(),proposal:assistance}]},'assistance_accepted',{kind:assistKind,reference,anchor:w.anchor,quote:w.selectedQuote,proposal:assistance});setInlineAssist(null);setModal('');if(view==='assistant')go(origin);};
- const discardAssist=()=>{event('assistance_rejected',{kind:assistKind});setInlineAssist(null);setModal('');if(view==='assistant')go(origin);};
- const openOriginal=(p:PhotoId)=>{setOriginalPhoto(p);setModal('original');event('original_image_opened',{photo:p});};
- const draftAlbum=()=>{if(!last){go('return');return;}if(!w.albumDraft)change({albumDraft:last.text,albumTitle:t('Our small beauty discovery','我们的小小美妆发现'),albumLimits:last.limits},'album_started');go('draft');};
- const start=async()=>{if(publishing)return;setPublishing(true);try{if(data.study){localStorage.setItem('common-ground-archived-'+data.study.startedAt,JSON.stringify(data));if(onlineConfigured)await saveStudy(data.study);}if(onlineConfigured)await beginStudyIdentity();community.retry();const ws=startWeek(participant.trim().toUpperCase(),lang,condition);setData({...data,study:log(ws,'weekly_consent',{viewport:{width:innerWidth,height:innerHeight},browser:navigator.userAgent}),mode:condition});setModal('');setInlineAssist(null);setNotice(t('You can browse and participate freely. No tasks are required.','现在可以自由浏览与参与，无需完成指定任务。'));}catch{setNotice(t('Could not join. Check your connection and participant code.','暂时无法加入，请检查网络与参与编号。'));}finally{setPublishing(false);}};
- const finish=()=>{if(study?.week){const next=weekFeedback(study,ratings.map(x=>!x||x==='na'?null:Number(x)),answer,focusId);setData({...data,study:next});setModal('');setAnswer('');setRatings(Array(6).fill(''));setNotice(t('Optional feedback saved. Continue browsing whenever you like.','可选反馈已保存，可以继续自由浏览。'));return;}setCloudStatus('pending');if(!study)return;try{const s=finishPhase(study,w,answer,ratings.map(x=>!x||x==='na'?null:Number(x)),reconstruction);const a=assignment(s);setData({...data,study:s,story:a.story,mode:a.mode,works:s.completed?works:cleanWorks()});setModal('');setInlineAssist(null);setView(s.research?'home':s.completed?'done':'detail');setAnswer('');setRatings(Array(6).fill(''));setOriginalDrafts({});setReconstruction(emptyReconstruction());window.scrollTo(0,0);}catch{setNotice(t('Complete the activities and reflection first.','请先完成活动和反思。'));}};
- const exportText=(format:'json'|'csv')=>format==='json'?JSON.stringify({version:VERSION,kind:study?.week?'week-natural-use':study?'legacy-study':'exploration',study,works:data.works,threadWorks:data.threadWorks||{},images:'Generated scenario props; no empirical image outcomes'},null,2):exportCsv(study?.events||[]);
- const download=(format:'json'|'csv')=>{const blob=new Blob([exportText(format)],{type:format==='json'?'application/json':'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`CommonGround-V4-${study?.participant||'explore'}.${format}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
- const assistPanel=<div className="cg-stack"><p className="cg-ai-stage"><Sparkles size={16}/>{({question:hasPhoto?t('AI · shape a question from the post or visual detail','AI · 从帖子或视觉细节形成问题'):t('AI · shape a question from this conversation','AI · 从当前讨论形成问题'),route:t('AI · route to people and related discussions','AI · 路由到成员与相关讨论'),quote:t('AI · keep a sentence with its author and context','AI · 保留原句、作者与情境'),album:t('AI · structure experience without erasing its source','AI · 整理经验但保留来源'),pass:t('AI · prepare a situated hand-off','AI · 准备带有边界的传递')} as Record<AssistKind,string>)[assistKind]}</p><div className="cg-assist-inputs"><strong>{t('Used for this suggestion','这条建议使用了')}</strong><span>{tx(st.title)}</span>{['question','route','quote','album'].includes(assistKind)&&w.anchor&&<span>{t('Image detail 1','图片细节 1')}</span>}{assistKind==='question'&&w.questionDraft&&<p>{t('Your current draft: ','你的当前草稿：')}{w.questionDraft}</p>}{assistKind==='route'&&<p>{t('Your published question: ','你已分享的问题：')}{w.question}</p>}{['quote','album'].includes(assistKind)&&w.selectedQuote&&<p>{t('Human sentence · ','成员原句 · ')}{w.selectedQuoteAuthor||st.guide}: “{w.selectedQuote}”</p>}{assistKind==='album'&&last&&<p>{t('Your return: ','你的回访：')}{last.text}<br/>{last.context}<br/>{last.limits}</p>}{assistKind==='pass'&&album&&<p>{t('Reviewed album version ','已审阅图册版本 ')+album.version}: {album.title}<br/>{t('Limits: ','边界：')}{album.limits||t('No additional limit supplied','未另填边界')}</p>}</div><div className="cg-context">{hasPhoto||assistKind==='pass'?<VisualRef id={assistKind==='pass'?(album?.anchor?.photo||album?.photo||st.photo):st.photo} lang={lang} anchor={assistKind==='pass'?album?.anchor||null:w.anchor} mini/>:null}<div><strong>{assistKind==='pass'?album?.title:st.member}</strong><p>{assistKind==='pass'?album?.text:tx(st.caption)}</p></div></div>{assistKind==='route'&&custom&&<button className="cg-text-link" onClick={()=>{setInlineAssist(null);openStory(story);}}>{t('Open this related conversation','打开这段相关讨论')}</button>}<blockquote>{assistance||t('Add an experience or a reference to use this suggestion.','补充一段经验或指代后可使用这条建议。')}</blockquote><details onToggle={e=>{if(e.currentTarget.open)event('assistance_source_inspected',{kind:assistKind,sourceIds:st.sourceIds});}}><summary>{t('Why this suggestion?','为什么出现这条建议？')}</summary><p>{tx(st.origin)}</p><p>{st.sourceIds.join(' · ')}</p><a href={st.source==='#'?stories[story].source:st.source} onClick={inspectSource} target="_blank" rel="noreferrer">{t('Inspect the source','查看来源')}</a></details><Button className="cg-primary" onClick={applyAssist} disabled={!assistance}>{t('Use as an editable draft','作为可编辑草稿使用')}</Button><Button className="cg-secondary" variant="outline" onClick={discardAssist}>{t('Return without using it','不采用，返回')}</Button></div>;
- const inlinePanel=(kind:AssistKind)=>inlineAssist===kind&&data.mode==='embedded'?<section className="cg-inline-assist" aria-label={t('AI help in this activity','当前活动中的 AI 辅助')}><div className="cg-inline-heading"><span><Sparkles size={16}/>{t('Help at this moment','此刻的辅助')}</span><button onClick={discardAssist} aria-label={t('Close AI help','关闭 AI 辅助')}><X size={18}/></button></div>{assistPanel}</section>:null;
- const trace=(kind:AssistKind)=>{if(data.mode!=='embedded')return null;const note=[...w.aiTrace].reverse().find(x=>x.kind===kind);return note?<details className="cg-ai-trace" onToggle={e=>{if(e.currentTarget.open)event('ai_trace_inspected',{kind,reference:note.reference});}}><summary><Sparkles size={15}/>{t('AI helped here · inspect its reference','AI 曾在此辅助 · 查看所用指代')}</summary><p>{note.reference}</p><p>{t('You still decide what to edit or share.','修改或分享仍由你决定。')}</p></details>:null;};
- return <div className={"cg-app"+(blocked?" cg-study-blocked":"")+(fidelity?" cg-study-fidelity":"")}><header className="cg-header">
-  <div className="cg-header-inner"><button className="cg-brand" onClick={()=>go('home')}>{t('B E A U T Y  H O U S E','美 妆 社 区')}</button><label className="cg-global-search"><Search size={18}/><input aria-label={t('Search the community','搜索社区')} value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')go('together')}} placeholder={t('Search','搜索')}/></label><div className="cg-header-actions"><button onClick={()=>{setEcosystemKind('shop');setModal('ecosystem');event('ecosystem_opened',{destination:'shop'})}}><Store size={19}/><span>{t('Stores & services','门店与服务')}</span></button><button onClick={()=>go('home')}><Users size={19}/><span>{t('Community','社区')}</span></button><button onClick={()=>go('profile')}><span className="cg-face-icon">◉</span><span>{t('Sign in','登录')}</span></button><button aria-label={t('Saved items','收藏')} onClick={()=>go('profile')}><Heart size={21}/></button><button aria-label={t('Shopping bag','购物袋')} onClick={()=>{setEcosystemKind('shop');setModal('ecosystem');event('ecosystem_opened',{destination:'shop'})}}><ShoppingBag size={21}/></button></div></div>
-  <nav className="cg-retail-nav" aria-label={t('Beauty categories','美妆分类')}>{[t('New','新品'),t('Brands','品牌'),t('Makeup','彩妆'),t('Skincare','护肤'),t('Hair','美发'),t('Fragrance','香水'),t('Tools & Brushes','工具与刷具'),t('Bath & Body','身体护理'),t('Mini Size','旅行装'),t('Gifts','礼品'),t('Collections','精选'),t('Sale & Offers','优惠')].map(label=><button key={label} onClick={()=>{setEcosystemKind('shop');setModal('ecosystem');event('ecosystem_opened',{destination:'shop'})}}>{label}</button>)}</nav>
-  <div className="cg-community-nav"><div className="cg-community-tabs"><button className={['home','detail','ask','reply','return','thanks','draft','pass','assistant'].includes(view)?'is-active':''} onClick={()=>go('home')}>{t('Community','社区')}</button><button className={view==='profile'?'is-active':''} onClick={()=>go('profile')}>{t('Profile','档案')}</button><button className={view==='together'?'is-active':''} onClick={()=>go('together')}>{t('Groups','群组')}</button><button className={view==='album'?'is-active':''} onClick={()=>go('album')}>{t('Gallery','图册')}</button></div><div className="cg-community-actions"><button className="cg-outline-pill" onClick={()=>setModal('newpost')}>{t('Start a Conversation','发起讨论')}</button><button className="cg-outline-pill" onClick={()=>{setNewPhoto('swatches');setModal('newpost');}}>{t('Upload to Gallery','上传到图册')}</button><button aria-label={t('Study session','研究会话')} onClick={()=>setModal('study')}><FlaskConical size={17}/></button><button disabled={sessionRunning} aria-label={t('Switch language','切换语言')} onClick={()=>setData({...data,lang:lang==='en'?'zh':'en'})}>{lang==='en'?'中文':'EN'}</button><button aria-label={t('Notifications','通知')} onClick={()=>{setModal('notifications');event('notifications_opened');}}><Bell size={18}/></button><button aria-label={t('Messages','消息')} onClick={()=>setNotice(t('Member messages are represented in the conversation.','成员消息展示在讨论中。'))}><Mail size={18}/></button></div></div>
- </header>
- <div className="cg-disclosure"><button onClick={()=>setModal('about')}>{t('Research simulation · scripted scenes + real test comments · AI uses presets','研究模拟 · 脚本情境与真实测试评论 · AI 使用预设')} <span>ⓘ</span></button>{active&&<button onClick={()=>setModal('study')}>{study.participant} · {study.phase+1}/2</button>}</div>
- {moderated&&study&&<StudySessionPanel study={study} lang={lang} onChange={researchChange} onAdvance={advance} onEvent={event}/>}
- <div className="cg-layout"><main className={'cg-main cg-view-'+view}>
- {!['home','together','album','detail','ask','done'].includes(view)&&<button className="cg-back" onClick={()=>go('detail')}><ArrowLeft size={18}/>{t('Back to the conversation','回到讨论')}</button>}
- {(view==='home')&&<>
-  <section className="cg-home-hero"><div className="cg-home-identity"><p className="cg-beauty-insider">Beauty <span>INSIDER</span></p><h1>{t('COMMUNITY','社 区')}</h1><p>{t('Ask questions, join conversations, and get ideas from people like you.','提出问题、参与讨论，从与你相似的人那里获得灵感。')}</p></div><div className="cg-hero-middle"><button className="cg-hero-search" onClick={()=>go('together')}><Search size={22}/>{t('Search or ask a question','搜索或提出问题')}</button><p><Users size={17}/>{t('People here to share','在这里分享的人')}<span>│</span><MessageCircle size={17}/>{t('Conversations to explore','可以探索的讨论')}</p></div><div className="cg-hero-art"><Photo id="swatches" lang={lang}/><Photo id="base" lang={lang}/></div></section>
-  <section className="cg-home-help"><button onClick={()=>setModal('about')}><span>✳</span><strong>{t('Hey there! New here?','嗨，新来的吗？')}</strong><small>{t('A place to get to know each other ›','从认识彼此开始 ›')}</small></button><button onClick={()=>setModal('about')}><MessageCircle size={25}/><strong>{t('What is this community?','这个社区是什么？')}</strong><small>{t('Read the community guide ›','阅读社区指南 ›')}</small></button><button onClick={()=>{setEcosystemKind('governance');setModal('ecosystem');event('ecosystem_opened',{destination:'governance'})}}><span>☏</span><strong>{t('Need help?','需要帮助？')}</strong><small>{t('See support and community rules ›','查看支持与社区规则 ›')}</small></button></section>
-  <button className="cg-home-join" onClick={()=>setModal('study')}><span>✿ ◈ ✧</span><u>{t('Join the Community','加入社区')}</u>{t(' to begin sharing and see your first recognition.','，开始分享并看到第一次认可。')}</button>
-  <section className="cg-home-trends"><div><div className="cg-trend-title"><h2>{t('Trending Groups','热门群组')}</h2><button onClick={()=>go('together')}>{t('View all Groups','查看全部群组')}</button></div><div className="cg-trend-groups">{displayStories.map((id,i)=><button key={id} onClick={()=>{setGroup(id);go('together');}}><span className={'cg-group-avatar cg-group-'+i}><Photo id={stories[id].photo} lang={lang}/></span><strong>{tx(caseTopics[id].group)}</strong><small>{t('Member conversations','成员讨论')}</small></button>)}{!active&&(['Beauty questions','Product experiences','New to beauty'] as const).map((name,i)=><button key={name} onClick={()=>go('together')}><span className={'cg-group-avatar cg-group-'+(i+3)}>{['✦','◌','✿'][i]}</span><strong>{t(name,['美妆问答','产品体验','美妆新人'][i])}</strong><small>{t('Explore the community','探索社区')}</small></button>)}</div></div><div><div className="cg-trend-title"><h2>{t('Trending in Gallery','图册热门内容')}</h2><button onClick={()=>go('album')}>{t('View all in Gallery','查看全部图片')}</button></div><div className="cg-trend-gallery">{displayStories.map(id=><button key={id} onClick={()=>openStory(id)}><Photo id={stories[id].photo} lang={lang}/><span>{stories[id].member}</span></button>)}</div></div></section>
-  <section className="cg-home-recent">{feed()}</section>
- </>}
- {view==='together'&&<div className="cg-posts-layout"><aside className="cg-post-filter"><h3>{t('Groups','群组')}</h3><button className={!group?'is-active':''} onClick={()=>setGroup('')}>{t('All conversations','全部讨论')}</button>{Object.entries(groupNames).map(([id,label])=><button key={id} className={group===id?'is-active':''} onClick={()=>setGroup(id as StoryId)}>{tx(label)}</button>)}</aside><div>{feed()}</div><aside className="cg-post-rail"><div className="cg-rail-box"><h3>{t('Make yourself at home','欢迎参与')}</h3><p>{t('Ask a question, share a photo or simply read. AI help is optional.','可以提问、分享图片，也可以只阅读。AI 辅助始终可选。')}</p><button onClick={()=>setModal('newpost')}>{t('Start a conversation','发起讨论')}</button><button onClick={()=>setModal('about')}>{t('Community information','社区说明')}</button><button onClick={()=>setModal('references')}>{t('View the case reference','查看案例参照')}</button></div></aside></div>}
- {view==='detail'&&<><div className="cg-detail-search"><Search size={19}/><button onClick={()=>go('together')}>{t('Search conversations…','搜索讨论……')}</button></div><div className="cg-detail-layout"><article className="cg-detail-post"><div className="cg-detail-context">{t('Post in ','帖子所属：')}<button onClick={()=>go('together')}>{tx(caseTopics[story].group)}</button><button className="cg-detail-save" aria-label={t('Save this post','收藏帖子')} onClick={()=>change({bookmarked:!w.bookmarked},'bookmark_changed')}><Bookmark size={21} fill={w.bookmarked?'currentColor':'none'}/></button></div><h1>{tx(st.title)}</h1><p className="cg-post-time">{focus?.seed?t('Fictional scenario post','虚构情境帖子'):t('Member post','成员帖子')} · {focus?.createdAt?new Date(focus.createdAt).toLocaleDateString(lang==='en'?'en-GB':'zh-CN'):t('Updated recently','最近更新')}</p><div className="cg-post-author"><span className="cg-avatar">{st.member.slice(0,1)}</span><strong>{st.member}</strong><span className="cg-role-chip">{t('COMMUNITY MEMBER','社区成员')}</span></div><p className="cg-detail-copy">{tx(st.caption)}</p>{hasPhoto&&<div className="cg-detail-images"><button onClick={()=>go('ask')}><Photo id={st.photo} lang={lang}/></button>{!custom&&st.photo!=='swatches'&&<button onClick={()=>openOriginal('swatches')}><Photo id="swatches" lang={lang}/></button>}</div>}{hasPhoto&&<p className="cg-detail-image-note">{t('Images are scenario material. Select a visual detail when you ask a question.','图片是情境材料。提问时可以选中一个视觉细节。')}</p>}{focus?.album&&<section className="fc-published-experience"><h3>{t('Experience, people and references','经验、贡献者与指代')}</h3><div className="cg-lineage">{Array.isArray(focus.album.authors)&&focus.album.authors.map((name,i)=><span key={i}>{name==='You'?focus.author:name}</span>)}</div>{focus.album.quotedLine&&<blockquote><strong>{focus.albumQuoteAuthor||t('Retained member sentence','保留的成员原句')}</strong><p>{focus.album.quotedLine}</p></blockquote>}{focus.album.anchor&&<><VisualRef id={focus.album.anchor.photo} lang={lang} anchor={focus.album.anchor} mini/><p className="cg-meta">{t('Original visual reference; the experience photo may differ.','原来的视觉指代；经验配图可能不同。')}</p></>}{focus.album.limits&&<p>{t('Still open: ','尚待确认：')}{focus.album.limits}</p>}<details><summary>{t('Inspect experience sources','查看经验来源')}</summary><p>{Array.isArray(focus.album.sourceIds)?focus.album.sourceIds.join(' · '):''}</p><p>{t('Attribution preserves contributions; it does not certify agreement.','署名保留贡献，不代表共同认可。')}</p></details></section>}<div className="cg-detail-tags"><span>{tx(st.tag)}</span><span>{tx(caseTopics[story].product)}</span></div><div className="cg-detail-actions"><button aria-pressed={community.liked(focusId)} onClick={()=>focus&&reactPost(focus)}><Heart size={21} fill={community.liked(focusId)?'currentColor':'none'}/>{t('Appreciate','认可')}</button><button onClick={()=>go('reply')}><MessageCircle size={21}/>{t('Reply','回复')}</button><button onClick={()=>go('ask')}>{w.question?t('Read your question','阅读你的提问'):hasPhoto?t('Ask about this image','针对图片提问'):t('Ask about this post','针对帖子提问')}</button></div>{fidelity&&<button className="cg-thread-preview" onClick={()=>go('reply')}><strong>{t('Read conversation','阅读讨论')}</strong><p>{t('View the member reply in this scenario','查看情境中的成员回应')}</p></button>}{w.question&&<button className="cg-thread-preview" onClick={()=>go('reply')}><strong>{w.anchor?t('Your question · image detail 1','你的提问 · 图片细节 1'):t('Your question','你的提问')}</strong><p>{w.question}</p><ArrowRight size={18}/></button>}{last&&<button className="cg-thread-preview" onClick={()=>go('thanks')}><strong>{t('Your latest update','你最近的回访')}</strong><p>{last.text}</p></button>}<div className="fc-context-actions">{album&&<button onClick={()=>go('pass')}>{t('Reply with an experience','带着经验回应')}</button>}{last&&<button onClick={()=>go('thanks')}>{t('Say thanks','表达感谢')}</button>}<button onClick={()=>go('return')}>{t('Share an update','分享近况')}</button><button onClick={draftAlbum}>{t('Keep an experience','整理一段经验')}</button></div>{sharedThread}</article><aside className="cg-detail-rail"><div className="cg-rail-box"><h3>{t('Conversation Stats','讨论概况')}</h3><p><MessageCircle size={17}/>{w.question?t('Your question and a reply','你的提问及一条回应'):t('A member conversation','一段成员讨论')}</p><p><Heart size={17}/>{t('Member appreciation','成员认可')}</p><p><Users size={17}/>{t('People sharing experience','分享经验的人')}</p><hr/><h3>{t('Related Posts','相关帖子')}</h3>{availableStories.filter(id=>id!==story).map(id=><button key={id} onClick={()=>openStory(id)}><strong>{tx(stories[id].title)}</strong><small>{stories[id].member} · {tx(caseTopics[id].group)}</small></button>)}<hr/><button onClick={()=>{setEcosystemKind('shop');setModal('ecosystem');event('ecosystem_opened',{destination:'shop'})}}>{t('Products mentioned in this topic','本话题涉及的产品')}</button></div></aside></div></>}
- {view==='ask'&&<><div className="cg-detail-search"><Search size={19}/><button onClick={()=>go('together')}>{t('Search conversations…','搜索讨论……')}</button></div><div className="cg-detail-layout"><article className="cg-detail-post cg-composer-post"><div className="cg-detail-context">{t('Post in ','帖子所属：')}<button onClick={()=>go('together')}>{tx(caseTopics[story].group)}</button></div><h1>{tx(st.title)}</h1><p className="cg-post-time">{focus?.seed?t('Fictional scenario post','虚构情境帖子'):t('Member post','成员帖子')} · {focus?.createdAt?new Date(focus.createdAt).toLocaleDateString(lang==='en'?'en-GB':'zh-CN'):t('Updated recently','最近更新')}</p><div className="cg-post-author"><span className="cg-avatar">{st.member.slice(0,1)}</span><strong>{st.member}</strong><span className="cg-role-chip">{t('COMMUNITY MEMBER','社区成员')}</span></div><p className="cg-detail-copy">{tx(st.caption)}</p><div className="cg-composer-divider"/><div className="cg-composer-heading"><span className="cg-avatar">{t('Y','我')}</span><div><h2>{t('Ask about this post','针对这个帖子提问')}</h2><p>{hasPhoto?t('Select a detail if you want a precise visual reference.','需要精确指代时，可以选择图片细节。'):t('Use your own words; AI help is optional.','用自己的话表达；AI 辅助可选。')}</p></div></div><div className="cg-composer-grid"><div>{hasPhoto?<><div className="cg-anchor-image" role="button" tabIndex={0} aria-label={t('Place a question pin. Click, or use arrow keys; Enter selects the centre.','定位问题。点击图片或用方向键移动；回车选择中心。')} onClick={e=>{const r=e.currentTarget.getBoundingClientRect();change({anchor:clampAnchor((e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height,st.photo)},'image_anchor_set');}} onKeyDown={e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Enter',' '].includes(e.key))return;e.preventDefault();const a=w.anchor||{x:.5,y:.5};change({anchor:clampAnchor(a.x+(e.key==='ArrowLeft'?-.05:e.key==='ArrowRight'?.05:0),a.y+(e.key==='ArrowUp'?-.05:e.key==='ArrowDown'?.05:0),st.photo)},'image_anchor_set',{keyboard:true});}}><Photo id={st.photo} lang={lang}/>{w.anchor&&<span className="cg-pin" style={{left:w.anchor.x*100+'%',top:w.anchor.y*100+'%'}}>1</span>}</div><div className="cg-photo-tools"><span>{w.anchor?t('Detail selected · click to move','已选择细节 · 点击可移动'):t('Select a visual detail','选择一个视觉细节')}</span><button onClick={()=>openOriginal(st.photo)}>{t('View original','查看原图')}</button></div></>:<div className="fc-text-reference"><h3>{t('A text conversation','一段文字讨论')}</h3><p>{tx(st.caption)}</p><small>{t('You can reply without an image pin.','回复文字帖无需选择图片定位。')}</small></div>}</div><div className="cg-stack"><label className="cg-field">{t('Your question','你想问什么')}<textarea rows={4} maxLength={600} value={w.questionDraft} onBlur={()=>draftEdited('question',w.questionDraft)} onChange={e=>change({questionDraft:e.target.value})} placeholder={t('I noticed… How do you…?','我注意到……你是怎么……？')}/></label><p className="cg-muted">{t('A sentence is enough. Keep your own voice.','一句话也很好，保留你自己的语气。')}</p><Button className="cg-primary" disabled={publishing||!w.questionDraft.trim()} onClick={()=>share('question',w.questionDraft,()=>{change({question:w.questionDraft.trim()},'question_shared',{photo:st.photo,anchor:w.anchor});go('reply');})}>{t('Share my question','分享我的问题')}<ArrowRight size={18}/></Button><Button className="cg-ai" variant="outline" onClick={()=>ai('question')}><Sparkles size={17}/>{t('Find a useful prompt','帮我找条提问线索')}</Button>{inlinePanel('question')}{trace('question')}{originalDrafts[story+':question']!==undefined&&<button className="cg-text-link" onClick={()=>change({questionDraft:originalDrafts[story+':question']},'original_restored',{kind:'question'})}>{t('Restore my wording','恢复我的原话')}</button>}</div></div></article><aside className="cg-detail-rail"><div className="cg-rail-box"><h3>{t('Conversation Stats','讨论概况')}</h3><p><MessageCircle size={17}/>{t('A member conversation','一段成员讨论')}</p><p><Heart size={17}/>{t('Member appreciation','成员认可')}</p><hr/><h3>{t('Related Posts','相关帖子')}</h3>{availableStories.filter(id=>id!==story).map(id=><button key={id} onClick={()=>openStory(id)}><strong>{tx(stories[id].title)}</strong><small>{stories[id].member} · {tx(caseTopics[id].group)}</small></button>)}</div></aside></div></>}
- {view==='reply'&&<div className="cg-detail-layout"><article className="cg-detail-post cg-thread-post"><div className="cg-post-author"><span className="cg-avatar">{st.member[0]}</span><strong>{st.member}</strong></div><h1>{tx(st.title)}</h1><p className="cg-detail-copy">{tx(st.caption)}</p>{hasPhoto&&<div className="cg-thread-photo"><VisualRef id={st.photo} lang={lang} anchor={w.anchor} mini/><button onClick={()=>openOriginal(st.photo)}>{t('View original image','查看原图')}</button></div>}{w.question&&<div className="cg-question-bubble"><strong>{t('Your question','你的问题')}</strong><p>{w.question}</p></div>}{!custom&&<div className="cg-mentor"><div className="cg-member-line"><span className="cg-avatar">{st.guide[0]}</span><strong>{st.guide}</strong><small>{t('Fictional scenario member','虚构情境成员')}</small></div><div className="cg-sentence-list">{sentences(tx(st.reply)).map((line,i)=><button key={i} aria-pressed={w.selectedQuote===line} onClick={()=>change({selectedQuote:w.selectedQuote===line?'':line,selectedQuoteAuthor:st.guide,selectedQuoteId:undefined,responseShown:true},'comment_sentence_selected',{sentence:i})}>{line}</button>)}</div></div>}<Button className="cg-ai" variant="outline" onClick={()=>ai('route')}><Sparkles size={16}/>{t('Find related people or discussions','寻找相关成员或讨论')}</Button>{inlinePanel('route')}{trace('route')}{w.selectedQuote&&<><div className="cg-linked-quote"><span>↳</span><div><strong>{w.selectedQuoteAuthor||st.guide}</strong><p>{w.selectedQuote}</p></div></div>{trace('quote')}</>}{sharedThread}<div className="fc-context-actions">{album&&<button onClick={()=>go('pass')}>{t('Reply with an experience','带着经验回应')}</button>}{last&&<button onClick={()=>go('thanks')}>{t('Say thanks','表达感谢')}</button>}<button onClick={()=>go('return')}>{t('Share an update','分享近况')}</button><button onClick={draftAlbum}>{t('Keep an experience','整理一段经验')}</button><button onClick={()=>go('ask')}>{hasPhoto?t('Ask about a visual detail','针对视觉细节提问'):t('Ask a question','提一个问题')}</button></div></article><aside className="cg-detail-rail"><div className="cg-rail-box"><h3>{t('Related conversations','相关讨论')}</h3>{community.posts.filter(p=>p.id!==focusId&&p.story===story).slice(0,4).map(p=><button key={p.id} onClick={()=>openPost(p)}>{tx(p.title)}</button>)}</div></aside></div>}
- {view==='return'&&<><p className="cg-kicker">{t('BACK WITH A SMALL UPDATE','带着一点发现回来')}</p><h1>{t('How did it feel for you?','这次，你的感受如何？')}</h1><div className="cg-split"><div><Photo id={w.updatePhoto} lang={lang}/><div className="cg-photo-picker">{(Object.keys(photos) as PhotoId[]).map(id=><button aria-label={t('Choose scenario photo ','选择情境图片 ')+id} aria-pressed={w.updatePhoto===id} key={id} onClick={()=>change({updatePhoto:id},'update_photo_selected',{photo:id})}><Photo id={id} lang={lang}/>{w.updatePhoto===id&&<Check size={18}/>}</button>)}</div><p className="cg-meta">{t('Scenario images, not before-and-after evidence.','图片为情境道具，不是前后效果证据。')}</p></div><div className="cg-stack">{moderated&&<details className="cg-task"><summary>{t('Open the supplied scenario card','查看提供的情境卡')}</summary><p>{tx(st.task)}</p><p>{t('Describe it in your own words; no real product trial is required.','请用自己的话描述，无需进行真实产品试验。')}</p></details>}{w.plan&&<p className="cg-muted">{t('Your thought: ','你之前的想法：')}{w.plan}</p>}<label className="cg-field">{t('A small update','一句近况')}<textarea rows={4} maxLength={800} value={w.updateDraft} onChange={e=>change({updateDraft:e.target.value})} placeholder={t('I tried… I noticed… I’m still unsure about…','我试了……注意到……还不确定……')}/></label><details><summary>{t('Anything else someone should know?','还有什么值得让对方知道？')}</summary><label className="cg-field">{t('Context, if useful','想补充的情境')}<input maxLength={240} value={w.context} onChange={e=>change({context:e.target.value})}/></label><label className="cg-field">{t('What is still open?','还有什么尚不确定？')}<input maxLength={240} value={w.limits} onChange={e=>change({limits:e.target.value})}/></label></details><Button className="cg-primary" disabled={publishing||!w.updateDraft.trim()} onClick={()=>share('update',w.updateDraft,()=>{change({updates:[...w.updates,{id:crypto.randomUUID(),text:w.updateDraft.trim(),photo:w.updatePhoto,context:w.context.trim(),limits:w.limits.trim(),at:new Date().toISOString()}]},'return_shared');go('reply');setNotice(t('Your update is shared. You can continue reading, say thanks or keep it as an experience.','近况已发布。可以继续阅读、表达感谢，或整理为经验。'));},{photo:w.updatePhoto,context:w.context,limits:w.limits})}>{t('Share my update','分享这次近况')}<ArrowRight size={18}/></Button><button className="cg-text-link" onClick={()=>{go('profile');setNotice(t('Draft kept on this device.','草稿已保留在本机。'));}}>{t('Keep it as a draft','先保留为草稿')}</button></div></div></>}
- {view==='thanks'&&<><p className="cg-kicker">{t('A MOMENT WORTH KEEPING','值得记住的一刻')}</p><h1>{t('You came back. The story continues.','你回来了，故事也继续了。')}</h1>{last?<div className="cg-split"><Photo id={last.photo} lang={lang}/><div className="cg-stack"><div className="cg-moment"><Heart size={25}/><strong>{t('A return, remembered','记住这一次回访')}</strong><p>{last.text}</p></div><label className="cg-field">{t('A note to ','对 ')}{w.selectedQuoteAuthor||(!custom?st.guide:st.member)}{t(' · optional',' 说句话 · 可选')}<textarea rows={3} maxLength={400} value={w.thanksDraft} onChange={e=>change({thanksDraft:e.target.value})} placeholder={t('What part of their help mattered to you?','对方的哪一点帮助让你印象深刻？')}/></label>{w.thanks&&<p className="cg-muted">{t('Your note: ','你写下的感谢：')}{w.thanks}</p>}<Button className="cg-primary" disabled={publishing||!w.thanksDraft.trim()} onClick={()=>share('thanks',w.thanksDraft,()=>{change({thanks:w.thanksDraft.trim()},'thanks_shared',{to:st.guide});setNotice(t('Your note is connected to this conversation.','你的感谢已与这段讨论连在一起。'));},{to:w.selectedQuoteAuthor||(!custom?st.guide:st.member)})}>{t('Share my thank-you','分享我的感谢')}</Button><Button className="cg-secondary" variant="outline" onClick={draftAlbum}>{t('Keep our story in an album','把我们的故事放进图册')}</Button><p className="cg-meta">{t('You can continue without sending a thank-you.','不发送感谢也可以继续。')}</p></div></div>:<Button onClick={()=>go('return')}>{t('Write an update','写一条回访')}</Button>}</>}
- {view==='draft'&&<><p className="cg-kicker">{t('OUR SHARED BEAUTY NOTES','我们共同的美妆笔记')}</p><h1>{t('Keep the story. Keep the people.','留下经验，也留下彼此。')}</h1><div className="cg-split"><div><Photo id={last?.photo||st.photo} lang={lang}/><div className="cg-lineage"><span>{st.member}</span><ArrowRight size={16}/>{(w.selectedQuoteAuthor||!custom&&w.responseShown)&&<><span>{w.selectedQuoteAuthor||st.guide}</span><ArrowRight size={16}/></>}<span>{t('You','你')}</span></div><p className="cg-meta">{t('Question · guidance · your return','提问 · 示范与建议 · 你的回访')}</p></div><div className="cg-stack"><label className="cg-field">{t('A title for this story','给故事取个名字')}<input maxLength={100} value={w.albumTitle} onChange={e=>change({albumTitle:e.target.value})}/></label><label className="cg-field">{t('What would you keep?','你想留下什么？')}<textarea rows={5} maxLength={1800} value={w.albumDraft} onBlur={()=>draftEdited('album',w.albumDraft)} onChange={e=>change({albumDraft:e.target.value})}/></label><label className="cg-field">{t('Leave room for another experience','为不同经验留一点空间')}<input maxLength={400} value={w.albumLimits} placeholder={t('This may be different when…','换个情境，也许会……')} onChange={e=>change({albumLimits:e.target.value})}/></label><Button className="cg-ai" variant="outline" onClick={()=>ai('album')}><Sparkles size={17}/>{t('Help arrange my words','帮我整理已有表达')}</Button>{inlinePanel('album')}{trace('album')}{originalDrafts[story+':album']!==undefined&&<button className="cg-text-link" onClick={()=>change({albumDraft:originalDrafts[story+':album']},'original_restored',{kind:'album'})}>{t('Restore my wording','恢复我的原话')}</button>}<Button className="cg-primary" disabled={!last||!w.albumTitle.trim()||!w.albumDraft.trim()} onClick={()=>{setReviewed(false);setModal('review');event('album_review_opened',{version:w.versions.length+1});}}>{t('Preview our album entry','预览这页共同图册')}</Button></div></div></>}
- {view==='album'&&<><section className="cg-gallery-hero"><h1>{t('Gallery','图册')}</h1><p>{t('Photos, experiences and the people behind them.','图片、经验，还有它们背后的人。')}</p></section>{feed('gallery')}
-{album?<><div className="cg-split"><div><VisualRef id={album.anchor?.photo||album.photo} lang={lang} anchor={album.anchor}/><p className="cg-meta">{t('Original question reference','原提问指代')}</p>{album.anchor&&album.photo!==album.anchor.photo&&<><Photo id={album.photo} lang={lang}/><p className="cg-meta">{t('Return photo · scenario prop','回访图片 · 情境道具')}</p></>}</div><div className="cg-stack"><span className="cg-kicker">{t('REVIEWED STORY · DESIGN PROPOSAL','已核对的故事 · 本研究新增设计')} · {album.version}</span><h2>{album.title}</h2>{album.quotedLine&&<div className="cg-linked-quote"><span>↳</span><div><strong>{t('Human reply retained','保留的成员回应')}</strong><p>{album.quotedLine}</p></div></div>}<p className="cg-preserve">{album.text}</p>{album.limits&&<div className="cg-open-question"><strong>{t('Still room to explore','还可以继续摸索')}</strong><p>{album.limits}</p></div>}<div className="cg-lineage">{album.authors.map((a,i)=><span key={i}>{a==='You'?t('You','你'):a}</span>)}</div><p className="cg-meta">{t('Image detail 1 → selected human sentence → return → reviewed album. Scenario roles, not co-author approvals.','图片细节 1 → 选中的成员原句 → 回访 → 已核对图册。这里是情境角色，不代表共同作者已认可。')}</p><Button className="cg-primary" onClick={()=>go('pass')}>{t('Pass this experience on','把这段经验传下去')}<ArrowRight size={18}/></Button><Button variant="outline" className="cg-secondary" onClick={()=>{change({albumTitle:album.title,albumDraft:album.text,albumLimits:album.limits});go('draft');}}>{t('Add a different perspective','补充一种不同的看法')}</Button><button className="cg-text-link" onClick={()=>{setModal('history');event('history_opened');}}><History size={17}/>{t('The story behind this page','这一页的来历与变化')}</button></div></div></>:<div className="cg-empty cg-album-empty"><Photo id="swatches" lang={lang}/><h2>{t('Your shared story starts with a return.','从一次回访，开始你的共同故事。')}</h2><p>{t('Keep an experience with the people and context that shaped it.','把经验与帮助过你的人、当时的情境一起留下。')}</p><Button className="cg-primary" onClick={last?draftAlbum:()=>go(w.question?'return':'detail')}>{last?t('Create our first page','写下共同的第一页'):t('Return to a conversation','回到一段讨论')}</Button></div>}</>}
- {view==='pass'&&<><p className="cg-kicker">{t('SHARE WHAT YOU LEARNED','分享你的经历')}</p><h1>{t('Now you have something to share.','现在，你也有可以分享的经历。')}</h1><div className="cg-split"><div className="cg-stack"><div className="cg-mentor"><div className="cg-member-line"><span className="cg-avatar">J</span><span><strong>{w.selectedQuoteAuthor||t('Community members','社区成员')}</strong><small>{t('Reply in this conversation','在这段讨论中回应')}</small></span></div><p>{w.selectedQuote||t('What would someone else need to know about your experience?','另一位成员需要了解你这段经历的哪些条件？')}</p></div>{album&&<div className="cg-context"><VisualRef id={album.anchor?.photo||album.photo} lang={lang} anchor={album.anchor} mini/><div><strong>{album.title}</strong><p>{t('Linked with its visual detail, contributors and limits','连同视觉细节、贡献者与适用边界一起分享')}</p></div></div>}</div><div className="cg-stack"><label className="cg-field">{t('Your reply with experience','带着经验回应')}<textarea rows={5} maxLength={800} value={w.passDraft} onBlur={()=>draftEdited('pass',w.passDraft)} onChange={e=>change({passDraft:e.target.value})} placeholder={t('One thing that helped me… It might be different for you…','有一点曾经帮到我……对你来说，也许会不同……')}/></label><Button className="cg-ai" variant="outline" disabled={!album} onClick={()=>ai('pass')}><Sparkles size={17}/>{t('Prepare a reply with its source and limits','结合来源与边界准备回应')}</Button>{inlinePanel('pass')}{trace('pass')}{originalDrafts[story+':pass']!==undefined&&<button className="cg-text-link" onClick={()=>change({passDraft:originalDrafts[story+':pass']},'original_restored',{kind:'pass'})}>{t('Restore my wording','恢复我的原话')}</button>}<Button className="cg-primary" disabled={publishing||!album||!w.passDraft.trim()} onClick={()=>share('handoff',w.passDraft,()=>{change({passed:w.passDraft.trim()},'help_passed_on',{albumVersion:album?.version});go('reply');},{albumVersion:album?.version,to:w.selectedQuoteAuthor||'community members'})}>{t('Reply with our album story','带着图册故事回复')}<ArrowRight size={18}/></Button><p className="cg-meta">{t('The published reply stays in this conversation with its experience source.','发布的回应保留在当前讨论中，并附带经验来源。')}</p></div></div></>}
- {view==='profile'&&<>{weekly&&<div className="fc-week-profile"><h2>{t('Your community participation','你的社区参与')}</h2><p>{study.participant} · {study.week!.activeDays.length} {t('days visited','天访问记录')}</p><Button variant="outline" onClick={()=>setModal('ratings')}>{t('Share optional feedback','提供可选反馈')}</Button><button onClick={()=>setModal('study')}>{t('Study details and export','研究说明与导出')}</button></div>}<p className="cg-kicker">{t('MY MOMENTS','我的社区时刻')}</p><h1>{t('Small gestures. A shared history.','小小的回应，共同的记忆。')}</h1><p className="cg-intro">{t('A collection of how you took part. No points, no ranking.','记住你怎样参与过，没有积分和排名。')}</p><div className="cg-moment-grid">{Object.entries(momentNames).map(([key,label])=><div className={'cg-moment '+(earnedMoments.has(key)?'earned':'waiting')} key={key}><Heart size={22}/><h2>{tx(label)}</h2><p>{earnedMoments.has(key)?t('Recorded in your community contributions','已留在你的社区贡献中'):t('Whenever you feel ready','在你愿意的时候')}</p></div>)}</div>{w.passed&&<div className="cg-mentor"><strong>{t('What you passed on','你传下去的帮助')}</strong><p>{w.passed}</p></div>}<div className="cg-actions"><Button className="cg-primary" onClick={()=>go('detail')}>{t('Continue the conversation','继续这段交流')}</Button><Button className="cg-secondary" variant="outline" onClick={()=>go('return')}>{t('Return to my draft','回到我的回访草稿')}</Button>{active&&<Button className="cg-secondary" variant="outline" onClick={()=>setModal('ratings')} disabled={!canFinish(w)}>{t('Reflect on this activity','回顾这次活动')}</Button>}</div>{feed('saved')}</>}
- {view==='assistant'&&<><p className="cg-kicker">{t('SEPARATE ASSISTANT WORKSPACE','独立助手工作区')}</p><h1>{t('A useful thread, not a final answer.','一条线索，留出你的判断。')}</h1><div className="cg-reading-width"><p className="cg-meta">{t('Bring the current community reference into this separate workspace before viewing the same suggestion.','先把当前社区指代带入独立工作区，再查看相同的建议。')}</p>{!separateContextLoaded?<Button className="cg-secondary" variant="outline" onClick={()=>{setSeparateContextLoaded(true);event('assistance_context_transferred',{kind:assistKind,anchor:w.anchor,quote:w.selectedQuote});}}>{t('Bring the selected context here','把选中的情境带到这里')}</Button>:assistPanel}</div></>}
- {view==='done'&&<div className="cg-reading-width"><p className="cg-kicker">{t('SESSION COMPLETE','会话已完成')}</p><h1>{t('Thank you for taking part.','谢谢你的参与。')}</h1><p>{t('Your activities are saved in this browser. Export a copy before clearing this session.','活动已保存在本机，请在清除前导出副本。')}</p><p role="status">{onlineConfigured?(cloudStatus==='saved'?t('Research record saved online.','研究记录已保存到数据库。'):cloudStatus==='error'?t('Online save failed. Keep this tab open and export a copy.','数据库保存失败，请保留此页并导出副本。'):t('Saving research record…','正在保存研究记录……')):''}</p><div className="cg-actions"><Button className="cg-primary" onClick={()=>download('json')}>JSON</Button><Button className="cg-secondary" variant="outline" onClick={()=>download('csv')}>CSV</Button></div><details><summary>{t('Preview export / copy manually','预览导出 / 手动复制')}</summary><label className="cg-field">JSON<textarea readOnly rows={8} value={exportText('json')}/></label><label className="cg-field">CSV<textarea readOnly rows={5} value={exportText('csv')}/></label></details><Button className="cg-secondary" variant="outline" onClick={()=>setModal('erase')}>{t('Clear this session','清除此会话')}</Button></div>}
- {active&&view!=='done'&&<div className="cg-study-progress"><span>{t('Activity','活动')} {study.phase+1}/2 · {t('Community activity · AI and thanks optional','社区活动 · AI 与感谢可选')}</span><button disabled={!canFinish(w)} onClick={()=>setModal('ratings')}>{t('Reflect','填写反思')}<ArrowRight size={15}/></button></div>}
- </main></div>
- <Dialog open={!!modal} onOpenChange={open=>{if(!open)setModal('');}}><DialogContent className="cg-dialog" initialFocus={()=>{const heading=document.querySelector<HTMLElement>('.cg-dialog [data-slot="dialog-title"]');heading?.closest('.cg-dialog')?.scrollTo(0,0);return heading;}}><DialogTitle tabIndex={-1}>{({about:t('About this space','关于这个空间'),original:t('Original image & context','原图与情境'),assist:t('AI support, inside the community','社区中的 AI 辅助'),review:t('A page in our shared story','共同故事中的一页'),history:t('People, sources & revisions','成员、来源与修订'),study:t('Research session','研究会话'),ratings:weekly?t('Optional community feedback','可选社区反馈'):t('Reflect on this activity','回顾这次活动'),erase:t('Clear local V4 data?','清除本地 V4 数据？'),ecosystem:t('A connected community','相互连接的社区'),newpost:t('Start a conversation','发起讨论'),references:t('Case reference · optional','案例参照 · 可选'),notifications:t('Replies in your conversations','你参与讨论中的回应')} as Record<string,string>)[modal]||''}</DialogTitle><DialogDescription>{t('Common Ground · community research simulation','Common Ground · 社区研究模拟')}</DialogDescription>
- {modal==='about'&&<div className="cg-stack"><p>{t('This is a desktop-web, case-informed research simulation, not Sephora’s service. It preserves documented image-led community practices while testing new AI interactions. Pictured people are generated fictional adults; member names and replies are scripted roles.','这是基于案例构建的桌面 Web 研究模拟，并非 Sephora 的服务。它保留有据可查的图片型社区实践，用于测试新增 AI 交互。图片人物均为生成的虚构成年人；成员姓名和回应是脚本角色。')}</p><p>{tx(st.origin)}</p><p>{t('Image meaning comes from the image, its context and what a member says. These props cannot demonstrate cosmetic results.','图片的含义来自画面、情境和成员的解释；这些图片道具不能证明产品效果。')}</p><a href={st.source==='#'?stories[story].source:st.source} onClick={inspectSource} target="_blank" rel="noreferrer">{t('Open this story’s source','查看当前故事的来源')}</a><p className="cg-meta">{st.sourceIds.join(' · ')}</p><p>{t('Assistance uses fixed presets, not a live AI model. Community contributions are stored in Supabase and visible to other visitors; consented research records are private. Nothing is published to Sephora. Consented week-study drafts remain available for 30 days in this browser; local expiry does not delete online records.','辅助使用固定预设，并非实时 AI 模型。社区贡献保存在 Supabase，其他访问者可见；同意后的研究记录保持私密。不会发布到 Sephora。一周观察的本地草稿保留 30 天；本地过期不会删除数据库记录。')}</p>{!sessionRunning&&<label className="cg-field">{t('Explore an assistance condition','探索辅助条件')}<select value={data.mode} onChange={e=>setData({...data,mode:e.target.value as Saved['mode']})}><option value="embedded">{t('Embedded assistance','嵌入式辅助')}</option><option value="separate">{t('Separate assistant','独立助手')}</option></select></label>}<details><summary>{t('Earlier study records','之前的研究记录')}</summary>{Object.keys(localStorage).filter(k=>k.startsWith('common-ground-archived-')).map(k=><button key={k} className="cg-text-link" onClick={()=>{const value=localStorage.getItem(k);if(!value)return;const url=URL.createObjectURL(new Blob([value],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=k+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}}>{t('Export archived record ','导出归档记录 ')+k.split('-').at(-1)}</button>)}</details><button className="cg-text-link" onClick={()=>setModal('erase')}>{t('Clear local data','清除本地数据')}</button></div>}
- {modal==='original'&&<div className="cg-stack"><Photo id={originalPhoto} lang={lang}/><p>{tx(photos[originalPhoto].alt)}</p><p>{t('Generated research prop. Original square framing; not an observed outcome or historical member photograph.','生成的研究道具，保留原始方形构图；不是实测结果或历史成员照片。')}</p></div>}
- {modal==='assist'&&assistPanel}
- {modal==='review'&&<div className="cg-stack"><div className="cg-context"><VisualRef id={w.anchor?.photo||st.photo} lang={lang} anchor={w.anchor} mini/><h2>{w.albumTitle}</h2></div>{w.selectedQuote&&<div className="cg-linked-quote"><span>↳</span><p>{w.selectedQuote}</p></div>}<section className="cg-review-block"><h3>{t('Your experience draft','你的经验草稿')}</h3><p className="cg-preserve">{w.albumDraft}</p></section><section className="cg-review-block"><h3>{t('Context and what remains uncertain','情境与尚待确认之处')}</h3><p>{last?.context||t('No additional context supplied','未另填情境')}</p><p>{w.albumLimits||last?.limits||t('No additional limit supplied','未另填边界')}</p></section>{last&&w.anchor&&last.photo!==w.anchor.photo&&<section className="cg-review-block"><h3>{t('Return photo · not the original question reference','回访图片 · 不等于原提问指代')}</h3><Photo id={last.photo} lang={lang}/></section>}<p>{t('People in this story: ','这段故事里的人：')}{[st.member,...(w.selectedQuoteAuthor?[w.selectedQuoteAuthor]:!custom&&w.responseShown?[st.guide]:[]),t('You','你')].join(' → ')}</p><p className="cg-meta">{t('Image detail, selected human sentence, generated prop origin and authored update remain inspectable. Source roles are retained, not treated as approvals.','图片细节、选中的成员原句、生成图片来历与个人回访均可核对。保留来源角色不代表他们已认可内容。')}</p><label className="cg-check"><Checkbox checked={reviewed} onCheckedChange={x=>{setReviewed(x===true);event('album_review_confirmed',{checked:x===true});}}/><span>{t('I reviewed the wording, people, selected references and image origin.','我已核对表达、贡献者、选中指代与图片来历。')}</span></label><Button className="cg-primary" disabled={publishing||!reviewed} onClick={()=>{try{const nw=publishAlbum(w,story,custom?{author:st.member,sourceIds:st.sourceIds}:undefined);share('album',w.albumDraft,()=>{change(nw,'album_published',{version:nw.versions.length});setModal('');go('album');},{title:w.albumTitle,limits:w.albumLimits,album:nw.versions.at(-1)});}catch{setNotice(t('Add your update, title and text first.','请先补充回访、标题与文字。'));}}}>{t('Add to our album','加入共同图册')}</Button><Button variant="outline" className="cg-secondary" onClick={()=>{setModal('');event('album_review_cancelled');}}>{t('Keep editing','继续编辑')}</Button></div>}
- {modal==='history'&&<div className="cg-stack">{w.versions.map(v=><details key={v.version}><summary onClick={()=>event('album_version_inspected',{version:v.version})}>{v.version} · {v.title}</summary>{v.quotedLine&&<blockquote>{v.quotedLine}</blockquote>}<p className="cg-preserve">{v.text}</p><p>{v.limits}</p><p>{v.authors.join(' → ')}</p><p className="cg-meta">{v.sourceIds.join(' · ')}<br/>{v.at}</p></details>)}<a href={st.source==='#'?stories[story].source:st.source} onClick={inspectSource} target="_blank" rel="noreferrer">{t('Inspect the source','检查来源')}</a></div>}
- {modal==='ecosystem'&&<div className="cg-stack"><p className="cg-ai-stage">{({shop:t('Linked products and purchase','关联产品与购买'),profile:t('Use profile and product context','使用档案与产品情境'),recognition:t('Recognition and loyalty conventions','认可与忠诚度惯例'),governance:t('Community governance','社区治理')} as const)[ecosystemKind]}</p><p>{({shop:t('A member may open factual product details, availability or purchase options, then return to the originating story. Community testimony keeps its author and context; it is not converted into a recommendation rank.','成员可以查看产品事实、库存或购买入口，再回到原故事。社区经验保留作者与情境，不被转化为推荐排名。'),profile:t('Skin type, preferences and product history remain self-described profile context. They can narrow what a member chooses to read, but the prototype does not diagnose skin or infer a result from an image.','肤质、偏好与产品历史仍由成员自述，可帮助缩小阅读范围；原型不诊断皮肤，也不从图片推断效果。'),recognition:t('Community recognition and loyalty status are different practices. This simulation shows recognition moments without awarding real status or points, and AI does not judge member merit.','社区认可与忠诚度身份属于不同实践。本模拟展示认可时刻，但不授予真实身份或积分，也不让 AI 评判贡献。'),governance:t('AI may group duplicate reports or flag a possible policy issue with reasons. Human moderators retain final review; members can inspect, correct and appeal decisions.','AI 可归并重复报告，或带理由提示潜在规则问题。最终复核由人工完成，成员可以查看、更正并申诉。')} as const)[ecosystemKind]}</p><p className="cg-meta">{t('This secondary pathway is represented to keep the community ecosystem visible. It is outside the research scope.','该次级路径用于保留社区生态的完整性，属于本研究的次级范围。')}</p><Button className="cg-primary" onClick={()=>setModal('')}>{t('Return to community stories','回到社区故事')}</Button></div>}
- {modal==='study'&&<div className="cg-stack">{weekly?<><h3>{t('One week, at your own pace','一周，按自己的节奏参与')}</h3><p>{t('Browse any topic, post, comment or return when you wish. There are no required tasks or daily quotas. AI and feedback are optional.','可以自由浏览话题、发帖、评论，也可以在愿意时回来。没有必做任务或每日配额；AI 与反馈始终可选。')}</p><p>{study.participant} · {t('Observation period ends ','观察期结束于 ')}{new Date(study.week!.endsAt).toLocaleDateString(lang==='en'?'en-GB':'zh-CN')}</p><p>{t('Community contributions are visible to other visitors. Your consented navigation, AI decisions, draft reviews and feedback are private to you and the researcher.','社区贡献向其他访问者展示；同意后的导航、AI 决定、草稿审阅与反馈记录仅你与研究者可见。')}</p><Button className="cg-primary" onClick={()=>setModal('')}>{t('Continue browsing','继续浏览')}</Button><Button variant="outline" onClick={()=>setModal('ratings')}>{t('Share optional feedback','提供可选反馈')}</Button><div className="cg-actions"><Button variant="outline" onClick={()=>download('json')}>JSON</Button><Button variant="outline" onClick={()=>download('csv')}>CSV</Button></div><button className="cg-text-link" onClick={()=>{setData({...data,study:{...log(study,'week_observation_ended'),completed:true}});setModal('');setNotice(t('Observation ended. You can continue browsing the community.','已结束观察记录，仍可继续浏览社区。'));}}>{study.completed?t('Recording has ended','研究记录已结束'):t('End research recording','结束研究记录')}</button></>:<>{study&&<div className="fc-archive"><p>{t('An earlier moderated-study record is retained. Export it before joining the new observation.','保留有一份旧版主持式测试记录，加入新观察前可以先导出。')}</p><button onClick={()=>download('json')}>JSON</button></div>}<p>{t('Join a seven-day community observation. Use the site naturally; no sequence of tasks is required.','加入为期七天的社区观察，自然使用网站，无需完成规定任务顺序。')}</p><label className="cg-field">{t('Anonymous participant code','匿名参与编号')}<input aria-label={t('Anonymous participant code','匿名参与编号')} value={participant} onChange={e=>setParticipant(e.target.value)} placeholder="P001" maxLength={7}/></label><p className="cg-meta">{t('Fictional seed posts and preset AI are identified. Public comments are shared; consented activity records are stored privately in the research database. Keep using the same browser for continuity.','初始虚构帖子与预设 AI 均有标识。公开评论会共享；同意后的操作记录私密保存在研究数据库。请使用同一浏览器保持连续性。')}</p><label className="cg-check"><Checkbox checked={consent} onCheckedChange={v=>setConsent(v===true)}/><span>{t('I have read the researcher’s information sheet and agree to the seven-day observation. I understand my posts/comments will be visible to other visitors. I will not share personal or sensitive information.','我已阅读研究告知书并同意七天观察，理解帖子与评论向其他访问者展示，不填写个人或敏感信息。')}</span></label><Button className="cg-primary" disabled={publishing||!consent||!/^P\d{3,6}$/i.test(participant.trim())} onClick={start}>{t('Join and browse freely','加入并自由浏览')}</Button><button className="cg-text-link" onClick={()=>setModal('')}>{t('Browse without joining the study','不加入研究，直接浏览')}</button></>}</div>}
- {modal==='notifications'&&<div className="cg-stack"><p>{t('Replies in topics you posted, joined or saved.','你发起、参与或收藏的话题中的回应。')}</p>{notifications.length?notifications.map(r=><button key={r.id} className="fc-notification" onClick={()=>{const p=community.posts.find(p=>p.id===threadOf(r.metadata,r.post_id));if(p){setModal('');openPost(p);}}}><strong>{r.display_name}</strong><span>{r.body}</span><small>{new Date(r.created_at).toLocaleDateString(lang==='en'?'en-GB':'zh-CN')}</small></button>):<p>{t('No replies yet. You can keep browsing or join a conversation.','暂时没有新的回应。可以继续浏览或加入讨论。')}</p>}</div>}
- {modal==='newpost'&&<div className="cg-stack"><label className="cg-field">{t('Post title','帖子标题')}<input aria-label={t('Post title','帖子标题')} maxLength={120} value={newTitle} onChange={e=>setNewTitle(e.target.value)}/></label><label className="cg-field">{t('Your story or question','你的故事或问题')}<textarea aria-label={t('Your story or question','你的故事或问题')} rows={5} maxLength={2400} value={newBody} onChange={e=>setNewBody(e.target.value)}/></label><label className="cg-field">{t('Group','群组')}<select aria-label={t('Group','群组')} value={newGroup} onChange={e=>setNewGroup(e.target.value as StoryId)}>{Object.entries(groupNames).map(([id,b])=><option key={id} value={id}>{tx(b)}</option>)}</select></label><label className="cg-field">{t('Scenario photo · optional','情境图片 · 可选')}<select value={newPhoto} onChange={e=>setNewPhoto(e.target.value as PhotoId|'')}><option value="">{t('Text only','仅文字')}</option>{Object.entries(photos).map(([id,b])=><option key={id} value={id}>{tx(b.alt)}</option>)}</select></label>{newPhoto&&<Photo id={newPhoto} lang={lang}/>}<p className="cg-meta">{t('This post will be visible to other visitors. Available images are fictional study props.','该帖子向其他访问者展示；可选图片是虚构研究道具。')}</p>{newError&&<p role="alert">{newError}</p>}<Button className="cg-primary" disabled={newBusy||!newTitle.trim()||!newBody.trim()} onClick={createPost}>{newBusy?t('Publishing…','发布中……'):t('Publish conversation','发布讨论')}</Button></div>}
- {modal==='references'&&<div className="cg-stack"><p>{t('Optional case-reference pages. Explore the community in any order.','可选的案例参照页面，可以按任意顺序探索社区。')}</p>{['home','conversation','gallery','product-advice'].map(name=><figure key={name}><LoadingImage src={'/reference/web-community-'+name+'.png'} alt={t('Case reference: ','案例参照：')+name} ratio={name==='home'?'1500 / 970':name==='conversation'?'1474 / 1643':name==='gallery'?'1324 / 1686':'1344 / 896'}/><figcaption>{t('Historical case-reference capture from the thesis; not a live service page.','论文中的历史案例参照截图，并非当前服务页面。')} <a href={'/reference/web-community-'+name+'.png'} target="_blank" rel="noreferrer">{t('Open full screenshot','打开完整截图')}</a> · <a href={name==='home'?'https://www.justinmind.com/ui-design/tips-examples-tabs-web':name==='product-advice'?'https://www.feedspace.io/blogs/user-generated-content-examples/':'https://medium.com/@ciety/community-case-sephoras-beauty-insider-community-53dd1f79b786'} target="_blank" rel="noreferrer">{t('Capture source','截图来源')}</a></figcaption></figure>)}<label className="cg-field">{t('Any mismatch you noticed? · optional','发现不一致之处？ · 可选')}<textarea aria-label={t('Any mismatch you noticed? · optional','发现不一致之处？ · 可选')} rows={3} value={answer} onChange={e=>setAnswer(e.target.value)} placeholder={t('Blank means no additional comment','留空默认没有补充')}/></label><Button className="cg-primary" onClick={()=>{if(study?.week)setData({...data,study:weekFeedback(study,Array(6).fill(null),answer,'reference')});setAnswer('');setModal('');}}>{t('Close / save optional note','关闭／保存可选说明')}</Button></div>}
- {modal==='ratings'&&<div className="cg-stack">{moderated&&study?.research&&<><h3>{t('Reconstruct the contribution chain','重建贡献链')}</h3><div className="cg-reconstruction">{([['pin','What did pin 1 refer to?','定位 1 指向什么？'],['human','Who wrote the selected human sentence?','选中的成员原句由谁写出？'],['ai','What did AI change or add? If unused, say so.','AI 改变或添加了什么？未使用也可说明。'],['member','Which wording or publication decision remained yours?','哪些表达或发布决定由你做出？']] as const).map(([key,en,zh])=><label className="cg-field" key={key}>{t(en,zh)}<textarea rows={2} maxLength={600} value={reconstruction[key]} onChange={e=>setReconstruction(r=>({...r,[key]:e.target.value}))}/></label>)}</div><button className="cg-text-link" onClick={()=>{setModal('');go('reply');event('reconstruction_reinspection');}}>{t('Reinspect the conversation (answers kept)','回看讨论（保留已填回答）')}</button></>}<label className="cg-field">{t('What would you pass on, who helped, and what is still uncertain?','你会传递什么、谁提供了帮助、还有什么尚不确定？')}<textarea aria-label={t('Optional reflection','可选反思')} placeholder={t('Blank means no additional comment','留空默认没有补充')} rows={4} value={answer} onChange={e=>setAnswer(e.target.value)} maxLength={2000}/></label><p className="cg-meta">{t('1 strongly disagree · 7 strongly agree · N/A not applicable. Researcher-written items.','1 非常不同意 · 7 非常同意 · N/A 不适用。研究者自拟条目。')}</p>{ratingLabels.map((b,i)=><fieldset className="cg-rating" key={i}><legend>{tx(b)}</legend><RadioGroup value={ratings[i]} onValueChange={v=>setRatings(r=>r.map((x,j)=>i===j?String(v):x))} className="cg-rating-options">{['1','2','3','4','5','6','7','na'].map(x=><label key={x}><RadioGroupItem value={x}/><span>{x==='na'?'N/A':x}</span></label>)}</RadioGroup></fieldset>)}<Button className="cg-primary" disabled={moderated&&!canFinish(w)} onClick={finish}>{weekly?t('Save optional feedback','保存可选反馈'):study?.research?(study.phase===0?t('Save reflection and take a break','保存反思并休息'):t('Continue to the transfer task','进入迁移任务')):study?.phase===0?t('Save & start activity two','保存并开始第二组活动'):t('Finish & export','完成并导出')}</Button></div>}
- {modal==='erase'&&<div className="cg-stack"><p>{t('This clears drafts and records from this browser. Online contributions and research records remain; contact the researcher with your participant code to request their removal. Downloaded exports are unaffected.','这会清除此浏览器的草稿与记录。网站上的贡献和研究记录仍会保留；如需删除，请向研究者提供参与编号。导出的副本不受影响。')}</p><Button className="cg-primary" onClick={()=>{Object.keys(localStorage).filter(k=>k.startsWith('common-ground-archived-')).forEach(k=>localStorage.removeItem(k));localStorage.removeItem(STORAGE);localStorage.removeItem('common-ground-post-draft');setNewTitle('');setNewBody('');setNewPhoto('');Object.keys(sessionStorage).filter(k=>k.startsWith('comment-draft-')).forEach(k=>sessionStorage.removeItem(k));setData({version:VERSION,savedAt:Date.now(),lang,story:'A',mode:'embedded',works:cleanWorks(),study:null});setModal('');setView('home');setConsent(false);setOriginalDrafts({});setParticipant('');setAnswer('');setRatings(Array(6).fill(''));}}>{t('Clear V4 data','清除 V4 数据')}</Button><Button variant="outline" className="cg-secondary" onClick={()=>setModal('')}>{t('Keep my data','保留数据')}</Button></div>}
- </DialogContent></Dialog>{notice&&!modal&&<div className="cg-notice" role="status">{notice}<button aria-label={t('Dismiss','关闭')} onClick={()=>setNotice('')}><X size={16}/></button></div>}</div>;
+"use client";
+import { useEffect, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Bookmark,
+  Check,
+  Heart,
+  MessageCircle,
+  Plus,
+  Sparkles,
+  Users,
+  X,
+  History,
+  FlaskConical,
+  Search,
+  Bell,
+  ShoppingBag,
+  Store,
+  Camera,
+  Mail,
+  ChevronDown,
+  LoaderCircle,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  VERSION,
+  STORAGE,
+  stories,
+  photos,
+  say,
+  emptyWork,
+  clampAnchor,
+  startStudy,
+  assignment,
+  log,
+  canFinish,
+  finishPhase,
+  albumProposal,
+  publishAlbum,
+  moments,
+  exportCsv,
+  restore,
+  type Lang,
+  type Bi,
+  type StoryId,
+  type PhotoId,
+  type Work,
+  type Saved,
+  emptyReconstruction,
+  researchComplete,
+  updateResearch,
+  advanceResearch,
+  type ResearchSession,
+  type ResearchStage,
+} from "@/lib/community-v3";
+import "./community-v3.css";
+import "./community-case-shell.css";
+import "./online.css";
+import { LoadingImage } from "@/components/loading-image";
+import { CommunityFeed, useCommunity } from "@/components/community-feed";
+import {
+  startWeek,
+  visitWeek,
+  weekFeedback,
+  groupNames,
+  seedPosts,
+  type CommunityPost,
+  threadOf,
+} from "@/lib/free-community";
+import "./community-polish.css";
+import "./interaction-patterns.css";
+import {RelatedConversations,ExperienceAssembly,ExperienceComparison,ConversationReturn} from "@/components/interaction-patterns";
+import {relatedPosts,type ExperienceSource,type Related,type MaterialKey} from "@/lib/interaction-patterns";
+import { StudySessionPanel } from "@/components/study-session";
+import { SharedThread } from "@/components/shared-thread";
+import {
+  onlineConfigured,
+  publishContribution,
+  saveStudy,
+  beginStudyIdentity,
+  messageForError,
+  type ContributionKind,
+} from "@/lib/online";
+type View =
+  | "home"
+  | "together"
+  | "detail"
+  | "ask"
+  | "reply"
+  | "return"
+  | "thanks"
+  | "draft"
+  | "album"
+  | "pass"
+  | "profile"
+  | "assistant"
+  | "done";
+type AssistKind = "question" | "route" | "quote" | "album" | "pass";
+type Modal =
+  | ""
+  | "about"
+  | "original"
+  | "assist"
+  | "review"
+  | "history"
+  | "study"
+  | "ratings"
+  | "erase"
+  | "ecosystem"
+  | "newpost"
+  | "references"
+  | "notifications";
+const cleanWorks = () => ({ A: emptyWork("A"), B: emptyWork("B"), C: emptyWork("C") });
+const ratingLabels: Bi[] = [
+  ["I felt able to ask a question in my own words.", "我觉得可以用自己的话开口提问。"],
+  ["I could see whose help shaped the shared story.", "我能看出共同故事中包含了谁的帮助。"],
+  [
+    "I could trace AI suggestions back to the image, comment or member source they used.",
+    "我能追溯 AI 建议所使用的图片、评论或成员来源。",
+  ],
+  [
+    "I could continue the community activity without losing the selected reference or person.",
+    "我能继续社区活动，而不丢失选中的指代或相关成员。",
+  ],
+  ["My contribution still felt like mine.", "我仍然觉得这份贡献属于自己的表达。"],
+  [
+    "I would feel comfortable passing this experience to another newcomer.",
+    "我愿意将这段经验分享给另一位新人。",
+  ],
+];
+const momentNames: Record<string, Bi> = {
+  "first-share": ["My first contribution", "第一次参与"],
+  return: ["I came back", "一次回访"],
+  thanks: ["A personal thank-you", "一句亲自表达的感谢"],
+  album: ["A shared story", "一段共同故事"],
+  "pass-on": ["Passing help on", "把帮助传下去"],
+};
+const caseTopics: Record<StoryId, { group: Bi; product: Bi }> = {
+  A: {
+    group: ["Complexion discussions", "底妆讨论"],
+    product: ["Foundation and primer", "粉底与妆前"],
+  },
+  B: {
+    group: ["Makeup techniques", "彩妆技巧"],
+    product: ["Blush and cheek colour", "腮红与面颊色彩"],
+  },
+  C: { group: ["Swatches and shades", "试色与色号"], product: ["Colour cosmetics", "彩妆产品"] },
+};
+function Photo({
+  id,
+  lang,
+  className = "",
+  onClick,
+}: {
+  id: PhotoId;
+  lang: Lang;
+  className?: string;
+  onClick?: () => void;
+}) {
+  return (
+    <span onClick={onClick}>
+      <LoadingImage
+        className={"cg-photo " + className}
+        src={photos[id].src}
+        alt={say(lang, photos[id].alt)}
+      />
+    </span>
+  );
+}
+function VisualRef({
+  id,
+  lang,
+  anchor,
+  mini = false,
+}: {
+  id: PhotoId;
+  lang: Lang;
+  anchor: Work["anchor"];
+  mini?: boolean;
+}) {
+  return (
+    <div className={"cg-visual-ref " + (mini ? "is-mini" : "")}>
+      <Photo id={id} lang={lang} />
+      {anchor && anchor.photo === id && (
+        <span className="cg-pin" style={{ left: anchor.x * 100 + "%", top: anchor.y * 100 + "%" }}>
+          1
+        </span>
+      )}
+    </div>
+  );
+}
+const sentences = (text: string) =>
+  (text.match(/[^.!?。！？]+[.!?。！？]?/g) || [text]).map((x) => x.trim()).filter(Boolean);
+export default function CommunityV3() {
+  const [data, setData] = useState<Saved | null>(null);
+  const [view, setView] = useState<View>("home");
+  const [modal, setModal] = useState<Modal>("");
+  const [notice, setNotice] = useState("");
+  const community = useCommunity();
+  const [group, setGroup] = useState<StoryId | "">("");
+  const [newTitle, setNewTitle] = useState(""),
+    [newBody, setNewBody] = useState(""),
+    [newGroup, setNewGroup] = useState<StoryId>("A"),
+    [newPhoto, setNewPhoto] = useState<PhotoId | "">("");
+  const [newBusy, setNewBusy] = useState(false),
+    [newError, setNewError] = useState("");
+  const [condition, setCondition] = useState<"embedded" | "separate">("embedded");
+  const [participant, setParticipant] = useState("");
+  const [sequence, setSequence] = useState("0");
+  const [consent, setConsent] = useState(false);
+  const [answer, setAnswer] = useState("");
+  const [ratings, setRatings] = useState<string[]>(Array(6).fill(""));
+  const [reviewed, setReviewed] = useState(false);
+  const [reconstruction, setReconstruction] = useState(emptyReconstruction());
+  const [searchTerm, setSearchTerm] = useState("");
+  const [publishing, setPublishing] = useState(false);
+  const [cloudStatus, setCloudStatus] = useState("");
+  const pendingShare = useRef<{ key: string; id: string } | null>(null);
+  const [conversationReturn,setConversationReturn]=useState<{post:CommunityPost;view:View}|null>(null);
+  const [assistKind, setAssistKind] = useState<AssistKind>("question");
+  const [inlineAssist, setInlineAssist] = useState<AssistKind | null>(null);
+  const [separateContextLoaded, setSeparateContextLoaded] = useState(false);
+  const [origin, setOrigin] = useState<View>("ask");
+  const [originalDrafts, setOriginalDrafts] = useState<Record<string, string>>({});
+  const [originalPhoto, setOriginalPhoto] = useState<PhotoId>("base");
+  const [ecosystemKind, setEcosystemKind] = useState<
+    "shop" | "profile" | "recognition" | "governance"
+  >("shop");
+  useEffect(() => {
+    let saved: Saved | null = null;
+    try {
+      saved = restore(localStorage.getItem(STORAGE) || "");
+    } catch {}
+    const query = new URLSearchParams(location.search);
+    const q = query.get("lang");
+    if (query.get("protocol") !== "moderated" && saved?.study && !saved.study.week) {
+      localStorage.setItem(
+        "common-ground-archived-" + saved.study.startedAt,
+        JSON.stringify(saved),
+      );
+      saved = { ...saved, study: null };
+    }
+    setCondition(query.get("condition") === "separate" ? "separate" : "embedded");
+    if (saved?.study?.week) {
+      saved = { ...saved, mode: saved.study.week.condition, study: visitWeek(saved.study) };
+    }
+    const lang: Lang = "en";
+    setData(
+      saved
+        ? { ...saved, version: VERSION, lang, study:saved.study?{...saved.study,lang}:null }
+        : {
+            version: VERSION,
+            savedAt: Date.now(),
+            lang,
+            story: "A",
+            mode: query.get("condition") === "separate" ? "separate" : "embedded",
+            works: cleanWorks(),
+            study: null,
+          },
+    );
+    if (!saved?.study && query.get("study") === "1") {
+      setModal("study");
+      const seq = query.get("sequence");
+      if (seq && /^[0-3]$/.test(seq)) setSequence(seq);
+    }
+    if (saved?.study?.research?.reflectionDraft) {
+      const f = saved.study.research.reflectionDraft;
+      if (f.phase === saved.study.phase) {
+        setAnswer(f.answer);
+        setRatings(f.ratings);
+        setReconstruction(f.reconstruction);
+      }
+    }
+    if (query.get("protocol") === "moderated" && saved?.study && researchComplete(saved.study))
+      setView("done");
+    else if (query.get("protocol") === "moderated" && saved?.study?.research?.stage === "activity")
+      setView("detail");
+    else if (["A", "B", "C"].includes(query.get("post") || "")) {
+      setData((d) =>
+        d
+          ? { ...d, story: query.get("post") as StoryId, activePost: "case:" + query.get("post") }
+          : d,
+      );
+      setView("detail");
+    }
+  }, []);
+  useEffect(() => {
+    try {
+      const d = JSON.parse(localStorage.getItem("common-ground-post-draft") || "null");
+      if (d) {
+        setNewTitle(d.title || "");
+        setNewBody(d.body || "");
+        if (["A", "B", "C"].includes(d.group)) setNewGroup(d.group);
+        if (["base", "blush", "swatches", ""].includes(d.photo)) setNewPhoto(d.photo);
+      }
+    } catch {}
+  }, []);
+  useEffect(() => {
+    if (!data) return;
+    localStorage.setItem(
+      "common-ground-post-draft",
+      JSON.stringify({ title: newTitle, body: newBody, group: newGroup, photo: newPhoto }),
+    );
+  }, [newTitle, newBody, newGroup, newPhoto, !!data]);
+  useEffect(() => {
+    if (!data?.study?.week || data.study.completed) return;
+    const check = () => {
+      setData((d) =>
+        d?.study?.week && !d.study.completed && Date.now() > d.study.week.endsAt
+          ? { ...d, study: { ...d.study, completed: true } }
+          : d,
+      );
+    };
+    check();
+    const timer = setInterval(check, 60000);
+    return () => clearInterval(timer);
+  }, [data?.study?.startedAt, data?.study?.completed]);
+  useEffect(() => {
+    if (!data) return;
+    document.documentElement.lang = data.lang;
+    try {
+      localStorage.setItem(STORAGE, JSON.stringify({ ...data, savedAt: Date.now() }));
+    } catch {
+      setNotice(
+        data.lang === "en"
+          ? "Local storage is unavailable. Export before leaving."
+          : "本地保存不可用，请在离开前导出。",
+      );
+    }
+  }, [data]);
+  useEffect(() => {
+    if (!notice) return;
+    const id = setTimeout(() => setNotice(""), 5000);
+    return () => clearTimeout(id);
+  }, [notice]);
+  useEffect(() => {
+    if (
+      !onlineConfigured ||
+      !data?.study ||
+      (!data.study.week && new URLSearchParams(location.search).get("protocol") !== "moderated")
+    )
+      return;
+    let current = true;
+    setCloudStatus("pending");
+    const id = setTimeout(() => {
+      saveStudy(data.study!)
+        .then(() => {
+          if (current) setCloudStatus("saved");
+        })
+        .catch(() => {
+          if (current) setCloudStatus("error");
+        });
+    }, 800);
+    return () => {
+      current = false;
+      clearTimeout(id);
+    };
+  }, [data?.study]);
+  useEffect(() => {
+    if (
+      new URLSearchParams(location.search).get("protocol") !== "moderated" ||
+      data?.study?.research?.stage !== "activity"
+    )
+      return;
+    const f = { phase: data.study.phase, answer, ratings, reconstruction };
+    if (JSON.stringify(data.study.research.reflectionDraft) === JSON.stringify(f)) return;
+    setData((d) =>
+      d?.study?.research?.stage === "activity"
+        ? { ...d, study: { ...d.study, research: { ...d.study.research, reflectionDraft: f } } }
+        : d,
+    );
+  }, [answer, ratings, reconstruction, data?.study?.phase, data?.study?.research?.stage]);
+  if (!data)
+    return (
+      <main className="cg-loading">
+        <LoaderCircle className="fc-spin" /> Common Ground
+      </main>
+    );
+  const { lang, story, study } = data;
+  const moderated = new URLSearchParams(location.search).get("protocol") === "moderated",
+    weekly = !!study?.week,
+    focusId = data.activePost || "case:" + story,
+    focus =
+      community.posts.find((p) => p.id === focusId) || seedPosts.find((p) => p.id === focusId),
+    custom = !!focus && !focus.id.startsWith("case:"),
+    hasPhoto = focus ? !!focus.photo : true;
+  const st = focus
+    ? {
+        ...stories[story],
+        member: focus.author,
+        title: focus.title,
+        caption: focus.body,
+        photo: focus.photo || stories[story].photo,
+        ...(!focus.id.startsWith("case:")
+          ? {
+              sourceIds: ["community-post:" + focus.id],
+              source: "#",
+              origin: focus.seed
+                ? ([
+                    "Authored fictional community post. Images are generated simulation props.",
+                    "编写的虚构社区帖子，图片为生成的模拟道具。",
+                  ] as Bi)
+                : ([
+                    "Participant-authored post in this simulation. Preset AI uses its text and any selected reference; it does not infer product effects.",
+                    "参与者在模拟社区中发布的帖子。预设 AI 使用帖子文字与选中指代，不推断产品效果。",
+                  ] as Bi),
+            }
+          : {}),
+      }
+    : stories[story];
+  const works = custom
+    ? { ...data.works, [story]: data.threadWorks?.[focusId] || emptyWork(story) }
+    : data.works;
+  const w = works[story],
+    stage = moderated ? study?.research?.stage : undefined,
+    active = moderated && !!study && !study.completed && (!stage || stage === "activity"),
+    sessionRunning = !!study && !researchComplete(study) && (weekly || moderated),
+    fidelity = stage === "fidelity",
+    blocked = moderated && !!stage && !["activity", "fidelity", "finished"].includes(stage);
+  const t = (en: string, zh: string) => say(lang, [en, zh]);
+  const tx = (b: Bi) => say(lang, b);
+  const last = w.updates.at(-1);
+  const album = w.versions.at(-1);
+  const localSources:ExperienceSource[]=[...Object.entries(data.works).flatMap(([id,work])=>work.versions.map(a=>({key:'local:case:'+id+':'+a.version,threadId:'case:'+id,author:study?.participant||(community.uid?'Member-'+community.uid.slice(0,6):'You'),album:a,quoteAuthor:work.selectedQuoteAuthor||stories[id as StoryId].guide}))),...Object.entries(data.threadWorks||{}).flatMap(([id,work])=>work.versions.map(a=>({key:'local:'+id+':'+a.version,threadId:id,author:study?.participant||(community.uid?'Member-'+community.uid.slice(0,6):'You'),album:a,quoteAuthor:work.selectedQuoteAuthor})))];
+  const experienceSources:ExperienceSource[]=[...localSources,...community.posts.filter(p=>p.album).map(p=>({key:p.id,threadId:p.id,author:p.author,album:p.album!,quoteAuthor:p.albumQuoteAuthor}))];
+  const handoff=w.handoffSource;
+  const currentPost=focus||seedPosts.find(p=>p.id==='case:'+story)!;
+  const related=relatedPosts(currentPost,community.posts,lang);
+
+  const availableStories: StoryId[] = moderated && sessionRunning ? ["A", "B"] : ["A", "B", "C"];
+  const displayStories: StoryId[] = active ? [story] : availableStories;
+  const earnedMoments = new Set(
+    community.ownContributions.flatMap((r) => [
+      r.kind === "update"
+        ? "return"
+        : r.kind === "thanks"
+          ? "thanks"
+          : r.kind === "album"
+            ? "album"
+            : r.kind === "handoff"
+              ? "pass-on"
+              : "first-share",
+    ]),
+  );
+  if (community.ownContributions.length) earnedMoments.add("first-share");
+  const followedThreads = new Set([
+    ...community.posts
+      .filter(
+        (p) =>
+          p.author === study?.participant ||
+          community.comments.some(
+            (r) => r.user_id === community.uid && threadOf(r.metadata, r.post_id) === p.id,
+          ) ||
+          bookmarkedThread(p.id),
+      )
+      .map((p) => p.id),
+  ]);
+  function bookmarkedThread(id: string) {
+    return id.startsWith("case:")
+      ? data!.works[id.slice(-1) as StoryId]?.bookmarked
+      : data!.threadWorks?.[id]?.bookmarked;
+  }
+  const notifications = community.comments
+    .filter(
+      (r) => r.user_id !== community.uid && followedThreads.has(threadOf(r.metadata, r.post_id)),
+    )
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .slice(0, 20);
+  const event = (type: string, detail: Record<string, unknown> = {}) =>
+    setData((d) =>
+      d
+        ? {
+            ...d,
+            study:
+              d.study && (d.study.week || moderated)
+                ? log(d.study, type, {
+                    actualStory: d.story,
+                    threadId: d.activePost || "case:" + d.story,
+                    ...detail,
+                  })
+                : null,
+          }
+        : d,
+    );
+  const researchChange = (
+    patch: Partial<ResearchSession>,
+    type: string,
+    detail: Record<string, unknown> = {},
+  ) =>
+    setData((d) =>
+      d?.study
+        ? {
+            ...d,
+            study:
+              type.endsWith("_draft_changed") ||
+              type === "interview_note_changed" ||
+              type === "fidelity_comment"
+                ? {
+                    ...d.study,
+                    research: d.study.research ? { ...d.study.research, ...patch } : undefined,
+                  }
+                : updateResearch(d.study, patch, type, detail),
+          }
+        : d,
+    );
+  const advance = (next: ResearchStage) => {
+    if (!study) return;
+    try {
+      const ns = advanceResearch(study, next),
+        a = assignment(ns);
+      setData({
+        ...data,
+        study: ns,
+        ...(next === "activity" ? { story: a.story, mode: a.mode, works: cleanWorks() } : {}),
+      });
+      setInlineAssist(null);
+      setModal("");
+      setView(next === "activity" ? "detail" : next === "finished" ? "done" : "home");
+      window.scrollTo(0, 0);
+    } catch {
+      setNotice(t("Complete the current section first.", "请先完成当前环节。"));
+    }
+  };
+  const inspectSource = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    event("source_link_inspected", { source: st.source, deferred: active });
+    if (active) {
+      e.preventDefault();
+      setNotice(
+        t(
+          "The source URL and scenario provenance are available here. Open the historical site after the paired activities.",
+          "此处可核对来源网址与情境来历，请在两组活动结束后打开历史网站。",
+        ),
+      );
+    }
+  };
+  const draftEdited = (kind: AssistKind, value: string) => {
+    const proposal = [...w.aiTrace].reverse().find((x) => x.kind === kind)?.proposal;
+    event("draft_reviewed", {
+      kind,
+      value,
+      changedFromProposal: proposal === undefined ? null : value !== proposal,
+    });
+  };
+  const change = (patch: Partial<Work>, type?: string, detail: Record<string, unknown> = {}) =>
+    setData((d) =>
+      d
+        ? {
+            ...d,
+            ...(custom
+              ? {
+                  threadWorks: {
+                    ...d.threadWorks,
+                    [focusId]: { ...(d.threadWorks?.[focusId] || emptyWork(d.story)), ...patch },
+                  },
+                }
+              : { works: { ...d.works, [d.story]: { ...d.works[d.story], ...patch } } }),
+            study:
+              d.study && (d.study.week || moderated) && type
+                ? log(d.study, type, { actualStory: d.story, threadId: focusId, ...detail })
+                : d.study,
+          }
+        : d,
+    );
+  const share = async (
+    kind: ContributionKind,
+    body: string,
+    done: () => void,
+    metadata: Record<string, unknown> = {},
+  ) => {
+    if (publishing) return;
+    if (stage && stage !== "activity" && stage !== "finished") {
+      setNotice(
+        t(
+          "This is the orientation section; contributions start in the assigned activities.",
+          "当前为熟悉界面环节；请在分配的活动中发布贡献。",
+        ),
+      );
+      return;
+    }
+    setPublishing(true);
+    try {
+      const key = JSON.stringify([
+        story,
+        study?.startedAt,
+        kind,
+        body,
+        w.anchor,
+        w.selectedQuote,
+        metadata,
+      ]);
+      if (pendingShare.current?.key !== key)
+        pendingShare.current = { key, id: crypto.randomUUID() };
+      if (onlineConfigured)
+        await publishContribution({
+          id: pendingShare.current.id,
+          story,
+          study: weekly || moderated ? study : null,
+          kind,
+          body,
+          anchor: w.anchor,
+          quote: w.selectedQuote,
+          quoteId: w.selectedQuoteId,
+          metadata: {
+            ...metadata,
+            thread_id: focusId,
+            ai_simulated: w.aiTrace.length > 0,
+            ai_trace: w.aiTrace,
+            quote_author: w.selectedQuoteAuthor || st.guide,
+          },
+        });
+      pendingShare.current = null;
+      done();
+    } catch {
+      setNotice(messageForError(lang));
+    } finally {
+      setPublishing(false);
+    }
+  };
+  const sharedThread =
+    !stage || stage === "activity" || stage === "finished" ? (
+      <SharedThread
+        story={story}
+        lang={lang}
+        study={weekly || moderated ? study : null}
+        threadId={focusId}
+        anchor={w.anchor}
+        quoteContext={
+          w.selectedQuote
+            ? {
+                text: w.selectedQuote,
+                author: w.selectedQuoteAuthor || st.guide,
+                id: w.selectedQuoteId,
+              }
+            : null
+        }
+        proposedDraft={w.plan}
+        onHelpQuote={() => ai("quote")}
+        renderQuoteHelp={() => inlinePanel("quote")}
+        onQuote={(text, row) =>
+          change(
+            {
+              selectedQuote: text,
+              selectedQuoteAuthor: text ? row.display_name : undefined,
+              selectedQuoteId: text ? row.id : undefined,
+            },
+            "comment_sentence_selected",
+            { commentId: row.id, author: row.display_name },
+          )
+        }
+        onPublish={(id) => event("real_comment_published", { id })}
+      onOpenSource={id=>{const p=community.posts.find(p=>p.id===id);if(p){setConversationReturn({post:currentPost,view});openPost(p);}else setNotice("The source record is included below; its conversation is not currently available.");}}
+      />
+    ) : null;
+  const go = (v: View) => {
+    if (v === "reply" && !custom) change({ responseShown: true });
+    setView(v);
+    window.scrollTo({ top: 0, behavior: "instant" });
+    if (fidelity && study?.research) {
+      researchChange(
+        {
+          fidelity: { ...study.research.fidelity, visits: [...study.research.fidelity.visits, v] },
+        },
+        "fidelity_route",
+        { from: view, view: v, story },
+      );
+    } else event("navigate", { from: view, view: v, actualStory: story });
+  };
+  const openStory = (id: StoryId) => {
+    if (moderated && sessionRunning && id === "C") {
+      event("reserved_case_attempt");
+      setNotice(t("This case is reserved for a later task.", "此案例保留用于稍后的任务。"));
+      return;
+    }
+    if (active && id !== story) {
+      event("outside_case_attempt", { requested: id });
+      setNotice(
+        t("Stay with your assigned story during this activity.", "本组活动请使用分配的故事。"),
+      );
+      return;
+    }
+    setData((d) =>
+      d
+        ? {
+            ...d,
+            story: id,
+            activePost: "case:" + id,
+            study: d.study
+              ? fidelity && d.study.research
+                ? updateResearch(
+                    d.study,
+                    {
+                      fidelity: {
+                        ...d.study.research.fidelity,
+                        visits: [...d.study.research.fidelity.visits, "detail:" + id],
+                      },
+                    },
+                    "fidelity_route",
+                    { from: view, view: "detail", actualStory: id },
+                  )
+                : log(d.study, "story_opened", { id })
+              : null,
+          }
+        : d,
+    );
+    setView("detail");
+    window.scrollTo(0, 0);
+  };
+  const openPost = (post: CommunityPost) => {
+    setData((d) =>
+      d
+        ? {
+            ...d,
+            story: post.story,
+            activePost: post.id,
+            study:
+              d.study && (d.study.week || moderated)
+                ? log(d.study, "post_opened", { actualStory: post.story, threadId: post.id })
+                : null,
+          }
+        : d,
+    );
+    setInlineAssist(null);
+    setView("detail");
+    window.scrollTo(0, 0);
+  };
+  const bookmarked = (id: string) =>
+    id.startsWith("case:")
+      ? data.works[id.slice(-1) as StoryId]?.bookmarked || false
+      : data.threadWorks?.[id]?.bookmarked || false;
+  const bookmarkPost = (post: CommunityPost) => {
+    setData((d) => {
+      if (!d) return d;
+      const saved = !bookmarked(post.id);
+      return {
+        ...d,
+        ...(post.id.startsWith("case:")
+          ? { works: { ...d.works, [post.story]: { ...d.works[post.story], bookmarked: saved } } }
+          : {
+              threadWorks: {
+                ...d.threadWorks,
+                [post.id]: {
+                  ...(d.threadWorks?.[post.id] || emptyWork(post.story)),
+                  bookmarked: saved,
+                },
+              },
+            }),
+        study:
+          d.study && (d.study.week || moderated)
+            ? log(d.study, "bookmark_changed", { threadId: post.id, saved })
+            : null,
+      };
+    });
+  };
+  const reactPost = async (post: CommunityPost) => {
+    try {
+      await community.react(post, weekly ? study : null);
+      event("post_appreciated", { threadId: post.id });
+    } catch {
+      setNotice(messageForError(lang));
+    }
+  };
+  const createPost = async () => {
+    if (newBusy) return;
+    setNewBusy(true);
+    setNewError("");
+    try {
+      const post = await community.addPost(
+        newTitle.trim(),
+        newBody.trim(),
+        newGroup,
+        newPhoto || null,
+        weekly ? study : null,
+      );
+      event("community_post_published", {
+        threadId: post.id,
+        group: newGroup,
+        hasImage: !!newPhoto,
+      });
+      setNewTitle("");
+      setNewBody("");
+      setNewPhoto("");
+      setModal("");
+      openPost(post);
+    } catch {
+      setNewError(messageForError(lang));
+    } finally {
+      setNewBusy(false);
+    }
+  };
+  const feed = (variant: "posts" | "gallery" | "saved" = "posts") => (
+    <CommunityFeed
+      lang={lang}
+      community={community}
+      search={searchTerm}
+      onSearch={setSearchTerm}
+      onOpen={openPost}
+      onCreate={() => setModal("newpost")}
+      bookmarked={bookmarked}
+      onBookmark={bookmarkPost}
+      onReact={reactPost}
+      variant={variant}
+      group={group}
+      setGroup={setGroup}
+    />
+  );
+  const ai = (kind: AssistKind) => {
+    if (stage && stage !== "activity") return;
+    setAssistKind(kind);
+    setOrigin(view);
+    if (kind === "question" || kind === "album" || kind === "pass")
+      setOriginalDrafts((d) => ({
+        ...d,
+        [story + ":" + kind]:
+          kind === "question" ? w.questionDraft : kind === "album" ? w.albumDraft : w.passDraft,
+      }));
+    event("assistance_requested", {
+      kind,
+      photo: st.photo,
+      anchor: w.anchor,
+      quote: w.selectedQuote,
+      sourceIds: st.sourceIds,
+    });
+    if (data.mode === "embedded") {
+      setInlineAssist(kind);
+      event("assistance_opened_in_context", { kind, view });
+    } else {
+      setInlineAssist(null);
+      setSeparateContextLoaded(false);
+      go("assistant");
+    }
+  };
+  const assistance =
+    assistKind === "question"
+      ? custom
+        ? t(
+            (w.questionDraft.trim() ? w.questionDraft.trim() + "\n" : "") +
+              "What context would help me understand “" +
+              tx(st.title) +
+              "”?",
+            (w.questionDraft.trim() ? w.questionDraft.trim() + "\n" : "") +
+              "关于“" +
+              tx(st.title) +
+              "”，补充什么情境会帮助理解？",
+          )
+        : w.questionDraft.trim()
+          ? w.questionDraft.trim() + "\n" + tx(st.prompt)
+          : tx(st.prompt)
+      : assistKind === "route"
+        ? custom
+          ? t(
+              `A related conversation: “${tx(stories[story].title)}”. It is a fictional scenario, not a new reply to your post. You can inspect it before deciding whether it is relevant.`,
+              `相关讨论：“${tx(stories[story].title)}”。这是虚构情境，不是针对你帖子的新增回应。可以先查看，再判断是否相关。`,
+            )
+          : t(
+              `${st.guide} has responded to a related ${tx(st.tag).toLowerCase()} discussion. Open the member reply and keep the source visible.`,
+              `${st.guide} 曾参与相近的“${tx(st.tag)}”讨论。可以展开成员回应，并保留来源。`,
+            )
+        : assistKind === "quote"
+          ? t(
+              `Follow-up: when ${w.selectedQuoteAuthor || st.guide} says “${w.selectedQuote}”, what ${w.anchor ? "image detail or " : ""}context would help me understand this experience?`,
+              `追问：${w.selectedQuoteAuthor || st.guide} 说“${w.selectedQuote}”时，补充什么${w.anchor ? "图片细节或" : ""}情境会帮助我理解这段经历？`,
+            )
+          : assistKind === "album"
+            ? albumProposal(w, lang)
+            : album
+              ? t(
+                  `I can share our experience with its context:\n${album.text}\n${album.limits ? `Limits: ${album.limits}` : "Your situation may differ."}\nThis experience does not establish what works for everyone.`,
+                  `我可以分享我们的经历和当时的情境：\n${album.text}\n${album.limits ? `适用边界：${album.limits}` : "你的情境也可能不同。"}\n这段经历不能证明某种做法适合所有人。`,
+                )
+              : "";
+  const applyAssist = () => {
+    const reference =
+      assistKind === "quote"
+        ? `${w.selectedQuoteAuthor || st.guide}: ${w.selectedQuote}`
+        : assistKind === "album"
+          ? t(
+              "Detail 1, the selected human sentence and my return",
+              "细节 1、选中的成员原句与我的回访",
+            )
+          : assistKind === "pass"
+            ? t("Reviewed album and its limits", "已审阅图册及适用边界")
+            : assistKind === "route"
+              ? t("Question and related member source", "问题与相关成员来源")
+              : t("Selected post context and my draft", "选中的帖子情境与我的草稿");
+    const patch: Partial<Work> =
+      assistKind === "question"
+        ? { questionDraft: assistance }
+        : assistKind === "route"
+          ? { routeNote: assistance }
+          : assistKind === "quote"
+            ? { plan: assistance }
+            : assistKind === "album"
+              ? { albumDraft: assistance }
+              : { passDraft: assistance };
+    change(
+      {
+        ...patch,
+        aiTrace: [
+          ...w.aiTrace,
+          { kind: assistKind, reference, at: new Date().toISOString(), proposal: assistance },
+        ],
+      },
+      "assistance_accepted",
+      {
+        kind: assistKind,
+        reference,
+        anchor: w.anchor,
+        quote: w.selectedQuote,
+        proposal: assistance,
+      },
+    );
+    setInlineAssist(null);
+    setModal("");
+    if (view === "assistant") go(origin);
+  };
+  const discardAssist = () => {
+    event("assistance_rejected", { kind: assistKind });
+    setInlineAssist(null);
+    setModal("");
+    if (view === "assistant") go(origin);
+  };
+  const openOriginal = (p: PhotoId) => {
+    setOriginalPhoto(p);
+    setModal("original");
+    event("original_image_opened", { photo: p });
+  };
+  const draftAlbum = () => {
+    if (!last) {
+      go("return");
+      return;
+    }
+    if (!w.albumDraft)
+      change(
+        {
+          albumDraft: last.text,
+          albumTitle: t("Our small beauty discovery", "我们的小小美妆发现"),
+          albumLimits: last.limits,
+        },
+        "album_started",
+      );
+    go("draft");
+  };
+  const start = async () => {
+    if (publishing) return;
+    setPublishing(true);
+    try {
+      if (data.study) {
+        localStorage.setItem(
+          "common-ground-archived-" + data.study.startedAt,
+          JSON.stringify(data),
+        );
+        if (onlineConfigured) await saveStudy(data.study);
+      }
+      if (onlineConfigured) await beginStudyIdentity();
+      community.retry();
+      const ws = startWeek(participant.trim().toUpperCase(), lang, condition);
+      setData({
+        ...data,
+        study: log(ws, "weekly_consent", {
+          viewport: { width: innerWidth, height: innerHeight },
+          browser: navigator.userAgent,
+        }),
+        mode: condition,
+      });
+      setModal("");
+      setInlineAssist(null);
+      setNotice(
+        t(
+          "You can browse and participate freely. No tasks are required.",
+          "现在可以自由浏览与参与，无需完成指定任务。",
+        ),
+      );
+    } catch {
+      setNotice(
+        t(
+          "Could not join. Check your connection and participant code.",
+          "暂时无法加入，请检查网络与参与编号。",
+        ),
+      );
+    } finally {
+      setPublishing(false);
+    }
+  };
+  const finish = () => {
+    if (study?.week) {
+      const next = weekFeedback(
+        study,
+        ratings.map((x) => (!x || x === "na" ? null : Number(x))),
+        answer,
+        focusId,
+      );
+      setData({ ...data, study: next });
+      setModal("");
+      setAnswer("");
+      setRatings(Array(6).fill(""));
+      setNotice(
+        t(
+          "Optional feedback saved. Continue browsing whenever you like.",
+          "可选反馈已保存，可以继续自由浏览。",
+        ),
+      );
+      return;
+    }
+    setCloudStatus("pending");
+    if (!study) return;
+    try {
+      const s = finishPhase(
+        study,
+        w,
+        answer,
+        ratings.map((x) => (!x || x === "na" ? null : Number(x))),
+        reconstruction,
+      );
+      const a = assignment(s);
+      setData({
+        ...data,
+        study: s,
+        story: a.story,
+        mode: a.mode,
+        works: s.completed ? works : cleanWorks(),
+      });
+      setModal("");
+      setInlineAssist(null);
+      setView(s.research ? "home" : s.completed ? "done" : "detail");
+      setAnswer("");
+      setRatings(Array(6).fill(""));
+      setOriginalDrafts({});
+      setReconstruction(emptyReconstruction());
+      window.scrollTo(0, 0);
+    } catch {
+      setNotice(t("Complete the activities and reflection first.", "请先完成活动和反思。"));
+    }
+  };
+  const exportText = (format: "json" | "csv") =>
+    format === "json"
+      ? JSON.stringify(
+          {
+            version: VERSION,
+            kind: study?.week ? "week-natural-use" : study ? "legacy-study" : "exploration",
+            study,
+            works: data.works,
+            threadWorks: data.threadWorks || {},
+            images: "Generated scenario props; no empirical image outcomes",
+          },
+          null,
+          2,
+        )
+      : exportCsv(study?.events || []);
+  const download = (format: "json" | "csv") => {
+    const blob = new Blob([exportText(format)], {
+      type: format === "json" ? "application/json" : "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob),
+      a = document.createElement("a");
+    a.href = url;
+    a.download = `CommonGround-V4-${study?.participant || "explore"}.${format}`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+  const expressionPanel = (
+    <div className="cg-stack">
+      <p className="cg-ai-stage">
+        <Sparkles size={16} />
+        {
+          (
+            {
+              question: hasPhoto
+                ? t(
+                    "AI · shape a question from the post or visual detail",
+                    "AI · 从帖子或视觉细节形成问题",
+                  )
+                : t("AI · shape a question from this conversation", "AI · 从当前讨论形成问题"),
+              route: t("AI · route to people and related discussions", "AI · 路由到成员与相关讨论"),
+              quote: t(
+                "AI · keep a sentence with its author and context",
+                "AI · 保留原句、作者与情境",
+              ),
+              album: t(
+                "AI · structure experience without erasing its source",
+                "AI · 整理经验但保留来源",
+              ),
+              pass: t("AI · prepare a situated hand-off", "AI · 准备带有边界的传递"),
+            } as Record<AssistKind, string>
+          )[assistKind]
+        }
+      </p>
+      <div className="cg-assist-inputs">
+        <strong>{t("Used for this suggestion", "这条建议使用了")}</strong>
+        <span>{tx(st.title)}</span>
+        {["question", "route", "quote", "album"].includes(assistKind) && w.anchor && (
+          <span>{t("Image detail 1", "图片细节 1")}</span>
+        )}
+        {assistKind === "question" && w.questionDraft && (
+          <p>
+            {t("Your current draft: ", "你的当前草稿：")}
+            {w.questionDraft}
+          </p>
+        )}
+        {assistKind === "route" && (
+          <p>
+            {t("Your published question: ", "你已分享的问题：")}
+            {w.question}
+          </p>
+        )}
+        {["quote", "album"].includes(assistKind) && w.selectedQuote && (
+          <p>
+            {t("Human sentence · ", "成员原句 · ")}
+            {w.selectedQuoteAuthor || st.guide}: “{w.selectedQuote}”
+          </p>
+        )}
+        {assistKind === "album" && last && (
+          <p>
+            {t("Your return: ", "你的回访：")}
+            {last.text}
+            <br />
+            {last.context}
+            <br />
+            {last.limits}
+          </p>
+        )}
+        {assistKind === "pass" && album && (
+          <p>
+            {t("Reviewed album version ", "已审阅图册版本 ") + album.version}: {album.title}
+            <br />
+            {t("Limits: ", "边界：")}
+            {album.limits || t("No additional limit supplied", "未另填边界")}
+          </p>
+        )}
+      </div>
+      <div className="cg-context">
+        {hasPhoto || assistKind === "pass" ? (
+          <VisualRef
+            id={assistKind === "pass" ? album?.anchor?.photo || album?.photo || st.photo : st.photo}
+            lang={lang}
+            anchor={assistKind === "pass" ? album?.anchor || null : w.anchor}
+            mini
+          />
+        ) : null}
+        <div>
+          <strong>{assistKind === "pass" ? album?.title : st.member}</strong>
+          <p>{assistKind === "pass" ? album?.text : tx(st.caption)}</p>
+        </div>
+      </div>
+      {assistKind === "route" && custom && (
+        <button
+          className="cg-text-link"
+          onClick={() => {
+            setInlineAssist(null);
+            openStory(story);
+          }}
+        >
+          {t("Open this related conversation", "打开这段相关讨论")}
+        </button>
+      )}
+      <blockquote>
+        {assistance ||
+          t(
+            "Add an experience or a reference to use this suggestion.",
+            "补充一段经验或指代后可使用这条建议。",
+          )}
+      </blockquote>
+      <details
+        onToggle={(e) => {
+          if (e.currentTarget.open)
+            event("assistance_source_inspected", { kind: assistKind, sourceIds: st.sourceIds });
+        }}
+      >
+        <summary>{t("Why this suggestion?", "为什么出现这条建议？")}</summary>
+        <p>{tx(st.origin)}</p>
+        <p>{st.sourceIds.join(" · ")}</p>
+        <a
+          href={st.source === "#" ? stories[story].source : st.source}
+          onClick={inspectSource}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {t("Inspect the source", "查看来源")}
+        </a>
+      </details>
+      <Button className="cg-primary" onClick={applyAssist} disabled={!assistance}>
+        {t("Use as an editable draft", "作为可编辑草稿使用")}
+      </Button>
+      <Button className="cg-secondary" variant="outline" onClick={discardAssist}>
+        {t("Return without using it", "不采用，返回")}
+      </Button>
+    </div>
+  );
+  const acceptSpecific=(kind:AssistKind,text:string,patch:Partial<Work>,detail:Record<string,unknown>)=>{
+    const reference=kind==='album'?'Selected return, context and attributed source material':'Selected experience version and current conversation';
+    change({...patch,aiTrace:[...w.aiTrace,{kind,reference,at:new Date().toISOString(),proposal:text}]},'assistance_accepted',{kind,reference,...detail});
+    setInlineAssist(null);setModal('');if(view==='assistant')go(origin);
+  };
+  const openRelated=(r:Related)=>{
+    change({routeNote:r.post.id,aiTrace:[...w.aiTrace,{kind:'route',reference:tx(r.post.title)+' · '+r.post.author,at:new Date().toISOString()}]},'route_opened',{kind:'route',targetThread:r.post.id,reasons:r.reasons});
+    setConversationReturn({post:currentPost,view:view==='assistant'?origin:view});setInlineAssist(null);openPost(r.post);
+  };
+  const inspectExperience=(source:ExperienceSource)=>{
+    event('handoff_source_inspected',{sourceThread:source.threadId,version:source.album.version});
+    const p=community.posts.find(p=>p.id===source.threadId);if(p){setConversationReturn({post:currentPost,view:view==='assistant'?origin:view});setInlineAssist(null);openPost(p);}else setNotice('This record remains visible in the comparison; its discussion is unavailable.');
+  };
+  const assistPanel=assistKind==='route'?<RelatedConversations items={related} lang={lang} onOpen={openRelated} onEvent={event}/>:
+    assistKind==='album'?<ExperienceAssembly work={w} onEvent={event} onApply={(text,selected)=>acceptSpecific('album',text,{albumDraft:text}, {materials:selected})}/>:
+    assistKind==='pass'?<ExperienceComparison sources={experienceSources} target={w.selectedQuote||w.question||tx(st.caption)} initialKey={handoff?.key} onEvent={event} onInspect={inspectExperience} onApply={(text,source,context)=>acceptSpecific('pass',text,{passDraft:text,handoffSource:source,handoffContext:context},{sourceThread:source.threadId,sourceVersion:source.album.version,targetThread:focusId,comparison:context})}/>:expressionPanel;
+  const inlinePanel = (kind: AssistKind) =>
+    inlineAssist === kind && data.mode === "embedded" ? (
+      <section
+        className="cg-inline-assist"
+        aria-label={t("AI help in this activity", "当前活动中的 AI 辅助")}
+      >
+        <div className="cg-inline-heading">
+          <span>
+            <Sparkles size={16} />
+            {t("Help at this moment", "此刻的辅助")}
+          </span>
+          <button onClick={discardAssist} aria-label={t("Close AI help", "关闭 AI 辅助")}>
+            <X size={18} />
+          </button>
+        </div>
+        {assistPanel}
+        {["route","album","pass"].includes(assistKind)&&<Button variant="outline" onClick={discardAssist}>Continue without AI</Button>}
+      </section>
+    ) : null;
+  const trace = (kind: AssistKind) => {
+    if (data.mode !== "embedded") return null;
+    const note = [...w.aiTrace].reverse().find((x) => x.kind === kind);
+    return note ? (
+      <details
+        className="cg-ai-trace"
+        onToggle={(e) => {
+          if (e.currentTarget.open)
+            event("ai_trace_inspected", { kind, reference: note.reference });
+        }}
+      >
+        <summary>
+          <Sparkles size={15} />
+          {t("AI helped here · inspect its reference", "AI 曾在此辅助 · 查看所用指代")}
+        </summary>
+        <p>{note.reference}</p>
+        <p>{t("You still decide what to edit or share.", "修改或分享仍由你决定。")}</p>
+      </details>
+    ) : null;
+  };
+  return (
+    <div
+      className={
+        "cg-app" + (blocked ? " cg-study-blocked" : "") + (fidelity ? " cg-study-fidelity" : "")
+      }
+    >
+      <header className="cg-header">
+        <div className="cg-header-inner">
+          <button className="cg-brand" onClick={() => go("home")}>
+            {t("B E A U T Y  H O U S E", "美 妆 社 区")}
+          </button>
+          <label className="cg-global-search">
+            <Search size={18} />
+            <input
+              aria-label={t("Search the community", "搜索社区")}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") go("together");
+              }}
+              placeholder={t("Search", "搜索")}
+            />
+          </label>
+          <div className="cg-header-actions">
+            <button
+              onClick={() => {
+                setEcosystemKind("shop");
+                setModal("ecosystem");
+                event("ecosystem_opened", { destination: "shop" });
+              }}
+            >
+              <Store size={19} />
+              <span>{t("Stores & services", "门店与服务")}</span>
+            </button>
+            <button onClick={() => go("home")}>
+              <Users size={19} />
+              <span>{t("Community", "社区")}</span>
+            </button>
+            <button onClick={() => go("profile")}>
+              <span className="cg-face-icon">◉</span>
+              <span>{t("Sign in", "登录")}</span>
+            </button>
+            <button aria-label={t("Saved items", "收藏")} onClick={() => go("profile")}>
+              <Heart size={21} />
+            </button>
+            <button
+              aria-label={t("Shopping bag", "购物袋")}
+              onClick={() => {
+                setEcosystemKind("shop");
+                setModal("ecosystem");
+                event("ecosystem_opened", { destination: "shop" });
+              }}
+            >
+              <ShoppingBag size={21} />
+            </button>
+          </div>
+        </div>
+        <nav className="cg-retail-nav" aria-label={t("Beauty categories", "美妆分类")}>
+          {[
+            t("New", "新品"),
+            t("Brands", "品牌"),
+            t("Makeup", "彩妆"),
+            t("Skincare", "护肤"),
+            t("Hair", "美发"),
+            t("Fragrance", "香水"),
+            t("Tools & Brushes", "工具与刷具"),
+            t("Bath & Body", "身体护理"),
+            t("Mini Size", "旅行装"),
+            t("Gifts", "礼品"),
+            t("Collections", "精选"),
+            t("Sale & Offers", "优惠"),
+          ].map((label) => (
+            <button
+              key={label}
+              onClick={() => {
+                setEcosystemKind("shop");
+                setModal("ecosystem");
+                event("ecosystem_opened", { destination: "shop" });
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+        <div className="cg-community-nav">
+          <div className="cg-community-tabs">
+            <button
+              className={
+                [
+                  "home",
+                  "detail",
+                  "ask",
+                  "reply",
+                  "return",
+                  "thanks",
+                  "draft",
+                  "pass",
+                  "assistant",
+                ].includes(view)
+                  ? "is-active"
+                  : ""
+              }
+              onClick={() => go("home")}
+            >
+              {t("Community", "社区")}
+            </button>
+            <button className={view === "profile" ? "is-active" : ""} onClick={() => go("profile")}>
+              {t("Profile", "档案")}
+            </button>
+            <button
+              className={view === "together" ? "is-active" : ""}
+              onClick={() => go("together")}
+            >
+              {t("Groups", "群组")}
+            </button>
+            <button className={view === "album" ? "is-active" : ""} onClick={() => go("album")}>
+              {t("Gallery", "图册")}
+            </button>
+          </div>
+          <div className="cg-community-actions">
+            <button className="cg-outline-pill" onClick={() => setModal("newpost")}>
+              {t("Start a Conversation", "发起讨论")}
+            </button>
+            <button
+              className="cg-outline-pill"
+              onClick={() => {
+                setNewPhoto("swatches");
+                setModal("newpost");
+              }}
+            >
+              {t("Upload to Gallery", "上传到图册")}
+            </button>
+            <button aria-label={t("Study session", "研究会话")} onClick={() => setModal("study")}>
+              <FlaskConical size={17} />
+            </button>
+            
+            <button
+              aria-label={t("Notifications", "通知")}
+              onClick={() => {
+                setModal("notifications");
+                event("notifications_opened");
+              }}
+            >
+              <Bell size={18} />
+            </button>
+            <button
+              aria-label={t("Messages", "消息")}
+              onClick={() =>
+                setNotice(
+                  t(
+                    "Member messages are represented in the conversation.",
+                    "成员消息展示在讨论中。",
+                  ),
+                )
+              }
+            >
+              <Mail size={18} />
+            </button>
+          </div>
+        </div>
+      </header>
+      <div className="cg-disclosure">
+        <button onClick={() => setModal("about")}>
+          {t(
+            "Research simulation · scripted scenes + real test comments · AI uses presets",
+            "研究模拟 · 脚本情境与真实测试评论 · AI 使用预设",
+          )}{" "}
+          <span>ⓘ</span>
+        </button>
+        {active && (
+          <button onClick={() => setModal("study")}>
+            {study.participant} · {study.phase + 1}/2
+          </button>
+        )}
+      </div>
+      {moderated && study && (
+        <StudySessionPanel
+          study={study}
+          lang={lang}
+          onChange={researchChange}
+          onAdvance={advance}
+          onEvent={event}
+        />
+      )}
+      <div className="cg-layout">
+        <main className={"cg-main cg-view-" + view}>
+          {conversationReturn&&(conversationReturn.post.id!==focusId||view!==conversationReturn.view)&&<ConversationReturn title={tx(conversationReturn.post.title)} onDismiss={()=>setConversationReturn(null)} onReturn={()=>{event('route_returned',{targetThread:conversationReturn.post.id});const v=conversationReturn.view;openPost(conversationReturn.post);setView(v);setConversationReturn(null);}}/>}
+          {!["home", "together", "album", "detail", "ask", "done"].includes(view) && (
+            <button className="cg-back" onClick={() => go("detail")}>
+              <ArrowLeft size={18} />
+              {t("Back to the conversation", "回到讨论")}
+            </button>
+          )}
+          {view === "home" && (
+            <>
+              <section className="cg-home-hero">
+                <div className="cg-home-identity">
+                  <p className="cg-beauty-insider">
+                    Beauty <span>INSIDER</span>
+                  </p>
+                  <h1>{t("COMMUNITY", "社 区")}</h1>
+                  <p>
+                    {t(
+                      "Ask questions, join conversations, and get ideas from people like you.",
+                      "提出问题、参与讨论，从与你相似的人那里获得灵感。",
+                    )}
+                  </p>
+                </div>
+                <div className="cg-hero-middle">
+                  <button className="cg-hero-search" onClick={() => go("together")}>
+                    <Search size={22} />
+                    {t("Search or ask a question", "搜索或提出问题")}
+                  </button>
+                  <p>
+                    <Users size={17} />
+                    {t("People here to share", "在这里分享的人")}
+                    <span>│</span>
+                    <MessageCircle size={17} />
+                    {t("Conversations to explore", "可以探索的讨论")}
+                  </p>
+                </div>
+                <div className="cg-hero-art">
+                  <Photo id="swatches" lang={lang} />
+                  <Photo id="base" lang={lang} />
+                </div>
+              </section>
+              <section className="cg-home-help">
+                <button onClick={() => setModal("about")}>
+                  <span>✳</span>
+                  <strong>{t("Hey there! New here?", "嗨，新来的吗？")}</strong>
+                  <small>{t("A place to get to know each other ›", "从认识彼此开始 ›")}</small>
+                </button>
+                <button onClick={() => setModal("about")}>
+                  <MessageCircle size={25} />
+                  <strong>{t("What is this community?", "这个社区是什么？")}</strong>
+                  <small>{t("Read the community guide ›", "阅读社区指南 ›")}</small>
+                </button>
+                <button
+                  onClick={() => {
+                    setEcosystemKind("governance");
+                    setModal("ecosystem");
+                    event("ecosystem_opened", { destination: "governance" });
+                  }}
+                >
+                  <span>☏</span>
+                  <strong>{t("Need help?", "需要帮助？")}</strong>
+                  <small>{t("See support and community rules ›", "查看支持与社区规则 ›")}</small>
+                </button>
+              </section>
+              <button className="cg-home-join" onClick={() => setModal("study")}>
+                <span>✿ ◈ ✧</span>
+                <u>{t("Join the Community", "加入社区")}</u>
+                {t(
+                  " to begin sharing and see your first recognition.",
+                  "，开始分享并看到第一次认可。",
+                )}
+              </button>
+              <section className="cg-home-trends">
+                <div>
+                  <div className="cg-trend-title">
+                    <h2>{t("Trending Groups", "热门群组")}</h2>
+                    <button onClick={() => go("together")}>
+                      {t("View all Groups", "查看全部群组")}
+                    </button>
+                  </div>
+                  <div className="cg-trend-groups">
+                    {displayStories.map((id, i) => (
+                      <button
+                        key={id}
+                        onClick={() => {
+                          setGroup(id);
+                          go("together");
+                        }}
+                      >
+                        <span className={"cg-group-avatar cg-group-" + i}>
+                          <Photo id={stories[id].photo} lang={lang} />
+                        </span>
+                        <strong>{tx(caseTopics[id].group)}</strong>
+                        <small>{t("Member conversations", "成员讨论")}</small>
+                      </button>
+                    ))}
+                    {!active &&
+                      (["Beauty questions", "Product experiences", "New to beauty"] as const).map(
+                        (name, i) => (
+                          <button key={name} onClick={() => go("together")}>
+                            <span className={"cg-group-avatar cg-group-" + (i + 3)}>
+                              {["✦", "◌", "✿"][i]}
+                            </span>
+                            <strong>{t(name, ["美妆问答", "产品体验", "美妆新人"][i])}</strong>
+                            <small>{t("Explore the community", "探索社区")}</small>
+                          </button>
+                        ),
+                      )}
+                  </div>
+                </div>
+                <div>
+                  <div className="cg-trend-title">
+                    <h2>{t("Trending in Gallery", "图册热门内容")}</h2>
+                    <button onClick={() => go("album")}>
+                      {t("View all in Gallery", "查看全部图片")}
+                    </button>
+                  </div>
+                  <div className="cg-trend-gallery">
+                    {displayStories.map((id) => (
+                      <button key={id} onClick={() => openStory(id)}>
+                        <Photo id={stories[id].photo} lang={lang} />
+                        <span>{stories[id].member}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </section>
+              <section className="cg-home-recent">{feed()}</section>
+            </>
+          )}
+          {view === "together" && (
+            <div className="cg-posts-layout">
+              <aside className="cg-post-filter">
+                <h3>{t("Groups", "群组")}</h3>
+                <button className={!group ? "is-active" : ""} onClick={() => setGroup("")}>
+                  {t("All conversations", "全部讨论")}
+                </button>
+                {Object.entries(groupNames).map(([id, label]) => (
+                  <button
+                    key={id}
+                    className={group === id ? "is-active" : ""}
+                    onClick={() => setGroup(id as StoryId)}
+                  >
+                    {tx(label)}
+                  </button>
+                ))}
+              </aside>
+              <div>{feed()}</div>
+              <aside className="cg-post-rail">
+                <div className="cg-rail-box">
+                  <h3>{t("Make yourself at home", "欢迎参与")}</h3>
+                  <p>
+                    {t(
+                      "Ask a question, share a photo or simply read. AI help is optional.",
+                      "可以提问、分享图片，也可以只阅读。AI 辅助始终可选。",
+                    )}
+                  </p>
+                  <button onClick={() => setModal("newpost")}>
+                    {t("Start a conversation", "发起讨论")}
+                  </button>
+                  <button onClick={() => setModal("about")}>
+                    {t("Community information", "社区说明")}
+                  </button>
+                  <button onClick={() => setModal("references")}>
+                    {t("View the case reference", "查看案例参照")}
+                  </button>
+                </div>
+              </aside>
+            </div>
+          )}
+          {view === "detail" && (
+            <>
+              <div className="cg-detail-search">
+                <Search size={19} />
+                <button onClick={() => go("together")}>
+                  {t("Search conversations…", "搜索讨论……")}
+                </button>
+              </div>
+              <div className="cg-detail-layout">
+                <article className="cg-detail-post">
+                  <div className="cg-detail-context">
+                    {t("Post in ", "帖子所属：")}
+                    <button onClick={() => go("together")}>{tx(caseTopics[story].group)}</button>
+                    <button
+                      className="cg-detail-save"
+                      aria-label={t("Save this post", "收藏帖子")}
+                      onClick={() => change({ bookmarked: !w.bookmarked }, "bookmark_changed")}
+                    >
+                      <Bookmark size={21} fill={w.bookmarked ? "currentColor" : "none"} />
+                    </button>
+                  </div>
+                  <h1>{tx(st.title)}</h1>
+                  <p className="cg-post-time">
+                    {focus?.seed
+                      ? t("Fictional scenario post", "虚构情境帖子")
+                      : t("Member post", "成员帖子")}{" "}
+                    ·{" "}
+                    {focus?.createdAt
+                      ? new Date(focus.createdAt).toLocaleDateString(
+                          lang === "en" ? "en-GB" : "zh-CN",
+                        )
+                      : t("Updated recently", "最近更新")}
+                  </p>
+                  <div className="cg-post-author">
+                    <span className="cg-avatar">{st.member.slice(0, 1)}</span>
+                    <strong>{st.member}</strong>
+                    <span className="cg-role-chip">{t("COMMUNITY MEMBER", "社区成员")}</span>
+                  </div>
+                  <p className="cg-detail-copy">{tx(st.caption)}</p>
+                  {hasPhoto && (
+                    <div className="cg-detail-images">
+                      <button onClick={() => go("ask")}>
+                        <Photo id={st.photo} lang={lang} />
+                      </button>
+                      {!custom && st.photo !== "swatches" && (
+                        <button onClick={() => openOriginal("swatches")}>
+                          <Photo id="swatches" lang={lang} />
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  {hasPhoto && (
+                    <p className="cg-detail-image-note">
+                      {t(
+                        "Images are scenario material. Select a visual detail when you ask a question.",
+                        "图片是情境材料。提问时可以选中一个视觉细节。",
+                      )}
+                    </p>
+                  )}
+                  {focus?.album && (
+                    <section className="fc-published-experience">
+                      <h3>{t("Experience, people and references", "经验、贡献者与指代")}</h3>
+                      <div className="cg-lineage">
+                        {Array.isArray(focus.album.authors) &&
+                          focus.album.authors.map((name, i) => (
+                            <span key={i}>{name === "You" ? focus.author : name}</span>
+                          ))}
+                      </div>
+                      {focus.album.quotedLine && (
+                        <blockquote>
+                          <strong>
+                            {focus.albumQuoteAuthor ||
+                              t("Retained member sentence", "保留的成员原句")}
+                          </strong>
+                          <p>{focus.album.quotedLine}</p>
+                        </blockquote>
+                      )}
+                      {focus.album.anchor && (
+                        <>
+                          <VisualRef
+                            id={focus.album.anchor.photo}
+                            lang={lang}
+                            anchor={focus.album.anchor}
+                            mini
+                          />
+                          <p className="cg-meta">
+                            {t(
+                              "Original visual reference; the experience photo may differ.",
+                              "原来的视觉指代；经验配图可能不同。",
+                            )}
+                          </p>
+                        </>
+                      )}
+                      {focus.album.limits && (
+                        <p>
+                          {t("Still open: ", "尚待确认：")}
+                          {focus.album.limits}
+                        </p>
+                      )}
+                      <details>
+                        <summary>{t("Inspect experience sources", "查看经验来源")}</summary>
+                        <p>
+                          {Array.isArray(focus.album.sourceIds)
+                            ? focus.album.sourceIds.join(" · ")
+                            : ""}
+                        </p>
+                        <p>
+                          {t(
+                            "Attribution preserves contributions; it does not certify agreement.",
+                            "署名保留贡献，不代表共同认可。",
+                          )}
+                        </p>
+                      </details>
+                    </section>
+                  )}
+                  <div className="cg-detail-tags">
+                    <span>{tx(st.tag)}</span>
+                    <span>{tx(caseTopics[story].product)}</span>
+                  </div>
+                  <div className="cg-detail-actions">
+                    <button
+                      aria-pressed={community.liked(focusId)}
+                      onClick={() => focus && reactPost(focus)}
+                    >
+                      <Heart size={21} fill={community.liked(focusId) ? "currentColor" : "none"} />
+                      {t("Appreciate", "认可")}
+                    </button>
+                    <button onClick={() => go("reply")}>
+                      <MessageCircle size={21} />
+                      {t("Reply", "回复")}
+                    </button>
+                    <button onClick={() => go("ask")}>
+                      {w.question
+                        ? t("Read your question", "阅读你的提问")
+                        : hasPhoto
+                          ? t("Ask about this image", "针对图片提问")
+                          : t("Ask about this post", "针对帖子提问")}
+                    </button>
+                  </div>
+                  {fidelity && (
+                    <button className="cg-thread-preview" onClick={() => go("reply")}>
+                      <strong>{t("Read conversation", "阅读讨论")}</strong>
+                      <p>{t("View the member reply in this scenario", "查看情境中的成员回应")}</p>
+                    </button>
+                  )}
+                  {w.question && (
+                    <button className="cg-thread-preview" onClick={() => go("reply")}>
+                      <strong>
+                        {w.anchor
+                          ? t("Your question · image detail 1", "你的提问 · 图片细节 1")
+                          : t("Your question", "你的提问")}
+                      </strong>
+                      <p>{w.question}</p>
+                      <ArrowRight size={18} />
+                    </button>
+                  )}
+                  {last && (
+                    <button className="cg-thread-preview" onClick={() => go("thanks")}>
+                      <strong>{t("Your latest update", "你最近的回访")}</strong>
+                      <p>{last.text}</p>
+                    </button>
+                  )}
+                  <div className="fc-context-actions">
+                    {album && (
+                      <button onClick={() => go("pass")}>
+                        {t("Reply with an experience", "带着经验回应")}
+                      </button>
+                    )}
+                    {last && (
+                      <button onClick={() => go("thanks")}>{t("Say thanks", "表达感谢")}</button>
+                    )}
+                    <button onClick={() => go("return")}>{t("Share an update", "分享近况")}</button>
+                    <button onClick={draftAlbum}>{t("Keep an experience", "整理一段经验")}</button>
+                  </div>
+                  {sharedThread}
+                </article>
+                <aside className="cg-detail-rail">
+                  <div className="cg-rail-box">
+                    <h3>{t("Conversation Stats", "讨论概况")}</h3>
+                    <p>
+                      <MessageCircle size={17} />
+                      {w.question
+                        ? t("Your question and a reply", "你的提问及一条回应")
+                        : t("A member conversation", "一段成员讨论")}
+                    </p>
+                    <p>
+                      <Heart size={17} />
+                      {t("Member appreciation", "成员认可")}
+                    </p>
+                    <p>
+                      <Users size={17} />
+                      {t("People sharing experience", "分享经验的人")}
+                    </p>
+                    <hr />
+                    <h3>{t("Related Posts", "相关帖子")}</h3>
+                    {availableStories
+                      .filter((id) => id !== story)
+                      .map((id) => (
+                        <button key={id} onClick={() => openStory(id)}>
+                          <strong>{tx(stories[id].title)}</strong>
+                          <small>
+                            {stories[id].member} · {tx(caseTopics[id].group)}
+                          </small>
+                        </button>
+                      ))}
+                    <hr />
+                    <button
+                      onClick={() => {
+                        setEcosystemKind("shop");
+                        setModal("ecosystem");
+                        event("ecosystem_opened", { destination: "shop" });
+                      }}
+                    >
+                      {t("Products mentioned in this topic", "本话题涉及的产品")}
+                    </button>
+                  </div>
+                </aside>
+              </div>
+            </>
+          )}
+          {view === "ask" && (
+            <>
+              <div className="cg-detail-search">
+                <Search size={19} />
+                <button onClick={() => go("together")}>
+                  {t("Search conversations…", "搜索讨论……")}
+                </button>
+              </div>
+              <div className="cg-detail-layout">
+                <article className="cg-detail-post cg-composer-post">
+                  <div className="cg-detail-context">
+                    {t("Post in ", "帖子所属：")}
+                    <button onClick={() => go("together")}>{tx(caseTopics[story].group)}</button>
+                  </div>
+                  <h1>{tx(st.title)}</h1>
+                  <p className="cg-post-time">
+                    {focus?.seed
+                      ? t("Fictional scenario post", "虚构情境帖子")
+                      : t("Member post", "成员帖子")}{" "}
+                    ·{" "}
+                    {focus?.createdAt
+                      ? new Date(focus.createdAt).toLocaleDateString(
+                          lang === "en" ? "en-GB" : "zh-CN",
+                        )
+                      : t("Updated recently", "最近更新")}
+                  </p>
+                  <div className="cg-post-author">
+                    <span className="cg-avatar">{st.member.slice(0, 1)}</span>
+                    <strong>{st.member}</strong>
+                    <span className="cg-role-chip">{t("COMMUNITY MEMBER", "社区成员")}</span>
+                  </div>
+                  <p className="cg-detail-copy">{tx(st.caption)}</p>
+                  <div className="cg-composer-divider" />
+                  <div className="cg-composer-heading">
+                    <span className="cg-avatar">{t("Y", "我")}</span>
+                    <div>
+                      <h2>{t("Ask about this post", "针对这个帖子提问")}</h2>
+                      <p>
+                        {hasPhoto
+                          ? t(
+                              "Select a detail if you want a precise visual reference.",
+                              "需要精确指代时，可以选择图片细节。",
+                            )
+                          : t(
+                              "Use your own words; AI help is optional.",
+                              "用自己的话表达；AI 辅助可选。",
+                            )}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="cg-composer-grid">
+                    <div>
+                      {hasPhoto ? (
+                        <>
+                          <div
+                            className="cg-anchor-image"
+                            role="button"
+                            tabIndex={0}
+                            aria-label={t(
+                              "Place a question pin. Click, or use arrow keys; Enter selects the centre.",
+                              "定位问题。点击图片或用方向键移动；回车选择中心。",
+                            )}
+                            onClick={(e) => {
+                              const r = e.currentTarget.getBoundingClientRect();
+                              change(
+                                {
+                                  anchor: clampAnchor(
+                                    (e.clientX - r.left) / r.width,
+                                    (e.clientY - r.top) / r.height,
+                                    st.photo,
+                                  ),
+                                },
+                                "image_anchor_set",
+                              );
+                            }}
+                            onKeyDown={(e) => {
+                              if (
+                                ![
+                                  "ArrowLeft",
+                                  "ArrowRight",
+                                  "ArrowUp",
+                                  "ArrowDown",
+                                  "Enter",
+                                  " ",
+                                ].includes(e.key)
+                              )
+                                return;
+                              e.preventDefault();
+                              const a = w.anchor || { x: 0.5, y: 0.5 };
+                              change(
+                                {
+                                  anchor: clampAnchor(
+                                    a.x +
+                                      (e.key === "ArrowLeft"
+                                        ? -0.05
+                                        : e.key === "ArrowRight"
+                                          ? 0.05
+                                          : 0),
+                                    a.y +
+                                      (e.key === "ArrowUp"
+                                        ? -0.05
+                                        : e.key === "ArrowDown"
+                                          ? 0.05
+                                          : 0),
+                                    st.photo,
+                                  ),
+                                },
+                                "image_anchor_set",
+                                { keyboard: true },
+                              );
+                            }}
+                          >
+                            <Photo id={st.photo} lang={lang} />
+                            {w.anchor && (
+                              <span
+                                className="cg-pin"
+                                style={{
+                                  left: w.anchor.x * 100 + "%",
+                                  top: w.anchor.y * 100 + "%",
+                                }}
+                              >
+                                1
+                              </span>
+                            )}
+                          </div>
+                          <div className="cg-photo-tools">
+                            <span>
+                              {w.anchor
+                                ? t("Detail selected · click to move", "已选择细节 · 点击可移动")
+                                : t("Select a visual detail", "选择一个视觉细节")}
+                            </span>
+                            <button onClick={() => openOriginal(st.photo)}>
+                              {t("View original", "查看原图")}
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="fc-text-reference">
+                          <h3>{t("A text conversation", "一段文字讨论")}</h3>
+                          <p>{tx(st.caption)}</p>
+                          <small>
+                            {t(
+                              "You can reply without an image pin.",
+                              "回复文字帖无需选择图片定位。",
+                            )}
+                          </small>
+                        </div>
+                      )}
+                    </div>
+                    <div className="cg-stack">
+                      <label className="cg-field">
+                        {t("Your question", "你想问什么")}
+                        <textarea
+                          rows={4}
+                          maxLength={600}
+                          value={w.questionDraft}
+                          onBlur={() => draftEdited("question", w.questionDraft)}
+                          onChange={(e) => change({ questionDraft: e.target.value })}
+                          placeholder={t("I noticed… How do you…?", "我注意到……你是怎么……？")}
+                        />
+                      </label>
+                      <p className="cg-muted">
+                        {t(
+                          "A sentence is enough. Keep your own voice.",
+                          "一句话也很好，保留你自己的语气。",
+                        )}
+                      </p>
+                      <Button
+                        className="cg-primary"
+                        disabled={publishing || !w.questionDraft.trim()}
+                        onClick={() =>
+                          share("question", w.questionDraft, () => {
+                            change({ question: w.questionDraft.trim() }, "question_shared", {
+                              photo: st.photo,
+                              anchor: w.anchor,
+                            });
+                            go("reply");
+                          })
+                        }
+                      >
+                        {t("Share my question", "分享我的问题")}
+                        <ArrowRight size={18} />
+                      </Button>
+                      <Button className="cg-ai" variant="outline" onClick={() => ai("question")}>
+                        <Sparkles size={17} />
+                        {t("Find a useful prompt", "帮我找条提问线索")}
+                      </Button>
+                      {inlinePanel("question")}
+                      {trace("question")}
+                      {originalDrafts[story + ":question"] !== undefined && (
+                        <button
+                          className="cg-text-link"
+                          onClick={() =>
+                            change(
+                              { questionDraft: originalDrafts[story + ":question"] },
+                              "original_restored",
+                              { kind: "question" },
+                            )
+                          }
+                        >
+                          {t("Restore my wording", "恢复我的原话")}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </article>
+                <aside className="cg-detail-rail">
+                  <div className="cg-rail-box">
+                    <h3>{t("Conversation Stats", "讨论概况")}</h3>
+                    <p>
+                      <MessageCircle size={17} />
+                      {t("A member conversation", "一段成员讨论")}
+                    </p>
+                    <p>
+                      <Heart size={17} />
+                      {t("Member appreciation", "成员认可")}
+                    </p>
+                    <hr />
+                    <h3>{t("Related Posts", "相关帖子")}</h3>
+                    {availableStories
+                      .filter((id) => id !== story)
+                      .map((id) => (
+                        <button key={id} onClick={() => openStory(id)}>
+                          <strong>{tx(stories[id].title)}</strong>
+                          <small>
+                            {stories[id].member} · {tx(caseTopics[id].group)}
+                          </small>
+                        </button>
+                      ))}
+                  </div>
+                </aside>
+              </div>
+            </>
+          )}
+          {view === "reply" && (
+            <div className="cg-detail-layout">
+              <article className="cg-detail-post cg-thread-post">
+                <div className="cg-post-author">
+                  <span className="cg-avatar">{st.member[0]}</span>
+                  <strong>{st.member}</strong>
+                </div>
+                <h1>{tx(st.title)}</h1>
+                <p className="cg-detail-copy">{tx(st.caption)}</p>
+                {hasPhoto && (
+                  <div className="cg-thread-photo">
+                    <VisualRef id={st.photo} lang={lang} anchor={w.anchor} mini />
+                    <button onClick={() => openOriginal(st.photo)}>
+                      {t("View original image", "查看原图")}
+                    </button>
+                  </div>
+                )}
+                {w.question && (
+                  <div className="cg-question-bubble">
+                    <strong>{t("Your question", "你的问题")}</strong>
+                    <p>{w.question}</p>
+                  </div>
+                )}
+                {!custom && (
+                  <div className="cg-mentor">
+                    <div className="cg-member-line">
+                      <span className="cg-avatar">{st.guide[0]}</span>
+                      <strong>{st.guide}</strong>
+                      <small>{t("Fictional scenario member", "虚构情境成员")}</small>
+                    </div>
+                    <div className="cg-sentence-list">
+                      {sentences(tx(st.reply)).map((line, i) => (
+                        <button
+                          key={i}
+                          aria-pressed={w.selectedQuote === line}
+                          onClick={() =>
+                            change(
+                              {
+                                selectedQuote: w.selectedQuote === line ? "" : line,
+                                selectedQuoteAuthor: st.guide,
+                                selectedQuoteId: undefined,
+                                responseShown: true,
+                              },
+                              "comment_sentence_selected",
+                              { sentence: i },
+                            )
+                          }
+                        >
+                          {line}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {w.selectedQuote && (
+                  <>
+                    <div className="cg-linked-quote">
+                      <span>↳</span>
+                      <div>
+                        <strong>{w.selectedQuoteAuthor || st.guide}</strong>
+                        <p>{w.selectedQuote}</p>
+                      </div>
+                    </div>
+                    {trace("quote")}
+                  </>
+                )}
+                <div className="ip-local-connection"><Button variant="outline" className="cg-ai" onClick={()=>ai('route')}><Sparkles size={16}/>Explore related conversations</Button>{inlinePanel('route')}{trace('route')}</div>
+                <div className="fc-context-actions"><button onClick={()=>go('pass')}>Reply with a shared experience</button></div>{sharedThread}
+                <div className="fc-context-actions">
+                  {experienceSources.length>0 && (
+                    <button onClick={() => go("pass")}>
+                      {t("Reply with an experience", "带着经验回应")}
+                    </button>
+                  )}
+                  {last && (
+                    <button onClick={() => go("thanks")}>{t("Say thanks", "表达感谢")}</button>
+                  )}
+                  <button onClick={() => go("return")}>{t("Share an update", "分享近况")}</button>
+                  <button onClick={draftAlbum}>{t("Keep an experience", "整理一段经验")}</button>
+                  <button onClick={() => go("ask")}>
+                    {hasPhoto
+                      ? t("Ask about a visual detail", "针对视觉细节提问")
+                      : t("Ask a question", "提一个问题")}
+                  </button>
+                </div>
+              </article>
+              <aside className="cg-detail-rail">
+                <div className="cg-rail-box">
+                  <h3>{t("Related conversations", "相关讨论")}</h3>
+                  {community.posts
+                    .filter((p) => p.id !== focusId && p.story === story)
+                    .slice(0, 4)
+                    .map((p) => (
+                      <button key={p.id} onClick={() => openPost(p)}>
+                        {tx(p.title)}
+                      </button>
+                    ))}
+                </div>
+              </aside>
+            </div>
+          )}
+          {view === "return" && (
+            <>
+              <p className="cg-kicker">{t("BACK WITH A SMALL UPDATE", "带着一点发现回来")}</p>
+              <h1>{t("How did it feel for you?", "这次，你的感受如何？")}</h1>
+              <div className="cg-split">
+                <div>
+                  <Photo id={w.updatePhoto} lang={lang} />
+                  <div className="cg-photo-picker">
+                    {(Object.keys(photos) as PhotoId[]).map((id) => (
+                      <button
+                        aria-label={t("Choose scenario photo ", "选择情境图片 ") + id}
+                        aria-pressed={w.updatePhoto === id}
+                        key={id}
+                        onClick={() =>
+                          change({ updatePhoto: id }, "update_photo_selected", { photo: id })
+                        }
+                      >
+                        <Photo id={id} lang={lang} />
+                        {w.updatePhoto === id && <Check size={18} />}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="cg-meta">
+                    {t(
+                      "Scenario images, not before-and-after evidence.",
+                      "图片为情境道具，不是前后效果证据。",
+                    )}
+                  </p>
+                </div>
+                <div className="cg-stack">
+                  {moderated && (
+                    <details className="cg-task">
+                      <summary>{t("Open the supplied scenario card", "查看提供的情境卡")}</summary>
+                      <p>{tx(st.task)}</p>
+                      <p>
+                        {t(
+                          "Describe it in your own words; no real product trial is required.",
+                          "请用自己的话描述，无需进行真实产品试验。",
+                        )}
+                      </p>
+                    </details>
+                  )}
+                  {w.plan && (
+                    <p className="cg-muted">
+                      {t("Your thought: ", "你之前的想法：")}
+                      {w.plan}
+                    </p>
+                  )}
+                  <label className="cg-field">
+                    {t("A small update", "一句近况")}
+                    <textarea
+                      rows={4}
+                      maxLength={800}
+                      value={w.updateDraft}
+                      onChange={(e) => change({ updateDraft: e.target.value })}
+                      placeholder={t(
+                        "I tried… I noticed… I’m still unsure about…",
+                        "我试了……注意到……还不确定……",
+                      )}
+                    />
+                  </label>
+                  <details>
+                    <summary>
+                      {t("Anything else someone should know?", "还有什么值得让对方知道？")}
+                    </summary>
+                    <label className="cg-field">
+                      {t("Context, if useful", "想补充的情境")}
+                      <input
+                        maxLength={240}
+                        value={w.context}
+                        onChange={(e) => change({ context: e.target.value })}
+                      />
+                    </label>
+                    <label className="cg-field">
+                      {t("What is still open?", "还有什么尚不确定？")}
+                      <input
+                        maxLength={240}
+                        value={w.limits}
+                        onChange={(e) => change({ limits: e.target.value })}
+                      />
+                    </label>
+                  </details>
+                  <Button
+                    className="cg-primary"
+                    disabled={publishing || !w.updateDraft.trim()}
+                    onClick={() =>
+                      share(
+                        "update",
+                        w.updateDraft,
+                        () => {
+                          change(
+                            {
+                              updates: [
+                                ...w.updates,
+                                {
+                                  id: crypto.randomUUID(),
+                                  text: w.updateDraft.trim(),
+                                  photo: w.updatePhoto,
+                                  context: w.context.trim(),
+                                  limits: w.limits.trim(),
+                                  at: new Date().toISOString(),
+                                },
+                              ],
+                            },
+                            "return_shared",
+                          );
+                          go("reply");
+                          setNotice(
+                            t(
+                              "Your update is shared. You can continue reading, say thanks or keep it as an experience.",
+                              "近况已发布。可以继续阅读、表达感谢，或整理为经验。",
+                            ),
+                          );
+                        },
+                        { photo: w.updatePhoto, context: w.context, limits: w.limits },
+                      )
+                    }
+                  >
+                    {t("Share my update", "分享这次近况")}
+                    <ArrowRight size={18} />
+                  </Button>
+                  <button
+                    className="cg-text-link"
+                    onClick={() => {
+                      go("profile");
+                      setNotice(t("Draft kept on this device.", "草稿已保留在本机。"));
+                    }}
+                  >
+                    {t("Keep it as a draft", "先保留为草稿")}
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+          {view === "thanks" && (
+            <>
+              <p className="cg-kicker">{t("A MOMENT WORTH KEEPING", "值得记住的一刻")}</p>
+              <h1>{t("You came back. The story continues.", "你回来了，故事也继续了。")}</h1>
+              {last ? (
+                <div className="cg-split">
+                  <Photo id={last.photo} lang={lang} />
+                  <div className="cg-stack">
+                    <div className="cg-moment">
+                      <Heart size={25} />
+                      <strong>{t("A return, remembered", "记住这一次回访")}</strong>
+                      <p>{last.text}</p>
+                    </div>
+                    <label className="cg-field">
+                      {t("A note to ", "对 ")}
+                      {w.selectedQuoteAuthor || (!custom ? st.guide : st.member)}
+                      {t(" · optional", " 说句话 · 可选")}
+                      <textarea
+                        rows={3}
+                        maxLength={400}
+                        value={w.thanksDraft}
+                        onChange={(e) => change({ thanksDraft: e.target.value })}
+                        placeholder={t(
+                          "What part of their help mattered to you?",
+                          "对方的哪一点帮助让你印象深刻？",
+                        )}
+                      />
+                    </label>
+                    {w.thanks && (
+                      <p className="cg-muted">
+                        {t("Your note: ", "你写下的感谢：")}
+                        {w.thanks}
+                      </p>
+                    )}
+                    <Button
+                      className="cg-primary"
+                      disabled={publishing || !w.thanksDraft.trim()}
+                      onClick={() =>
+                        share(
+                          "thanks",
+                          w.thanksDraft,
+                          () => {
+                            change({ thanks: w.thanksDraft.trim() }, "thanks_shared", {
+                              to: st.guide,
+                            });
+                            setNotice(
+                              t(
+                                "Your note is connected to this conversation.",
+                                "你的感谢已与这段讨论连在一起。",
+                              ),
+                            );
+                          },
+                          { to: w.selectedQuoteAuthor || (!custom ? st.guide : st.member) },
+                        )
+                      }
+                    >
+                      {t("Share my thank-you", "分享我的感谢")}
+                    </Button>
+                    <Button className="cg-secondary" variant="outline" onClick={draftAlbum}>
+                      {t("Keep our story in an album", "把我们的故事放进图册")}
+                    </Button>
+                    <p className="cg-meta">
+                      {t("You can continue without sending a thank-you.", "不发送感谢也可以继续。")}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <Button onClick={() => go("return")}>{t("Write an update", "写一条回访")}</Button>
+              )}
+            </>
+          )}
+          {view === "draft" && (
+            <>
+              <p className="cg-kicker">{t("OUR SHARED BEAUTY NOTES", "我们共同的美妆笔记")}</p>
+              <h1>{t("Keep the story. Keep the people.", "留下经验，也留下彼此。")}</h1>
+              <div className="cg-split">
+                <div>
+                  <Photo id={last?.photo || st.photo} lang={lang} />
+                  <div className="cg-lineage">
+                    <span>{st.member}</span>
+                    <ArrowRight size={16} />
+                    {(w.selectedQuoteAuthor || (!custom && w.responseShown)) && (
+                      <>
+                        <span>{w.selectedQuoteAuthor || st.guide}</span>
+                        <ArrowRight size={16} />
+                      </>
+                    )}
+                    <span>{t("You", "你")}</span>
+                  </div>
+                  <p className="cg-meta">
+                    {t("Question · guidance · your return", "提问 · 示范与建议 · 你的回访")}
+                  </p>
+                </div>
+                <div className="cg-stack">
+                  <label className="cg-field">
+                    {t("A title for this story", "给故事取个名字")}
+                    <input
+                      maxLength={100}
+                      aria-label="A title for this story" value={w.albumTitle}
+                      onChange={(e) => change({ albumTitle: e.target.value })}
+                    />
+                  </label>
+                  <label className="cg-field">
+                    {t("What would you keep?", "你想留下什么？")}
+                    <textarea
+                      rows={5}
+                      maxLength={1800}
+                      aria-label="What would you keep?"
+                      value={w.albumDraft}
+                      onBlur={() => draftEdited("album", w.albumDraft)}
+                      onChange={(e) => change({ albumDraft: e.target.value })}
+                    />
+                  </label>
+                  <label className="cg-field">
+                    {t("Leave room for another experience", "为不同经验留一点空间")}
+                    <input
+                      maxLength={400}
+                      value={w.albumLimits}
+                      placeholder={t("This may be different when…", "换个情境，也许会……")}
+                      onChange={(e) => change({ albumLimits: e.target.value })}
+                    />
+                  </label>
+                  <Button className="cg-ai" variant="outline" onClick={() => ai("album")}>
+                    <Sparkles size={17} />
+                    {t("Help arrange my words", "帮我整理已有表达")}
+                  </Button>
+                  {inlinePanel("album")}
+                  {trace("album")}
+                  {originalDrafts[story + ":album"] !== undefined && (
+                    <button
+                      className="cg-text-link"
+                      onClick={() =>
+                        change(
+                          { albumDraft: originalDrafts[story + ":album"] },
+                          "original_restored",
+                          { kind: "album" },
+                        )
+                      }
+                    >
+                      {t("Restore my wording", "恢复我的原话")}
+                    </button>
+                  )}
+                  <Button
+                    className="cg-primary"
+                    disabled={!last || !w.albumTitle.trim() || !w.albumDraft.trim()}
+                    onClick={() => {
+                      setReviewed(false);
+                      setModal("review");
+                      event("album_review_opened", { version: w.versions.length + 1 });
+                    }}
+                  >
+                    {t("Preview our album entry", "预览这页共同图册")}
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+          {view === "album" && (
+            <>
+              <section className="cg-gallery-hero">
+                <h1>{t("Gallery", "图册")}</h1>
+                <p>
+                  {t(
+                    "Photos, experiences and the people behind them.",
+                    "图片、经验，还有它们背后的人。",
+                  )}
+                </p>
+              </section>
+              {feed("gallery")}
+              {album ? (
+                <>
+                  <div className="cg-split">
+                    <div>
+                      <VisualRef
+                        id={album.anchor?.photo || album.photo}
+                        lang={lang}
+                        anchor={album.anchor}
+                      />
+                      <p className="cg-meta">{t("Original question reference", "原提问指代")}</p>
+                      {album.anchor && album.photo !== album.anchor.photo && (
+                        <>
+                          <Photo id={album.photo} lang={lang} />
+                          <p className="cg-meta">
+                            {t("Return photo · scenario prop", "回访图片 · 情境道具")}
+                          </p>
+                        </>
+                      )}
+                    </div>
+                    <div className="cg-stack">
+                      <span className="cg-kicker">
+                        {t("REVIEWED STORY · DESIGN PROPOSAL", "已核对的故事 · 本研究新增设计")} ·{" "}
+                        {album.version}
+                      </span>
+                      <h2>{album.title}</h2>
+                      {album.quotedLine && (
+                        <div className="cg-linked-quote">
+                          <span>↳</span>
+                          <div>
+                            <strong>{t("Human reply retained", "保留的成员回应")}</strong>
+                            <p>{album.quotedLine}</p>
+                          </div>
+                        </div>
+                      )}
+                      <p className="cg-preserve">{album.text}</p>
+                      {album.limits && (
+                        <div className="cg-open-question">
+                          <strong>{t("Still room to explore", "还可以继续摸索")}</strong>
+                          <p>{album.limits}</p>
+                        </div>
+                      )}
+                      <div className="cg-lineage">
+                        {album.authors.map((a, i) => (
+                          <span key={i}>{a === "You" ? t("You", "你") : a}</span>
+                        ))}
+                      </div>
+                      <p className="cg-meta">
+                        {t(
+                          "Image detail 1 → selected human sentence → return → reviewed album. Scenario roles, not co-author approvals.",
+                          "图片细节 1 → 选中的成员原句 → 回访 → 已核对图册。这里是情境角色，不代表共同作者已认可。",
+                        )}
+                      </p>
+                      <Button className="cg-primary" onClick={() => go("pass")}>
+                        {t("Pass this experience on", "把这段经验传下去")}
+                        <ArrowRight size={18} />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="cg-secondary"
+                        onClick={() => {
+                          change({
+                            albumTitle: album.title,
+                            albumDraft: album.text,
+                            albumLimits: album.limits,
+                          });
+                          go("draft");
+                        }}
+                      >
+                        {t("Add a different perspective", "补充一种不同的看法")}
+                      </Button>
+                      <button
+                        className="cg-text-link"
+                        onClick={() => {
+                          setModal("history");
+                          event("history_opened");
+                        }}
+                      >
+                        <History size={17} />
+                        {t("The story behind this page", "这一页的来历与变化")}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="cg-empty cg-album-empty">
+                  <Photo id="swatches" lang={lang} />
+                  <h2>
+                    {t("Your shared story starts with a return.", "从一次回访，开始你的共同故事。")}
+                  </h2>
+                  <p>
+                    {t(
+                      "Keep an experience with the people and context that shaped it.",
+                      "把经验与帮助过你的人、当时的情境一起留下。",
+                    )}
+                  </p>
+                  <Button
+                    className="cg-primary"
+                    onClick={last ? draftAlbum : () => go(w.question ? "return" : "detail")}
+                  >
+                    {last
+                      ? t("Create our first page", "写下共同的第一页")
+                      : t("Return to a conversation", "回到一段讨论")}
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+          {view === "pass" && <article className="cg-detail-post ip-handoff-page"><div className="cg-detail-context">Reply in <button onClick={()=>go('reply')}>{tx(st.title)}</button></div><h1>Share an experience with its context</h1><p className="cg-meta">Keep a member's account connected to its source. Compare it with the question here before sharing.</p><div className="ip-current-question"><strong>{w.selectedQuoteAuthor||st.member}</strong><p>{w.selectedQuote||w.question||tx(st.caption)}</p></div><Button className="cg-ai" variant="outline" onClick={()=>ai('pass')}><Sparkles size={16}/>Compare with a shared experience</Button>{inlinePanel('pass')}{trace('pass')}{handoff&&<section className="ip-chosen-source"><strong>Linked source · {handoff.album.title} · v{handoff.album.version}</strong><small>{handoff.author} · {handoff.album.authors.map(a=>a==='You'?handoff.author:a).join(' → ')}</small><p>{handoff.album.limits||'No additional limits supplied.'}</p><button className="cg-text-link" onClick={()=>inspectExperience(handoff)}>Inspect linked record</button></section>}<label className="cg-field">Your reply with experience<textarea rows={8} maxLength={4000} aria-label="Your reply with experience" value={w.passDraft} onBlur={()=>draftEdited('pass',w.passDraft)} onChange={e=>change({passDraft:e.target.value})} placeholder="Use your own words and leave room for a different experience."/></label>{originalDrafts[story+':pass']!==undefined&&<button className="cg-text-link" onClick={()=>change({passDraft:originalDrafts[story+':pass']},'original_restored',{kind:'pass'})}>Restore my wording</button>}<div className="ip-actions"><Button className="cg-primary" disabled={publishing||!w.passDraft.trim()} onClick={()=>share('handoff',w.passDraft,()=>{change({passed:w.passDraft.trim()},'help_passed_on',{sourceThread:handoff?.threadId,sourceVersion:handoff?.album.version});go('reply');},{experience_source:handoff||null,comparison:w.handoffContext||'',target_thread:focusId})}>Publish reply with experience <ArrowRight size={16}/></Button><Button variant="outline" onClick={()=>go('reply')}>Back to conversation</Button></div></article>}
+          {view === "profile" && (
+            <>
+              {weekly && (
+                <div className="fc-week-profile">
+                  <h2>{t("Your community participation", "你的社区参与")}</h2>
+                  <p>
+                    {study.participant} · {study.week!.activeDays.length}{" "}
+                    {t("days visited", "天访问记录")}
+                  </p>
+                  <Button variant="outline" onClick={() => setModal("ratings")}>
+                    {t("Share optional feedback", "提供可选反馈")}
+                  </Button>
+                  <button onClick={() => setModal("study")}>
+                    {t("Study details and export", "研究说明与导出")}
+                  </button>
+                </div>
+              )}
+              <p className="cg-kicker">{t("MY MOMENTS", "我的社区时刻")}</p>
+              <h1>{t("Small gestures. A shared history.", "小小的回应，共同的记忆。")}</h1>
+              <p className="cg-intro">
+                {t(
+                  "A collection of how you took part. No points, no ranking.",
+                  "记住你怎样参与过，没有积分和排名。",
+                )}
+              </p>
+              <div className="cg-moment-grid">
+                {Object.entries(momentNames).map(([key, label]) => (
+                  <div
+                    className={"cg-moment " + (earnedMoments.has(key) ? "earned" : "waiting")}
+                    key={key}
+                  >
+                    <Heart size={22} />
+                    <h2>{tx(label)}</h2>
+                    <p>
+                      {earnedMoments.has(key)
+                        ? t("Recorded in your community contributions", "已留在你的社区贡献中")
+                        : t("Whenever you feel ready", "在你愿意的时候")}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              {w.passed && (
+                <div className="cg-mentor">
+                  <strong>{t("What you passed on", "你传下去的帮助")}</strong>
+                  <p>{w.passed}</p>
+                </div>
+              )}
+              <div className="cg-actions">
+                <Button className="cg-primary" onClick={() => go("detail")}>
+                  {t("Continue the conversation", "继续这段交流")}
+                </Button>
+                <Button className="cg-secondary" variant="outline" onClick={() => go("return")}>
+                  {t("Return to my draft", "回到我的回访草稿")}
+                </Button>
+                {active && (
+                  <Button
+                    className="cg-secondary"
+                    variant="outline"
+                    onClick={() => setModal("ratings")}
+                    disabled={!canFinish(w)}
+                  >
+                    {t("Reflect on this activity", "回顾这次活动")}
+                  </Button>
+                )}
+              </div>
+              {feed("saved")}
+            </>
+          )}
+          {view === "assistant" && (
+            <>
+              <p className="cg-kicker">{t("SEPARATE ASSISTANT WORKSPACE", "独立助手工作区")}</p>
+              <h1>{t("A useful thread, not a final answer.", "一条线索，留出你的判断。")}</h1>
+              <div className="cg-reading-width">
+                <p className="cg-meta">
+                  {t(
+                    "Bring the current community reference into this separate workspace before viewing the same suggestion.",
+                    "先把当前社区指代带入独立工作区，再查看相同的建议。",
+                  )}
+                </p>
+                {!separateContextLoaded ? (
+                  <Button
+                    className="cg-secondary"
+                    variant="outline"
+                    onClick={() => {
+                      setSeparateContextLoaded(true);
+                      event("assistance_context_transferred", {
+                        kind: assistKind,
+                        anchor: w.anchor,
+                        quote: w.selectedQuote,
+                      });
+                    }}
+                  >
+                    {t("Bring the selected context here", "把选中的情境带到这里")}
+                  </Button>
+                ) : (
+                  <>{assistPanel}<Button variant="outline" onClick={discardAssist}>Return to conversation without using AI</Button></>
+                )}
+              </div>
+            </>
+          )}
+          {view === "done" && (
+            <div className="cg-reading-width">
+              <p className="cg-kicker">{t("SESSION COMPLETE", "会话已完成")}</p>
+              <h1>{t("Thank you for taking part.", "谢谢你的参与。")}</h1>
+              <p>
+                {t(
+                  "Your activities are saved in this browser. Export a copy before clearing this session.",
+                  "活动已保存在本机，请在清除前导出副本。",
+                )}
+              </p>
+              <p role="status">
+                {onlineConfigured
+                  ? cloudStatus === "saved"
+                    ? t("Research record saved online.", "研究记录已保存到数据库。")
+                    : cloudStatus === "error"
+                      ? t(
+                          "Online save failed. Keep this tab open and export a copy.",
+                          "数据库保存失败，请保留此页并导出副本。",
+                        )
+                      : t("Saving research record…", "正在保存研究记录……")
+                  : ""}
+              </p>
+              <div className="cg-actions">
+                <Button className="cg-primary" onClick={() => download("json")}>
+                  JSON
+                </Button>
+                <Button className="cg-secondary" variant="outline" onClick={() => download("csv")}>
+                  CSV
+                </Button>
+              </div>
+              <details>
+                <summary>{t("Preview export / copy manually", "预览导出 / 手动复制")}</summary>
+                <label className="cg-field">
+                  JSON
+                  <textarea readOnly rows={8} value={exportText("json")} />
+                </label>
+                <label className="cg-field">
+                  CSV
+                  <textarea readOnly rows={5} value={exportText("csv")} />
+                </label>
+              </details>
+              <Button className="cg-secondary" variant="outline" onClick={() => setModal("erase")}>
+                {t("Clear this session", "清除此会话")}
+              </Button>
+            </div>
+          )}
+          {active && view !== "done" && (
+            <div className="cg-study-progress">
+              <span>
+                {t("Activity", "活动")} {study.phase + 1}/2 ·{" "}
+                {t("Community activity · AI and thanks optional", "社区活动 · AI 与感谢可选")}
+              </span>
+              <button disabled={!canFinish(w)} onClick={() => setModal("ratings")}>
+                {t("Reflect", "填写反思")}
+                <ArrowRight size={15} />
+              </button>
+            </div>
+          )}
+        </main>
+      </div>
+      <Dialog
+        open={!!modal}
+        onOpenChange={(open) => {
+          if (!open) setModal("");
+        }}
+      >
+        <DialogContent
+          className="cg-dialog"
+          initialFocus={() => {
+            const heading = document.querySelector<HTMLElement>(
+              '.cg-dialog [data-slot="dialog-title"]',
+            );
+            heading?.closest(".cg-dialog")?.scrollTo(0, 0);
+            return heading;
+          }}
+        >
+          <DialogTitle tabIndex={-1}>
+            {(
+              {
+                about: t("About this space", "关于这个空间"),
+                original: t("Original image & context", "原图与情境"),
+                assist: t("AI support, inside the community", "社区中的 AI 辅助"),
+                review: t("A page in our shared story", "共同故事中的一页"),
+                history: t("People, sources & revisions", "成员、来源与修订"),
+                study: t("Research session", "研究会话"),
+                ratings: weekly
+                  ? t("Optional community feedback", "可选社区反馈")
+                  : t("Reflect on this activity", "回顾这次活动"),
+                erase: t("Clear local V4 data?", "清除本地 V4 数据？"),
+                ecosystem: t("A connected community", "相互连接的社区"),
+                newpost: t("Start a conversation", "发起讨论"),
+                references: t("Case reference · optional", "案例参照 · 可选"),
+                notifications: t("Replies in your conversations", "你参与讨论中的回应"),
+              } as Record<string, string>
+            )[modal] || ""}
+          </DialogTitle>
+          <DialogDescription>
+            {t("Common Ground · community research simulation", "Common Ground · 社区研究模拟")}
+          </DialogDescription>
+          {modal === "about" && (
+            <div className="cg-stack">
+              <p>
+                {t(
+                  "This is a desktop-web, case-informed research simulation, not Sephora’s service. It preserves documented image-led community practices while testing new AI interactions. Pictured people are generated fictional adults; member names and replies are scripted roles.",
+                  "这是基于案例构建的桌面 Web 研究模拟，并非 Sephora 的服务。它保留有据可查的图片型社区实践，用于测试新增 AI 交互。图片人物均为生成的虚构成年人；成员姓名和回应是脚本角色。",
+                )}
+              </p>
+              <p>{tx(st.origin)}</p>
+              <p>
+                {t(
+                  "Image meaning comes from the image, its context and what a member says. These props cannot demonstrate cosmetic results.",
+                  "图片的含义来自画面、情境和成员的解释；这些图片道具不能证明产品效果。",
+                )}
+              </p>
+              <a
+                href={st.source === "#" ? stories[story].source : st.source}
+                onClick={inspectSource}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t("Open this story’s source", "查看当前故事的来源")}
+              </a>
+              <p className="cg-meta">{st.sourceIds.join(" · ")}</p>
+              <p>
+                {t(
+                  "Assistance uses fixed presets, not a live AI model. Community contributions are stored in Supabase and visible to other visitors; consented research records are private. Nothing is published to Sephora. Consented week-study drafts remain available for 30 days in this browser; local expiry does not delete online records.",
+                  "辅助使用固定预设，并非实时 AI 模型。社区贡献保存在 Supabase，其他访问者可见；同意后的研究记录保持私密。不会发布到 Sephora。一周观察的本地草稿保留 30 天；本地过期不会删除数据库记录。",
+                )}
+              </p>
+              {!sessionRunning && (
+                <label className="cg-field">
+                  {t("Explore an assistance condition", "探索辅助条件")}
+                  <select
+                    value={data.mode}
+                    onChange={(e) => setData({ ...data, mode: e.target.value as Saved["mode"] })}
+                  >
+                    <option value="embedded">{t("Embedded assistance", "嵌入式辅助")}</option>
+                    <option value="separate">{t("Separate assistant", "独立助手")}</option>
+                  </select>
+                </label>
+              )}
+              <details>
+                <summary>{t("Earlier study records", "之前的研究记录")}</summary>
+                {Object.keys(localStorage)
+                  .filter((k) => k.startsWith("common-ground-archived-"))
+                  .map((k) => (
+                    <button
+                      key={k}
+                      className="cg-text-link"
+                      onClick={() => {
+                        const value = localStorage.getItem(k);
+                        if (!value) return;
+                        const url = URL.createObjectURL(
+                          new Blob([value], { type: "application/json" }),
+                        );
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = k + ".json";
+                        a.click();
+                        setTimeout(() => URL.revokeObjectURL(url), 1000);
+                      }}
+                    >
+                      {t("Export archived record ", "导出归档记录 ") + k.split("-").at(-1)}
+                    </button>
+                  ))}
+              </details>
+              <button className="cg-text-link" onClick={() => setModal("erase")}>
+                {t("Clear local data", "清除本地数据")}
+              </button>
+            </div>
+          )}
+          {modal === "original" && (
+            <div className="cg-stack">
+              <Photo id={originalPhoto} lang={lang} />
+              <p>{tx(photos[originalPhoto].alt)}</p>
+              <p>
+                {t(
+                  "Generated research prop. Original square framing; not an observed outcome or historical member photograph.",
+                  "生成的研究道具，保留原始方形构图；不是实测结果或历史成员照片。",
+                )}
+              </p>
+            </div>
+          )}
+          {modal === "assist" && assistPanel}
+          {modal === "review" && (
+            <div className="cg-stack">
+              <div className="cg-context">
+                <VisualRef id={w.anchor?.photo || st.photo} lang={lang} anchor={w.anchor} mini />
+                <h2>{w.albumTitle}</h2>
+              </div>
+              {w.selectedQuote && (
+                <div className="cg-linked-quote">
+                  <span>↳</span>
+                  <p>{w.selectedQuote}</p>
+                </div>
+              )}
+              <section className="cg-review-block">
+                <h3>{t("Your experience draft", "你的经验草稿")}</h3>
+                <p className="cg-preserve">{w.albumDraft}</p>
+              </section>
+              <section className="cg-review-block">
+                <h3>{t("Context and what remains uncertain", "情境与尚待确认之处")}</h3>
+                <p>{last?.context || t("No additional context supplied", "未另填情境")}</p>
+                <p>
+                  {w.albumLimits || last?.limits || t("No additional limit supplied", "未另填边界")}
+                </p>
+              </section>
+              {last && w.anchor && last.photo !== w.anchor.photo && (
+                <section className="cg-review-block">
+                  <h3>
+                    {t(
+                      "Return photo · not the original question reference",
+                      "回访图片 · 不等于原提问指代",
+                    )}
+                  </h3>
+                  <Photo id={last.photo} lang={lang} />
+                </section>
+              )}
+              <p>
+                {t("People in this story: ", "这段故事里的人：")}
+                {[
+                  st.member,
+                  ...(w.selectedQuoteAuthor
+                    ? [w.selectedQuoteAuthor]
+                    : !custom && w.responseShown
+                      ? [st.guide]
+                      : []),
+                  t("You", "你"),
+                ].join(" → ")}
+              </p>
+              <p className="cg-meta">
+                {t(
+                  "Image detail, selected human sentence, generated prop origin and authored update remain inspectable. Source roles are retained, not treated as approvals.",
+                  "图片细节、选中的成员原句、生成图片来历与个人回访均可核对。保留来源角色不代表他们已认可内容。",
+                )}
+              </p>
+              <label className="cg-check">
+                <Checkbox
+                  checked={reviewed}
+                  onCheckedChange={(x) => {
+                    setReviewed(x === true);
+                    event("album_review_confirmed", { checked: x === true });
+                  }}
+                />
+                <span>
+                  {t(
+                    "I reviewed the wording, people, selected references and image origin.",
+                    "我已核对表达、贡献者、选中指代与图片来历。",
+                  )}
+                </span>
+              </label>
+              <Button
+                className="cg-primary"
+                disabled={publishing || !reviewed}
+                onClick={() => {
+                  try {
+                    const nw = publishAlbum(
+                      w,
+                      story,
+                      custom ? { author: st.member, sourceIds: st.sourceIds } : undefined,
+                    );
+                    share(
+                      "album",
+                      w.albumDraft,
+                      () => {
+                        change(nw, "album_published", { version: nw.versions.length });
+                        setModal("");
+                        go("album");
+                      },
+                      { title: w.albumTitle, limits: w.albumLimits, album: nw.versions.at(-1) },
+                    );
+                  } catch {
+                    setNotice(
+                      t("Add your update, title and text first.", "请先补充回访、标题与文字。"),
+                    );
+                  }
+                }}
+              >
+                {t("Add to our album", "加入共同图册")}
+              </Button>
+              <Button
+                variant="outline"
+                className="cg-secondary"
+                onClick={() => {
+                  setModal("");
+                  event("album_review_cancelled");
+                }}
+              >
+                {t("Keep editing", "继续编辑")}
+              </Button>
+            </div>
+          )}
+          {modal === "history" && (
+            <div className="cg-stack">
+              {w.versions.map((v) => (
+                <details key={v.version}>
+                  <summary onClick={() => event("album_version_inspected", { version: v.version })}>
+                    {v.version} · {v.title}
+                  </summary>
+                  {v.quotedLine && <blockquote>{v.quotedLine}</blockquote>}
+                  <p className="cg-preserve">{v.text}</p>
+                  <p>{v.limits}</p>
+                  <p>{v.authors.join(" → ")}</p>
+                  <p className="cg-meta">
+                    {v.sourceIds.join(" · ")}
+                    <br />
+                    {v.at}
+                  </p>
+                </details>
+              ))}
+              <a
+                href={st.source === "#" ? stories[story].source : st.source}
+                onClick={inspectSource}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t("Inspect the source", "检查来源")}
+              </a>
+            </div>
+          )}
+          {modal === "ecosystem" && (
+            <div className="cg-stack">
+              <p className="cg-ai-stage">
+                {
+                  (
+                    {
+                      shop: t("Linked products and purchase", "关联产品与购买"),
+                      profile: t("Use profile and product context", "使用档案与产品情境"),
+                      recognition: t("Recognition and loyalty conventions", "认可与忠诚度惯例"),
+                      governance: t("Community governance", "社区治理"),
+                    } as const
+                  )[ecosystemKind]
+                }
+              </p>
+              <p>
+                {
+                  (
+                    {
+                      shop: t(
+                        "A member may open factual product details, availability or purchase options, then return to the originating story. Community testimony keeps its author and context; it is not converted into a recommendation rank.",
+                        "成员可以查看产品事实、库存或购买入口，再回到原故事。社区经验保留作者与情境，不被转化为推荐排名。",
+                      ),
+                      profile: t(
+                        "Skin type, preferences and product history remain self-described profile context. They can narrow what a member chooses to read, but the prototype does not diagnose skin or infer a result from an image.",
+                        "肤质、偏好与产品历史仍由成员自述，可帮助缩小阅读范围；原型不诊断皮肤，也不从图片推断效果。",
+                      ),
+                      recognition: t(
+                        "Community recognition and loyalty status are different practices. This simulation shows recognition moments without awarding real status or points, and AI does not judge member merit.",
+                        "社区认可与忠诚度身份属于不同实践。本模拟展示认可时刻，但不授予真实身份或积分，也不让 AI 评判贡献。",
+                      ),
+                      governance: t(
+                        "AI may group duplicate reports or flag a possible policy issue with reasons. Human moderators retain final review; members can inspect, correct and appeal decisions.",
+                        "AI 可归并重复报告，或带理由提示潜在规则问题。最终复核由人工完成，成员可以查看、更正并申诉。",
+                      ),
+                    } as const
+                  )[ecosystemKind]
+                }
+              </p>
+              <p className="cg-meta">
+                {t(
+                  "This secondary pathway is represented to keep the community ecosystem visible. It is outside the research scope.",
+                  "该次级路径用于保留社区生态的完整性，属于本研究的次级范围。",
+                )}
+              </p>
+              <Button className="cg-primary" onClick={() => setModal("")}>
+                {t("Return to community stories", "回到社区故事")}
+              </Button>
+            </div>
+          )}
+          {modal === "study" && (
+            <div className="cg-stack">
+              {weekly ? (
+                <>
+                  <h3>{t("One week, at your own pace", "一周，按自己的节奏参与")}</h3>
+                  <p>
+                    {t(
+                      "Browse any topic, post, comment or return when you wish. There are no required tasks or daily quotas. AI and feedback are optional.",
+                      "可以自由浏览话题、发帖、评论，也可以在愿意时回来。没有必做任务或每日配额；AI 与反馈始终可选。",
+                    )}
+                  </p>
+                  <p>
+                    {study.participant} · {t("Observation period ends ", "观察期结束于 ")}
+                    {new Date(study.week!.endsAt).toLocaleDateString(
+                      lang === "en" ? "en-GB" : "zh-CN",
+                    )}
+                  </p>
+                  <p>
+                    {t(
+                      "Community contributions are visible to other visitors. Your consented navigation, AI decisions, draft reviews and feedback are private to you and the researcher.",
+                      "社区贡献向其他访问者展示；同意后的导航、AI 决定、草稿审阅与反馈记录仅你与研究者可见。",
+                    )}
+                  </p>
+                  <Button className="cg-primary" onClick={() => setModal("")}>
+                    {t("Continue browsing", "继续浏览")}
+                  </Button>
+                  <Button variant="outline" onClick={() => setModal("ratings")}>
+                    {t("Share optional feedback", "提供可选反馈")}
+                  </Button>
+                  <div className="cg-actions">
+                    <Button variant="outline" onClick={() => download("json")}>
+                      JSON
+                    </Button>
+                    <Button variant="outline" onClick={() => download("csv")}>
+                      CSV
+                    </Button>
+                  </div>
+                  <button
+                    className="cg-text-link"
+                    onClick={() => {
+                      setData({
+                        ...data,
+                        study: { ...log(study, "week_observation_ended"), completed: true },
+                      });
+                      setModal("");
+                      setNotice(
+                        t(
+                          "Observation ended. You can continue browsing the community.",
+                          "已结束观察记录，仍可继续浏览社区。",
+                        ),
+                      );
+                    }}
+                  >
+                    {study.completed
+                      ? t("Recording has ended", "研究记录已结束")
+                      : t("End research recording", "结束研究记录")}
+                  </button>
+                </>
+              ) : (
+                <>
+                  {study && (
+                    <div className="fc-archive">
+                      <p>
+                        {t(
+                          "An earlier moderated-study record is retained. Export it before joining the new observation.",
+                          "保留有一份旧版主持式测试记录，加入新观察前可以先导出。",
+                        )}
+                      </p>
+                      <button onClick={() => download("json")}>JSON</button>
+                    </div>
+                  )}
+                  <p>
+                    {t(
+                      "Join a seven-day community observation. Use the site naturally; no sequence of tasks is required.",
+                      "加入为期七天的社区观察，自然使用网站，无需完成规定任务顺序。",
+                    )}
+                  </p>
+                  <label className="cg-field">
+                    {t("Anonymous participant code", "匿名参与编号")}
+                    <input
+                      aria-label={t("Anonymous participant code", "匿名参与编号")}
+                      value={participant}
+                      onChange={(e) => setParticipant(e.target.value)}
+                      placeholder="P001"
+                      maxLength={7}
+                    />
+                  </label>
+                  <p className="cg-meta">
+                    {t(
+                      "Fictional seed posts and preset AI are identified. Public comments are shared; consented activity records are stored privately in the research database. Keep using the same browser for continuity.",
+                      "初始虚构帖子与预设 AI 均有标识。公开评论会共享；同意后的操作记录私密保存在研究数据库。请使用同一浏览器保持连续性。",
+                    )}
+                  </p>
+                  <label className="cg-check">
+                    <Checkbox checked={consent} onCheckedChange={(v) => setConsent(v === true)} />
+                    <span>
+                      {t(
+                        "I have read the researcher’s information sheet and agree to the seven-day observation. I understand my posts/comments will be visible to other visitors. I will not share personal or sensitive information.",
+                        "我已阅读研究告知书并同意七天观察，理解帖子与评论向其他访问者展示，不填写个人或敏感信息。",
+                      )}
+                    </span>
+                  </label>
+                  <Button
+                    className="cg-primary"
+                    disabled={publishing || !consent || !/^P\d{3,6}$/i.test(participant.trim())}
+                    onClick={start}
+                  >
+                    {t("Join and browse freely", "加入并自由浏览")}
+                  </Button>
+                  <button className="cg-text-link" onClick={() => setModal("")}>
+                    {t("Browse without joining the study", "不加入研究，直接浏览")}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+          {modal === "notifications" && (
+            <div className="cg-stack">
+              <p>
+                {t(
+                  "Replies in topics you posted, joined or saved.",
+                  "你发起、参与或收藏的话题中的回应。",
+                )}
+              </p>
+              {notifications.length ? (
+                notifications.map((r) => (
+                  <button
+                    key={r.id}
+                    className="fc-notification"
+                    onClick={() => {
+                      const p = community.posts.find(
+                        (p) => p.id === threadOf(r.metadata, r.post_id),
+                      );
+                      if (p) {
+                        setModal("");
+                        openPost(p);
+                      }
+                    }}
+                  >
+                    <strong>{r.display_name}</strong>
+                    <span>{r.body}</span>
+                    <small>
+                      {new Date(r.created_at).toLocaleDateString(lang === "en" ? "en-GB" : "zh-CN")}
+                    </small>
+                  </button>
+                ))
+              ) : (
+                <p>
+                  {t(
+                    "No replies yet. You can keep browsing or join a conversation.",
+                    "暂时没有新的回应。可以继续浏览或加入讨论。",
+                  )}
+                </p>
+              )}
+            </div>
+          )}
+          {modal === "newpost" && (
+            <div className="cg-stack">
+              <label className="cg-field">
+                {t("Post title", "帖子标题")}
+                <input
+                  aria-label={t("Post title", "帖子标题")}
+                  maxLength={120}
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                />
+              </label>
+              <label className="cg-field">
+                {t("Your story or question", "你的故事或问题")}
+                <textarea
+                  aria-label={t("Your story or question", "你的故事或问题")}
+                  rows={5}
+                  maxLength={2400}
+                  value={newBody}
+                  onChange={(e) => setNewBody(e.target.value)}
+                />
+              </label>
+              <label className="cg-field">
+                {t("Group", "群组")}
+                <select
+                  aria-label={t("Group", "群组")}
+                  value={newGroup}
+                  onChange={(e) => setNewGroup(e.target.value as StoryId)}
+                >
+                  {Object.entries(groupNames).map(([id, b]) => (
+                    <option key={id} value={id}>
+                      {tx(b)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="cg-field">
+                {t("Scenario photo · optional", "情境图片 · 可选")}
+                <select
+                  value={newPhoto}
+                  onChange={(e) => setNewPhoto(e.target.value as PhotoId | "")}
+                >
+                  <option value="">{t("Text only", "仅文字")}</option>
+                  {Object.entries(photos).map(([id, b]) => (
+                    <option key={id} value={id}>
+                      {tx(b.alt)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {newPhoto && <Photo id={newPhoto} lang={lang} />}
+              <p className="cg-meta">
+                {t(
+                  "This post will be visible to other visitors. Available images are fictional study props.",
+                  "该帖子向其他访问者展示；可选图片是虚构研究道具。",
+                )}
+              </p>
+              {newError && <p role="alert">{newError}</p>}
+              <Button
+                className="cg-primary"
+                disabled={newBusy || !newTitle.trim() || !newBody.trim()}
+                onClick={createPost}
+              >
+                {newBusy ? t("Publishing…", "发布中……") : t("Publish conversation", "发布讨论")}
+              </Button>
+            </div>
+          )}
+          {modal === "references" && (
+            <div className="cg-stack">
+              <p>
+                {t(
+                  "Optional case-reference pages. Explore the community in any order.",
+                  "可选的案例参照页面，可以按任意顺序探索社区。",
+                )}
+              </p>
+              {["home", "conversation", "gallery", "product-advice"].map((name) => (
+                <figure key={name}>
+                  <LoadingImage
+                    src={"/reference/web-community-" + name + ".png"}
+                    alt={t("Case reference: ", "案例参照：") + name}
+                    ratio={
+                      name === "home"
+                        ? "1500 / 970"
+                        : name === "conversation"
+                          ? "1474 / 1643"
+                          : name === "gallery"
+                            ? "1324 / 1686"
+                            : "1344 / 896"
+                    }
+                  />
+                  <figcaption>
+                    {t(
+                      "Historical case-reference capture from the thesis; not a live service page.",
+                      "论文中的历史案例参照截图，并非当前服务页面。",
+                    )}{" "}
+                    <a
+                      href={"/reference/web-community-" + name + ".png"}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {t("Open full screenshot", "打开完整截图")}
+                    </a>{" "}
+                    ·{" "}
+                    <a
+                      href={
+                        name === "home"
+                          ? "https://www.justinmind.com/ui-design/tips-examples-tabs-web"
+                          : name === "product-advice"
+                            ? "https://www.feedspace.io/blogs/user-generated-content-examples/"
+                            : "https://medium.com/@ciety/community-case-sephoras-beauty-insider-community-53dd1f79b786"
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {t("Capture source", "截图来源")}
+                    </a>
+                  </figcaption>
+                </figure>
+              ))}
+              <label className="cg-field">
+                {t("Any mismatch you noticed? · optional", "发现不一致之处？ · 可选")}
+                <textarea
+                  aria-label={t("Any mismatch you noticed? · optional", "发现不一致之处？ · 可选")}
+                  rows={3}
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  placeholder={t("Blank means no additional comment", "留空默认没有补充")}
+                />
+              </label>
+              <Button
+                className="cg-primary"
+                onClick={() => {
+                  if (study?.week)
+                    setData({
+                      ...data,
+                      study: weekFeedback(study, Array(6).fill(null), answer, "reference"),
+                    });
+                  setAnswer("");
+                  setModal("");
+                }}
+              >
+                {t("Close / save optional note", "关闭／保存可选说明")}
+              </Button>
+            </div>
+          )}
+          {modal === "ratings" && (
+            <div className="cg-stack">
+              {moderated && study?.research && (
+                <>
+                  <h3>{t("Reconstruct the contribution chain", "重建贡献链")}</h3>
+                  <div className="cg-reconstruction">
+                    {(
+                      [
+                        ["pin", "What did pin 1 refer to?", "定位 1 指向什么？"],
+                        [
+                          "human",
+                          "Who wrote the selected human sentence?",
+                          "选中的成员原句由谁写出？",
+                        ],
+                        [
+                          "ai",
+                          "What did AI change or add? If unused, say so.",
+                          "AI 改变或添加了什么？未使用也可说明。",
+                        ],
+                        [
+                          "member",
+                          "Which wording or publication decision remained yours?",
+                          "哪些表达或发布决定由你做出？",
+                        ],
+                      ] as const
+                    ).map(([key, en, zh]) => (
+                      <label className="cg-field" key={key}>
+                        {t(en, zh)}
+                        <textarea
+                          rows={2}
+                          maxLength={600}
+                          value={reconstruction[key]}
+                          onChange={(e) =>
+                            setReconstruction((r) => ({ ...r, [key]: e.target.value }))
+                          }
+                        />
+                      </label>
+                    ))}
+                  </div>
+                  <button
+                    className="cg-text-link"
+                    onClick={() => {
+                      setModal("");
+                      go("reply");
+                      event("reconstruction_reinspection");
+                    }}
+                  >
+                    {t("Reinspect the conversation (answers kept)", "回看讨论（保留已填回答）")}
+                  </button>
+                </>
+              )}
+              <label className="cg-field">
+                {t(
+                  "What would you pass on, who helped, and what is still uncertain?",
+                  "你会传递什么、谁提供了帮助、还有什么尚不确定？",
+                )}
+                <textarea
+                  aria-label={t("Optional reflection", "可选反思")}
+                  placeholder={t("Blank means no additional comment", "留空默认没有补充")}
+                  rows={4}
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  maxLength={2000}
+                />
+              </label>
+              <p className="cg-meta">
+                {t(
+                  "1 strongly disagree · 7 strongly agree · N/A not applicable. Researcher-written items.",
+                  "1 非常不同意 · 7 非常同意 · N/A 不适用。研究者自拟条目。",
+                )}
+              </p>
+              {ratingLabels.map((b, i) => (
+                <fieldset className="cg-rating" key={i}>
+                  <legend>{tx(b)}</legend>
+                  <RadioGroup
+                    value={ratings[i]}
+                    onValueChange={(v) =>
+                      setRatings((r) => r.map((x, j) => (i === j ? String(v) : x)))
+                    }
+                    className="cg-rating-options"
+                  >
+                    {["1", "2", "3", "4", "5", "6", "7", "na"].map((x) => (
+                      <label key={x}>
+                        <RadioGroupItem value={x} />
+                        <span>{x === "na" ? "N/A" : x}</span>
+                      </label>
+                    ))}
+                  </RadioGroup>
+                </fieldset>
+              ))}
+              <Button className="cg-primary" disabled={moderated && !canFinish(w)} onClick={finish}>
+                {weekly
+                  ? t("Save optional feedback", "保存可选反馈")
+                  : study?.research
+                    ? study.phase === 0
+                      ? t("Save reflection and take a break", "保存反思并休息")
+                      : t("Continue to the transfer task", "进入迁移任务")
+                    : study?.phase === 0
+                      ? t("Save & start activity two", "保存并开始第二组活动")
+                      : t("Finish & export", "完成并导出")}
+              </Button>
+            </div>
+          )}
+          {modal === "erase" && (
+            <div className="cg-stack">
+              <p>
+                {t(
+                  "This clears drafts and records from this browser. Online contributions and research records remain; contact the researcher with your participant code to request their removal. Downloaded exports are unaffected.",
+                  "这会清除此浏览器的草稿与记录。网站上的贡献和研究记录仍会保留；如需删除，请向研究者提供参与编号。导出的副本不受影响。",
+                )}
+              </p>
+              <Button
+                className="cg-primary"
+                onClick={() => {
+                  Object.keys(localStorage)
+                    .filter((k) => k.startsWith("common-ground-archived-"))
+                    .forEach((k) => localStorage.removeItem(k));
+                  localStorage.removeItem(STORAGE);
+                  localStorage.removeItem("common-ground-post-draft");
+                  setNewTitle("");
+                  setNewBody("");
+                  setNewPhoto("");
+                  Object.keys(sessionStorage)
+                    .filter((k) => k.startsWith("comment-draft-"))
+                    .forEach((k) => sessionStorage.removeItem(k));
+                  setData({
+                    version: VERSION,
+                    savedAt: Date.now(),
+                    lang,
+                    story: "A",
+                    mode: "embedded",
+                    works: cleanWorks(),
+                    study: null,
+                  });
+                  setModal("");
+                  setView("home");
+                  setConsent(false);
+                  setOriginalDrafts({});
+                  setParticipant("");
+                  setAnswer("");
+                  setRatings(Array(6).fill(""));
+                }}
+              >
+                {t("Clear V4 data", "清除 V4 数据")}
+              </Button>
+              <Button variant="outline" className="cg-secondary" onClick={() => setModal("")}>
+                {t("Keep my data", "保留数据")}
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      {notice && !modal && (
+        <div className="cg-notice" role="status">
+          {notice}
+          <button aria-label={t("Dismiss", "关闭")} onClick={() => setNotice("")}>
+            <X size={16} />
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }

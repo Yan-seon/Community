@@ -5,8 +5,8 @@ export const say = (l: Lang, b: Bi) => b[l === 'en' ? 0 : 1];
 export type StoryId = 'A' | 'B' | 'C';
 export type PhotoId = 'base' | 'blush' | 'swatches';
 export type Mode = 'embedded' | 'separate';
-export const VERSION = '4.2.0-free-community';
-const COMPATIBLE_VERSIONS=[VERSION,'4.1.0-study-ready','4.0.0-ai-community-weave'];
+export const VERSION = '4.3.0-distinct-interactions';
+const COMPATIBLE_VERSIONS=[VERSION,'4.2.0-free-community','4.1.0-study-ready','4.0.0-ai-community-weave'];
 export const STORAGE = 'common-ground-v3';
 export const photos: Record<PhotoId, {src:string; alt:Bi}> = {
   base:{src:'/v3/base.png',alt:['Fictional member pointing to her cheek in window light','虚构成员在窗边指向面颊的示意照片']},
@@ -24,7 +24,7 @@ export const clampAnchor=(x:number,y:number,photo:PhotoId):Anchor=>({x:Math.max(
 export type Update = {id:string;text:string;photo:PhotoId;context:string;limits:string;at:string};
 export type Album = {version:number;title:string;text:string;limits:string;photo:PhotoId;anchor:Anchor|null;quotedLine:string;authors:string[];sourceIds:string[];updateId:string;at:string};
 export type AiTrace = {kind:'question'|'route'|'quote'|'album'|'pass';reference:string;at:string;proposal?:string};
-export type Work = {anchor:Anchor|null;questionDraft:string;question:string;responseShown:boolean;selectedQuote:string;selectedQuoteAuthor?:string;selectedQuoteId?:string;routeNote:string;plan:string;updateDraft:string;context:string;limits:string;updatePhoto:PhotoId;updates:Update[];thanksDraft:string;thanks:string;albumDraft:string;albumTitle:string;albumLimits:string;versions:Album[];passDraft:string;passed:string;bookmarked:boolean;aiTrace:AiTrace[]};
+export type Work = {handoffSource?:import('./interaction-patterns').ExperienceSource;handoffContext?:string;anchor:Anchor|null;questionDraft:string;question:string;responseShown:boolean;selectedQuote:string;selectedQuoteAuthor?:string;selectedQuoteId?:string;routeNote:string;plan:string;updateDraft:string;context:string;limits:string;updatePhoto:PhotoId;updates:Update[];thanksDraft:string;thanks:string;albumDraft:string;albumTitle:string;albumLimits:string;versions:Album[];passDraft:string;passed:string;bookmarked:boolean;aiTrace:AiTrace[]};
 export const emptyWork=(id:StoryId='A'):Work=>({anchor:null,questionDraft:'',question:'',responseShown:false,selectedQuote:'',routeNote:'',plan:'',updateDraft:'',context:'',limits:'',updatePhoto:stories[id].photo,updates:[],thanksDraft:'',thanks:'',albumDraft:'',albumTitle:'',albumLimits:'',versions:[],passDraft:'',passed:'',bookmarked:false,aiTrace:[]});
 export const sequenceAssignments = [
   [{mode:'embedded',story:'A'},{mode:'separate',story:'B'}],
