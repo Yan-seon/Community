@@ -1,6 +1,6 @@
 # One-week natural community use — revised evaluation plan
 
-Protocol: `week-natural-use-2026-10-06`. This replaces the default task-led procedure in the October 2 release. This is a **plan**, not participant findings. The current thesis Chapter 8 describes the earlier moderated within-participant procedure; its method and evidence table must be replaced with this plan before describing the new deployment as the thesis evaluation.
+Protocol: `week-natural-use-2026-10-09`. This replaces the default task-led procedure in the October 2 release. This is a **plan**, not participant findings. The revised thesis Chapter 8 describes this between-participant seven-day plan. Earlier moderated procedures remain archived and must not be pooled with this observation.
 
 ## Environment and participant experience
 
@@ -44,3 +44,7 @@ Public topics, reactions and contributions are stored in `comments`; `metadata.t
 Earlier moderated records have their own protocol/version and private-room arrangement. They are retained and archived locally when enrolment replaces an old record. Do not pool them with week observations. The old moderated controls are available only for an explicitly restored legacy session (`?protocol=moderated`), not as the default study. Technical checks use TEST content/P998xxx codes; exclude these and earlier technical fixtures from research analysis. Default visitor views hide TEST-labelled posts/comments; `?qa=1` is for technical inspection only.
 
 Passing technical and visual checks supports deployment readiness; it does not establish perceived fidelity, AI benefit or an actual seven-day effect. Those claims require recruited participant evidence.
+
+## October 9 interaction revision
+
+Release 4.3.0 is English desktop Web only. Three mechanisms operate at five moments: reference-preserving expression (post/image questions and sentence follow-ups), human discussion connection (explainable group/keyword candidates, previews, entry and return), and attributed experience circulation (select supplied materials, review a version, choose a source and compare it with the current conversation before replying). The separate workspace exposes the same components after context transfer. Routing does not identify an expert or perform outreach; comparisons retain unknown conditions rather than predicting fit. Source/version inspection is available to other readers of published experience replies.

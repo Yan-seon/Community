@@ -6,9 +6,9 @@ import {photos,type Work} from '../lib/community-v3';
 import {say,type Lang} from '../lib/community-v3';
 import {type Related,type ExperienceSource,type MaterialKey,arrangeExperience,prepareHandoff} from '../lib/interaction-patterns';
 
-export function RelatedConversations({items,lang,onOpen,onEvent}:{items:Related[];lang:Lang;onOpen:(r:Related)=>void;onEvent:(type:string,detail:Record<string,unknown>)=>void}){
+export function RelatedConversations({items,lang,currentTitle,onOpen,onEvent}:{items:Related[];lang:Lang;currentTitle:string;onOpen:(r:Related)=>void;onEvent:(type:string,detail:Record<string,unknown>)=>void}){
  const [preview,setPreview]=useState<string|null>(null);
- return <div className="ip-related" data-interaction="route"><h3>Explore related conversations</h3><p className="cg-meta">Preset matches use discussion groups and shared topic words. People and posts are not ranked by expertise.</p>
+ return <div className="ip-related" data-interaction="route"><h3>Explore related conversations</h3><p className="ip-current-origin">For: <strong>{currentTitle}</strong></p><p className="cg-meta">Preset matches use discussion groups and shared topic words. People and posts are not ranked by expertise.</p>
  {!items.length&&<p>No matching discussion is available yet. You can keep browsing or ask the community directly.</p>}
  {items.map(r=><article className="ip-route-card" key={r.post.id}><div className="ip-route-heading">{r.post.photo&&<LoadingImage src={photos[r.post.photo].src} alt={say(lang,photos[r.post.photo].alt)}/>}<div><strong>{say(lang,r.post.title)}</strong><small>{r.post.author} · {r.post.seed?'Fictional seed conversation':'Member conversation'}</small></div></div><p className="ip-reason">{r.reasons.join(' · ')}</p><div className="ip-actions"><Button variant="outline" onClick={()=>{setPreview(preview===r.post.id?null:r.post.id);onEvent('route_previewed',{targetThread:r.post.id,reasons:r.reasons});}}>{preview===r.post.id?'Hide preview':'Preview discussion'}</Button><Button className="cg-primary" onClick={()=>onOpen(r)}>Open conversation <ArrowRight size={16}/></Button></div>{preview===r.post.id&&<div className="ip-route-preview"><p>{say(lang,r.post.body)}</p><small>Read the full discussion before deciding whether this experience fits. Opening it does not notify or contact its author.</small></div>}</article>)}
  </div>;

@@ -1202,7 +1202,7 @@ export default function CommunityV3() {
     event('handoff_source_inspected',{sourceThread:source.threadId,version:source.album.version});
     const p=community.posts.find(p=>p.id===source.threadId);if(p){setConversationReturn({post:currentPost,view:view==='assistant'?origin:view});setInlineAssist(null);openPost(p);}else setNotice('This record remains visible in the comparison; its discussion is unavailable.');
   };
-  const assistPanel=assistKind==='route'?<RelatedConversations items={related} lang={lang} onOpen={openRelated} onEvent={event}/>:
+  const assistPanel=assistKind==='route'?<RelatedConversations items={related} lang={lang} currentTitle={tx(st.title)} onOpen={openRelated} onEvent={event}/>:
     assistKind==='album'?<ExperienceAssembly work={w} onEvent={event} onApply={(text,selected)=>acceptSpecific('album',text,{albumDraft:text}, {materials:selected})}/>:
     assistKind==='pass'?<ExperienceComparison sources={experienceSources} target={w.selectedQuote||w.question||tx(st.caption)} initialKey={handoff?.key} onEvent={event} onInspect={inspectExperience} onApply={(text,source,context)=>acceptSpecific('pass',text,{passDraft:text,handoffSource:source,handoffContext:context},{sourceThread:source.threadId,sourceVersion:source.album.version,targetThread:focusId,comparison:context})}/>:expressionPanel;
   const inlinePanel = (kind: AssistKind) =>
