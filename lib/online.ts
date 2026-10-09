@@ -26,7 +26,7 @@ export async function roomId(study:Study|null){return study&&!study.week?await u
 export async function publishContribution(input:Contribution){
   if(!input.body.trim())throw new Error('Write a contribution before publishing.');
   const uid=await userId();const id=input.id??crypto.randomUUID();
-  const row={id,post_id:input.story,room_id:input.study&&!input.study.week?uid:'shared',user_id:uid,display_name:input.study?.participant||input.displayName?.trim()||`Member-${uid.slice(0,6)}`,body:input.body.trim(),kind:input.kind||'comment',image_anchor:input.anchor||null,quoted_text:input.quote||null,quoted_comment_id:input.quoteId||null,metadata:input.metadata||{}};
+  const row={id,post_id:input.story,room_id:input.study&&!input.study.week?uid:'shared',user_id:uid,display_name:input.study?.participant||input.displayName?.trim()||`Member-${uid.slice(0,6)}`,body:input.body.trim(),kind:input.kind||'comment',image_anchor:input.anchor||null,quoted_text:input.quote||null,quoted_comment_id:input.quoteId||null,metadata:{...input.metadata,...(new URLSearchParams(location.search).get('qa')==='1'?{test_fixture:true}: {})}};
   const result=await database().from('comments').insert(row).select().single();
   // Retrying an uncertain network result with the same id must not duplicate it.
   if(result.error?.code==='23505'){

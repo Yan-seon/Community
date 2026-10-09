@@ -11,7 +11,7 @@ import {
   type CommentRow,
 } from "@/lib/online";
 import { LoadingImage } from "./loading-image";
-import { threadOf } from "../lib/free-community";
+import { threadOf, isTestContribution } from "../lib/free-community";
 import { photos, say, type Anchor, type Lang, type StoryId, type Study } from "@/lib/community-v3";
 import { Button } from "@/components/ui/button";
 
@@ -83,13 +83,7 @@ export function SharedThread({
       )
         return;
       const showTests = new URLSearchParams(location.search).get("qa") === "1";
-      if (
-        !showTests &&
-        (/^TEST\b/i.test(row.display_name) ||
-          /^P(?:998|900)\d{3}$/i.test(row.display_name) ||
-          /^TEST\b/i.test(row.body))
-      )
-        return;
+      if (!showTests && isTestContribution(row)) return;
       setRows((old) =>
         [...old.filter((r) => r.id !== row.id), row].sort(
           (a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id),

@@ -3,9 +3,9 @@ import {Heart,Bookmark,MessageCircle,Plus,Search,LoaderCircle} from 'lucide-reac
 import {Button} from './ui/button';
 import {LoadingImage} from './loading-image';
 import {database,onlineConfigured,publishContribution,userId,type CommentRow} from '../lib/online';
-import {seedPosts,groupNames,threadOf,type CommunityPost} from '../lib/free-community';
+import {seedPosts,groupNames,threadOf,isTestContribution,type CommunityPost} from '../lib/free-community';
 import {photos,say,type Lang,type StoryId,type Study,type PhotoId,type Album} from '../lib/community-v3';
-export const testFixture=(row:CommentRow)=>/^TEST\b/i.test(row.display_name)||/^P(?:998|900)\d{3}$/i.test(row.display_name)||/^TEST\b/i.test(row.body)||/^TEST\b/i.test(String(row.metadata.title||''));
+export const testFixture=isTestContribution;
 export function useCommunity(){
  const pendingPost=useRef<{key:string;id:string}|null>(null);
  const [rows,setRows]=useState<CommentRow[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(false),[uid,setUid]=useState(''),[refresh,setRefresh]=useState(0);

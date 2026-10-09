@@ -19,3 +19,8 @@ const authored:(CommunityPost)[]=[
 export const seedPosts:CommunityPost[]=[...Object.values(stories).map(s=>({id:'case:'+s.id,story:s.id,title:s.title,body:s.caption,author:s.member,photo:s.photo,createdAt:'2026-10-01T12:00:00.000Z',seed:true})),...authored];
 export const groupNames:Record<StoryId,Bi>={A:['Complexion discussions','底妆讨论'],B:['Makeup techniques','彩妆技巧'],C:['Swatches and shades','试色与色号']};
 export const threadOf=(metadata:Record<string,unknown>,story:StoryId)=>typeof metadata.thread_id==='string'?metadata.thread_id:'case:'+story;
+
+export function isTestContribution(row:{display_name:string;body:string;metadata:Record<string,unknown>}):boolean{
+ const source=row.metadata.experience_source as {album?:{title?:string}}|undefined;
+ return row.metadata.test_fixture===true||/^TEST\b/i.test(row.display_name)||/^P(?:998|900)\d{3}$/i.test(row.display_name)||/^TEST\b/i.test(row.body)||/^TEST\b/i.test(String(row.metadata.title||''))||/^TEST\b/i.test(source?.album?.title||'');
+}
