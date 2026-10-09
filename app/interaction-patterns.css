@@ -11,3 +11,5 @@
 .ip-current-origin{font-size:14px;color:#514268;background:white;padding:10px 12px;border:1px solid #e2dbe9;border-radius:5px;margin:12px 0}
 
 .cg-app .cg-live-comment{padding:18px 16px!important}.cg-app .cg-live-comment header{min-width:0;row-gap:8px}.cg-app .cg-live-comment header time{overflow-wrap:anywhere}
+
+.cg-app .fc-post-photo .cg-image-wrap{max-height:360px;overflow:hidden}.cg-app .fc-gallery .fc-post-photo .cg-image-wrap{max-height:none}
