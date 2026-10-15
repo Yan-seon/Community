@@ -13,6 +13,8 @@ import {
 import { LoadingImage } from "./loading-image";
 import { threadOf, isTestContribution, seedProvenance } from "../lib/free-community";
 import { photos, say, type Anchor, type Lang, type StoryId, type Study } from "@/lib/community-v3";
+import { PublicAiContext } from "./public-ai-context";
+import { AnchoredReference } from "./anchored-reference";
 import { Button } from "@/components/ui/button";
 
 const sentenceParts = (text: string) =>
@@ -25,6 +27,7 @@ export function SharedThread({
   anchor,
   quoteContext,
   proposedDraft,
+  proposedMediation,
   onHelpQuote,
   renderQuoteHelp,
   onQuote,
@@ -37,6 +40,7 @@ export function SharedThread({
   threadId?: string;
   quoteContext?: { text: string; author: string; id?: string } | null;
   proposedDraft?: string;
+  proposedMediation?: Record<string,unknown>;
   onHelpQuote?: () => void;
   renderQuoteHelp?: () => React.ReactNode;
   anchor: Anchor | null;
@@ -170,6 +174,7 @@ export function SharedThread({
         metadata: {
           thread_id: threadId || "case:" + story,
           ai_simulated: aiAdopted,
+          ...(aiAdopted&&proposedMediation?{public_ai:proposedMediation}:{}),
           quote_author: quote?.row.display_name || quoteContext?.author || null,
         },
       });
@@ -225,7 +230,7 @@ export function SharedThread({
               <header>
                 <span className="cg-avatar">{row.display_name[0]}</span>
                 <strong>{row.display_name}</strong>
-                {row.metadata.synthetic_seed===true&&<small className="sc-member">Simulated member</small>}
+                
                 <time dateTime={row.created_at}>
                   {new Date(seedProvenance(row.metadata)?.scenarioAt||row.created_at).toLocaleString(lang === "en" ? "en-GB" : "zh-CN")}
                 </time>
@@ -269,7 +274,7 @@ export function SharedThread({
                   {row.metadata.limits}
                 </p>
               )}
-              {!!row.metadata.experience_source&&typeof row.metadata.experience_source==='object'&&(()=>{const source=row.metadata.experience_source as import('../lib/interaction-patterns').ExperienceSource;return source.album&&<details className="ip-public-source"><summary>Experience source · {source.album.title} · v{source.album.version}</summary><p>{source.author} · {source.album.authors.map(a=>a==='You'?source.author:a).join(' → ')}</p><p>{source.album.text}</p>{source.album.quotedLine&&<blockquote><strong>{source.quoteAuthor||'Retained member wording'}</strong><p>{source.album.quotedLine}</p></blockquote>}{source.album.anchor&&<div className="cg-live-image"><LoadingImage src={photos[source.album.anchor.photo].src} alt={say(lang,photos[source.album.anchor.photo].alt)}/><span className="cg-pin" style={{left:source.album.anchor.x*100+'%',top:source.album.anchor.y*100+'%'}}>1</span></div>}<p>Original limits: {source.album.limits||'No additional limits supplied.'}</p><p>{source.album.sourceIds.join(' · ')}</p>{onOpenSource&&<button className="cg-text-link" onClick={()=>onOpenSource(source.threadId)}>Open source conversation</button>}</details>;})()}
+              {!!row.metadata.experience_source&&typeof row.metadata.experience_source==='object'&&(()=>{const source=row.metadata.experience_source as import('../lib/interaction-patterns').ExperienceSource;return source.album&&<details className="ip-public-source"><summary>Experience source · {source.album.title} · v{source.album.version}</summary><p>{source.author} · {source.album.authors.map(a=>a==='You'?source.author:a).join(' → ')}</p><p>{source.album.text}</p>{source.album.quotedLine&&<blockquote><strong>{source.quoteAuthor||'Retained member wording'}</strong><p>{source.album.quotedLine}</p></blockquote>}{source.album.anchor&&<AnchoredReference anchor={source.album.anchor} lang={lang}/>}<p>Original limits: {source.album.limits||'No additional limits supplied.'}</p><p>{source.album.sourceIds.join(' · ')}</p>{onOpenSource&&<button className="cg-text-link" onClick={()=>onOpenSource(source.threadId)}>Open source conversation</button>}</details>;})()}
               {row.quoted_text && (
                 <blockquote>
                   <strong>
@@ -278,24 +283,11 @@ export function SharedThread({
                   <p>{row.quoted_text}</p>{row.quoted_comment_id&&<button className="cg-text-link" onClick={()=>{document.querySelector('[data-comment-id="'+row.quoted_comment_id+'"]')?.scrollIntoView({behavior:'smooth',block:'center'});}}>Locate original comment</button>}
                 </blockquote>
               )}
+              <PublicAiContext metadata={row.metadata} onOpen={onOpenSource}/>
               <div className="cg-live-comment-content">
                 <p className="cg-live-body">{row.body}</p>
                 {row.image_anchor && photos[row.image_anchor.photo] && (
-                  <div className="cg-live-image">
-                    <LoadingImage
-                      src={photos[row.image_anchor.photo].src}
-                      alt={say(lang, photos[row.image_anchor.photo].alt)}
-                    />
-                    <span
-                      className="cg-pin"
-                      style={{
-                        left: row.image_anchor.x * 100 + "%",
-                        top: row.image_anchor.y * 100 + "%",
-                      }}
-                    >
-                      1
-                    </span>
-                  </div>
+                  <AnchoredReference anchor={row.image_anchor} lang={lang}/>
                 )}
               </div>
               <details>
@@ -308,6 +300,7 @@ export function SharedThread({
                       onClick={() => {
                         setQuote({ text: line, row });
                         onQuote(line, row);
+                        document.querySelector(".cg-live-composer")?.scrollIntoView({behavior:"smooth",block:"center"});
                         setSuggestion("");
                         requestId.current = null;
                       }}

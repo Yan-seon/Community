@@ -7,7 +7,7 @@ export function startWeek(participant:string,lang:Lang,condition:Mode,at=Date.no
 export function visitWeek(s:Study,at=Date.now()):Study{if(!s.week||s.completed)return s;if(at>s.week.endsAt)return {...s,completed:true};const day=localDay(at);return {...log(s,'community_visit',{localDay:day}),week:{...s.week,activeDays:[...new Set([...s.week.activeDays,day])],visits:s.week.visits+1,lastVisitAt:at}};}
 export function weekFeedback(s:Study,ratings:(number|null)[],notes:string,context:string):Study{if(!s.week)return s;if(ratings.length!==6||ratings.some(v=>v!==null&&(!Number.isInteger(v)||v<1||v>7)))throw Error('Invalid rating');return {...log(s,'optional_feedback_saved',{context,answered:!!notes.trim()}),week:{...s.week,feedback:[...s.week.feedback,{at:new Date().toISOString(),ratings,notes:notes.trim(),answered:!!notes.trim(),context}]}};}
 export type SeedProvenance={batchId:string;characterId:string;scenarioAt:string;sources:string[]};
-export type CommunityPost={id:string;story:StoryId;title:Bi;body:Bi;author:string;photo:PhotoId|null;createdAt:string;seed:boolean;album?:Album;albumQuoteAuthor?:string;provenance?:SeedProvenance};
+export type CommunityPost={id:string;story:StoryId;title:Bi;body:Bi;author:string;photo:PhotoId|null;createdAt:string;seed:boolean;album?:Album;albumQuoteAuthor?:string;provenance?:SeedProvenance;aiContext?:Record<string,unknown>};
 export function seedProvenance(metadata:Record<string,unknown>):SeedProvenance|undefined{
  const s=metadata.simulation as Record<string,unknown>|undefined;
  if(metadata.synthetic_seed!==true||!s||typeof s.batch_id!=='string'||typeof s.character_id!=='string'||typeof s.scenario_at!=='string'||!Number.isFinite(Date.parse(s.scenario_at)))return undefined;
@@ -16,7 +16,7 @@ export function seedProvenance(metadata:Record<string,unknown>):SeedProvenance|u
 export function postFromRow(r:{id:string;post_id:StoryId;display_name:string;body:string;created_at:string;metadata:Record<string,unknown>}):CommunityPost|null{
  if(r.metadata.entity!=='community_post'||typeof r.metadata.title!=='string')return null;
  const provenance=seedProvenance(r.metadata),key=String(r.metadata.photo);
- return {id:r.id,story:r.post_id,title:[r.metadata.title,r.metadata.title],body:[r.body,r.body],author:r.display_name,photo:Object.hasOwn(photos,key)?key as PhotoId:null,createdAt:provenance?.scenarioAt||r.created_at,seed:!!provenance,provenance};
+ return {id:r.id,story:r.post_id,title:[r.metadata.title,r.metadata.title],body:[r.body,r.body],author:r.display_name,photo:Object.hasOwn(photos,key)?key as PhotoId:null,createdAt:provenance?.scenarioAt||r.created_at,seed:!!provenance,provenance,...(r.metadata.public_ai?{aiContext:{public_ai:r.metadata.public_ai,synthetic_seed:r.metadata.synthetic_seed}}:{})};
 }
 const authored:(CommunityPost)[]=[
  {id:'primer-return',story:'A',author:'Mia',photo:'base',title:['A smaller amount, one attempt later','少一点用量，一次尝试之后'],body:['I changed just the amount of primer. The pilling seemed less noticeable once, but I cannot separate the amount from the conditions that day. Has anyone kept a useful comparison diary?','我只改变了妆前用量。一次观察中搓泥似乎少了，但无法把用量与当天条件分开。有人记录过有用的对比小记吗？']},

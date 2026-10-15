@@ -76,6 +76,8 @@ import {
 import "./community-polish.css";
 import "./interaction-patterns.css";
 import {RelatedConversations,ExperienceAssembly,ExperienceComparison,ConversationReturn} from "@/components/interaction-patterns";
+import {PublicAiContext} from "@/components/public-ai-context";
+import {questionPrompt,type QuestionAim} from "@/lib/ai-mediation";
 import {relatedPosts,type ExperienceSource,type Related,type MaterialKey} from "@/lib/interaction-patterns";
 import { StudySessionPanel } from "@/components/study-session";
 import { SharedThread } from "@/components/shared-thread";
@@ -224,6 +226,7 @@ export default function CommunityV3() {
   const [publishing, setPublishing] = useState(false);
   const [cloudStatus, setCloudStatus] = useState("");
   const pendingShare = useRef<{ key: string; id: string } | null>(null);
+  const [questionAim,setQuestionAim]=useState<QuestionAim>("detail");
   const [conversationReturn,setConversationReturn]=useState<{post:CommunityPost;view:View}|null>(null);
   const [assistKind, setAssistKind] = useState<AssistKind>("question");
   const [inlineAssist, setInlineAssist] = useState<AssistKind | null>(null);
@@ -618,6 +621,11 @@ export default function CommunityV3() {
             thread_id: focusId,
             ai_simulated: w.aiTrace.length > 0,
             ai_trace: w.aiTrace,
+            ...(w.aiTrace.some(a=>a.kind===({question:'question',album:'album',handoff:'pass'} as Record<string,string>)[kind])?{public_ai:{
+              kind:({question:'question',album:'album',handoff:'pass'} as Record<string,string>)[kind],
+              reference:kind==='question'?(w.anchor?'The member-selected image location and current post':'The current post and member draft'):kind==='album'?'The member update, selected wording and supplied limits':(w.handoffSource?.album.title||'Selected experience')+' · version '+(w.handoffSource?.album.version||1),
+              decision:'Requested an editable suggestion and chose the published wording. Publication remained a member action.',
+            }}:{}),
             quote_author: w.selectedQuoteAuthor || st.guide,
           },
         });
@@ -647,6 +655,7 @@ export default function CommunityV3() {
             : null
         }
         proposedDraft={w.plan}
+        proposedMediation={{kind:"quote",reference:(w.selectedQuoteAuthor||st.guide)+": "+w.selectedQuote,decision:"Selected a sentence, requested help and chose an editable follow-up. The published wording is the member’s."}}
         onHelpQuote={() => ai("quote")}
         renderQuoteHelp={() => inlinePanel("quote")}
         onQuote={(text, row) =>
@@ -846,16 +855,7 @@ export default function CommunityV3() {
   const assistance =
     assistKind === "question"
       ? custom
-        ? t(
-            (w.questionDraft.trim() ? w.questionDraft.trim() + "\n" : "") +
-              "What context would help me understand “" +
-              tx(st.title) +
-              "”?",
-            (w.questionDraft.trim() ? w.questionDraft.trim() + "\n" : "") +
-              "关于“" +
-              tx(st.title) +
-              "”，补充什么情境会帮助理解？",
-          )
+        ? questionPrompt(currentPost,w.anchor,w.questionDraft,questionAim)
         : w.questionDraft.trim()
           ? w.questionDraft.trim() + "\n" + tx(st.prompt)
           : tx(st.prompt)
@@ -1166,6 +1166,7 @@ export default function CommunityV3() {
           {t("Open this related conversation", "打开这段相关讨论")}
         </button>
       )}
+      {assistKind==='question'&&custom&&<fieldset className="ip-question-intent"><legend>What would help you join in?</legend>{([['detail','Explain one detail'],['conditions','Ask about the conditions'],['difference','Invite a different experience']] as const).map(([id,label])=><button key={id} type="button" aria-pressed={questionAim===id} onClick={()=>{setQuestionAim(id);event('question_intention_selected',{aim:id});}}>{label}</button>)}</fieldset>}
       <blockquote>
         {assistance ||
           t(
@@ -1181,7 +1182,7 @@ export default function CommunityV3() {
       >
         <summary>{t("Why this suggestion?", "为什么出现这条建议？")}</summary>
         <p>{tx(st.origin)}</p>
-              <button className="cg-text-link" onClick={()=>setModal("member")}>Meet the simulated members</button>
+              <button className="cg-text-link" onClick={()=>setModal("member")}>Meet community members</button>
               <a href="/community-media/credits.json" target="_blank" rel="noreferrer">Image authors and licences</a>
         <p>{st.sourceIds.join(" · ")}</p>
         <a
@@ -1420,7 +1421,7 @@ export default function CommunityV3() {
       <div className="cg-disclosure">
         <button onClick={() => setModal("about")}>
           {t(
-            "Research simulation · fictional members and seeded history · AI uses presets",
+            "Community information · about AI help",
             "研究模拟 · 脚本情境与真实测试评论 · AI 使用预设",
           )}{" "}
           <span>ⓘ</span>
@@ -1635,7 +1636,7 @@ export default function CommunityV3() {
                   <h1>{tx(st.title)}</h1>
                   <p className="cg-post-time">
                     {focus?.seed
-                      ? t(focus?.provenance?"Simulated member · scenario history":"Fictional scenario post", "虚构情境帖子")
+                      ? t("Member conversation", "成员讨论")
                       : t("Member post", "成员帖子")}{" "}
                     ·{" "}
                     {focus?.createdAt
@@ -1651,11 +1652,10 @@ export default function CommunityV3() {
                   </div>
                   <p className="cg-detail-copy">{tx(st.caption)}</p>
                   <SeedContext post={focus}/>
+                  {focus?.aiContext&&<PublicAiContext metadata={focus.aiContext} onOpen={id=>{const p=community.posts.find(p=>p.id===id);if(p){setConversationReturn({post:currentPost,view});openPost(p);}}}/>}
                   {hasPhoto && (
                     <div className="cg-detail-images">
-                      <button onClick={() => go("ask")}>
-                        <Photo id={st.photo} lang={lang} />
-                      </button>
+                      <div className="ip-main-reference"><button className="ip-main-picture" aria-label="Select a detail in this image" onClick={e=>{const r=e.currentTarget.getBoundingClientRect();change({anchor:clampAnchor(e.detail===0?.5:(e.clientX-r.left)/r.width,e.detail===0?.5:(e.clientY-r.top)/r.height,st.photo)},'image_anchor_set',{from:'conversation'});go('ask');}}><Photo id={st.photo} lang={lang}/></button>{community.comments.filter(r=>threadOf(r.metadata,r.post_id)===focusId&&r.kind==='question'&&r.image_anchor?.photo===st.photo).map((r,i)=><button key={r.id} className="cg-pin ip-public-pin" style={{left:r.image_anchor!.x*100+'%',top:r.image_anchor!.y*100+'%'}} aria-label={'Read image question '+(i+1)+' by '+r.display_name} onClick={()=>{document.querySelector('[data-comment-id="'+r.id+'"]')?.scrollIntoView({behavior:'smooth',block:'center'});event('public_image_reference_inspected',{commentId:r.id});}}>{i+1}</button>)}</div>
                       {!custom && st.photo !== "swatches" && (
                         <button onClick={() => openOriginal("swatches")}>
                           <Photo id="swatches" lang={lang} />
@@ -1786,6 +1786,8 @@ export default function CommunityV3() {
                     <button onClick={() => go("return")}>{t("Share an update", "分享近况")}</button>
                     <button onClick={draftAlbum}>{t("Keep an experience", "整理一段经验")}</button>
                   </div>
+                  <div className="ip-local-connection"><Button variant="outline" className="cg-ai" onClick={()=>ai('route')}><Sparkles size={16}/>Explore related conversations</Button>{inlinePanel('route')}{trace('route')}</div>
+                  <div className="fc-context-actions"><button onClick={()=>go('pass')}>Reply with a shared experience</button></div>
                   {sharedThread}
                 </article>
                 <aside className="cg-detail-rail">
@@ -1849,7 +1851,7 @@ export default function CommunityV3() {
                   <h1>{tx(st.title)}</h1>
                   <p className="cg-post-time">
                     {focus?.seed
-                      ? t(focus?.provenance?"Simulated member · scenario history":"Fictional scenario post", "虚构情境帖子")
+                      ? t("Member conversation", "成员讨论")
                       : t("Member post", "成员帖子")}{" "}
                     ·{" "}
                     {focus?.createdAt
@@ -1865,6 +1867,7 @@ export default function CommunityV3() {
                   </div>
                   <p className="cg-detail-copy">{tx(st.caption)}</p>
                   <SeedContext post={focus}/>
+                  {focus?.aiContext&&<PublicAiContext metadata={focus.aiContext} onOpen={id=>{const p=community.posts.find(p=>p.id===id);if(p){setConversationReturn({post:currentPost,view});openPost(p);}}}/>}
                   <div className="cg-composer-divider" />
                   <div className="cg-composer-heading">
                     <span className="cg-avatar">{t("Y", "我")}</span>
@@ -1987,6 +1990,7 @@ export default function CommunityV3() {
                         {t("Your question", "你想问什么")}
                         <textarea
                           rows={4}
+                          aria-label={t("Your question", "你想问什么")}
                           maxLength={600}
                           value={w.questionDraft}
                           onBlur={() => draftEdited("question", w.questionDraft)}
@@ -2077,6 +2081,7 @@ export default function CommunityV3() {
                 <h1>{tx(st.title)}</h1>
                 <p className="cg-detail-copy">{tx(st.caption)}</p>
                   <SeedContext post={focus}/>
+                  {focus?.aiContext&&<PublicAiContext metadata={focus.aiContext} onOpen={id=>{const p=community.posts.find(p=>p.id===id);if(p){setConversationReturn({post:currentPost,view});openPost(p);}}}/>}
                 {hasPhoto && (
                   <div className="cg-thread-photo">
                     <VisualRef id={st.photo} lang={lang} anchor={w.anchor} mini />
@@ -2096,7 +2101,7 @@ export default function CommunityV3() {
                     <div className="cg-member-line">
                       <span className="cg-avatar">{st.guide[0]}</span>
                       <strong>{st.guide}</strong>
-                      <small>{t("Fictional scenario member", "虚构情境成员")}</small>
+                      <small>{t("Community member", "社区成员")}</small>
                     </div>
                     <div className="cg-sentence-list">
                       {sentences(tx(st.reply)).map((line, i) => (
@@ -2790,7 +2795,7 @@ export default function CommunityV3() {
                 )}
               </p>
               <p>{tx(st.origin)}</p>
-              <button className="cg-text-link" onClick={()=>setModal("member")}>Meet the simulated members</button>
+              <button className="cg-text-link" onClick={()=>setModal("member")}>Meet community members</button>
               <a href="/community-media/credits.json" target="_blank" rel="noreferrer">Image authors and licences</a>
               <p>
                 {t(

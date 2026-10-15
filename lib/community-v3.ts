@@ -6,8 +6,8 @@ export const say = (l: Lang, b: Bi) => b[l === 'en' ? 0 : 1];
 export type StoryId = 'A' | 'B' | 'C';
 export type PhotoId = 'base' | 'blush' | 'swatches' | SeedPhotoId;
 export type Mode = 'embedded' | 'separate';
-export const VERSION = '4.4.0-community-simulation-corpus';
-const COMPATIBLE_VERSIONS=[VERSION,'4.3.0-distinct-interactions','4.2.0-free-community','4.1.0-study-ready','4.0.0-ai-community-weave'];
+export const VERSION = '4.5.0-embedded-community-practices';
+const COMPATIBLE_VERSIONS=[VERSION,'4.4.0-community-simulation-corpus','4.3.0-distinct-interactions','4.2.0-free-community','4.1.0-study-ready','4.0.0-ai-community-weave'];
 export const STORAGE = 'common-ground-v3';
 export const photos: Record<PhotoId, {src:string; alt:Bi}> = {
   ...communityMedia,

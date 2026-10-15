@@ -1,0 +1,2710 @@
+{
+  "batch_id": "embedded-practices-2026-10-15",
+  "created_on": "2026-10-15",
+  "purpose": "Authored stimulus episodes illustrating embedded AI community practices, never participant evidence.",
+  "clock": "scenario_at is fictional narrative time; database created_at remains the real import timestamp.",
+  "members": [
+    {
+      "id": "SIM01",
+      "name": "Mia",
+      "role": "questioner",
+      "bio": "Learning base makeup; describes what she tried and returns when something changes.",
+      "fictional": true
+    },
+    {
+      "id": "SIM02",
+      "name": "Nora",
+      "role": "sharer",
+      "bio": "Enjoys colour placement and everyday makeup; friendly, concise and never presents one technique as universal.",
+      "fictional": true
+    },
+    {
+      "id": "SIM03",
+      "name": "Lea",
+      "role": "sharer",
+      "bio": "Likes comparing colours and keeping the lighting context with a reference image.",
+      "fictional": true
+    },
+    {
+      "id": "SIM04",
+      "name": "Ari",
+      "role": "helper",
+      "bio": "Experienced hobbyist who asks for missing context before offering one small experiment.",
+      "fictional": true
+    },
+    {
+      "id": "SIM05",
+      "name": "Sam",
+      "role": "helper",
+      "bio": "Practical brush and blending enthusiast; suggests affordable changes before another purchase.",
+      "fictional": true
+    },
+    {
+      "id": "SIM06",
+      "name": "Jo",
+      "role": "helper",
+      "bio": "Interested in visual comparisons, lighting and the difference between a swatch and wear.",
+      "fictional": true
+    },
+    {
+      "id": "SIM07",
+      "name": "Emma",
+      "role": "questioner",
+      "bio": "Returning to makeup after a break; prefers uncomplicated explanations.",
+      "fictional": true
+    },
+    {
+      "id": "SIM08",
+      "name": "Zoe",
+      "role": "questioner",
+      "bio": "New to brushes and eye makeup; asks short, direct questions.",
+      "fictional": true
+    },
+    {
+      "id": "SIM09",
+      "name": "Iris",
+      "role": "questioner",
+      "bio": "Trying to use products she already owns; comfortable reporting that an idea did not help.",
+      "fictional": true
+    },
+    {
+      "id": "SIM10",
+      "name": "Lila",
+      "role": "questioner",
+      "bio": "Quiet at first; shares a question or a short follow-up rather than a long tutorial.",
+      "fictional": true
+    },
+    {
+      "id": "SIM11",
+      "name": "Tess",
+      "role": "sharer",
+      "bio": "Enjoys eye colour and playful combinations; keeps a slightly chatty writing style.",
+      "fictional": true
+    },
+    {
+      "id": "SIM12",
+      "name": "Ava",
+      "role": "sharer",
+      "bio": "Likes nail colours, seasonal comparisons and cheerful short replies.",
+      "fictional": true
+    },
+    {
+      "id": "SIM13",
+      "name": "June",
+      "role": "sharer",
+      "bio": "Collects small everyday routines and enjoys using up familiar products.",
+      "fictional": true
+    },
+    {
+      "id": "SIM14",
+      "name": "Rina",
+      "role": "helper",
+      "bio": "Long-time community reader who connects people to useful conversations without claiming professional authority.",
+      "fictional": true
+    },
+    {
+      "id": "SIM15",
+      "name": "Maya",
+      "role": "social",
+      "bio": "Welcomes newcomers and notices other members’ efforts; also posts her own ordinary questions.",
+      "fictional": true
+    },
+    {
+      "id": "SIM16",
+      "name": "Liv",
+      "role": "social",
+      "bio": "Occasional visitor who leaves brief, warm replies and does not follow every thread.",
+      "fictional": true
+    },
+    {
+      "id": "SIM17",
+      "name": "Bea",
+      "role": "social",
+      "bio": "Enjoys community rituals and favourite-product conversations; avoids pressure to buy.",
+      "fictional": true
+    },
+    {
+      "id": "SIM18",
+      "name": "Nia",
+      "role": "social",
+      "bio": "Likes a friendly chat and follows up on remembered conversations.",
+      "fictional": true
+    },
+    {
+      "id": "SIM19",
+      "name": "Elise",
+      "role": "comparison",
+      "bio": "Weighs buying against using what she has; explains dislikes as well as favourites.",
+      "fictional": true
+    },
+    {
+      "id": "SIM20",
+      "name": "Hana",
+      "role": "comparison",
+      "bio": "Compares products, prices and preferences; comfortable disagreeing politely.",
+      "fictional": true
+    }
+  ],
+  "posts": [],
+  "rows": [
+    {
+      "id": "815fd215-d05b-5683-b6e6-4e49bd345bc6",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Emma",
+      "body": "Could someone explain one way to start with a tint rather than a full red lip? I marked the lipstick I mean; the picture cannot tell me how it would look on me.",
+      "kind": "question",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "164daba0-a9c8-52ff-8c28-3da1c703c2c6",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM07",
+          "scenario_at": "2026-10-08T18:00:00+00:00",
+          "sources": [
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/",
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "question",
+          "reference": "Selected image detail and the member’s starting wording",
+          "decision": "Kept the selected detail and edited the suggestion into a question in her own voice.",
+          "original": "I like the colour but do not know how to ask about starting small.",
+          "proposal": "Could someone explain one way to start with a tint rather than a full red lip? I marked the lipstick I mean; the picture cannot tell me how it would look on me."
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": {
+        "x": 0.53,
+        "y": 0.79,
+        "photo": "media-02"
+      },
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "7647b0b1-0990-5355-85a6-e02e30572b2a",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Nora",
+      "body": "For a tint, I start with a little colour and stop when it feels like enough to me. It does not have to become a full lip.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "164daba0-a9c8-52ff-8c28-3da1c703c2c6",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM02",
+          "scenario_at": "2026-10-08T19:12:00+00:00",
+          "sources": [
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/",
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Emma"
+      },
+      "image_anchor": null,
+      "quoted_text": "Could someone explain one way to start with a tint rather than a full red lip? I marked the lipstick I mean; the picture cannot tell me how it would look on me.",
+      "quoted_comment_id": "815fd215-d05b-5683-b6e6-4e49bd345bc6"
+    },
+    {
+      "id": "f890fd4e-314e-5f12-98da-e1552a73209a",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Emma",
+      "body": "I like the idea of stopping there. Did you choose the tint because of the finish or because it felt easier to wear?",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "164daba0-a9c8-52ff-8c28-3da1c703c2c6",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM07",
+          "scenario_at": "2026-10-08T20:06:00+00:00",
+          "sources": [
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/",
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "quote",
+          "reference": "Nora: For a tint, I start with a little colour and stop when it feels like enough to me. It does not have to become a full lip.",
+          "decision": "Kept the original author and asked about one part of their experience; edited before publishing.",
+          "original": "Can you say more?",
+          "proposal": "I like the idea of stopping there. Did you choose the tint because of the finish or because it felt easier to wear?"
+        },
+        "ai_simulated": true,
+        "quote_author": "Nora"
+      },
+      "image_anchor": null,
+      "quoted_text": "For a tint, I start with a little colour and stop when it feels like enough to me. It does not have to become a full lip.",
+      "quoted_comment_id": "7647b0b1-0990-5355-85a6-e02e30572b2a"
+    },
+    {
+      "id": "f31d0aad-dd43-56fb-a541-4d5e12617721",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Nora",
+      "body": "Mostly how it felt to wear. A bold lip is not a graduation test for belonging here.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "164daba0-a9c8-52ff-8c28-3da1c703c2c6",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM02",
+          "scenario_at": "2026-10-08T21:00:00+00:00",
+          "sources": [
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/",
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Emma"
+      },
+      "image_anchor": null,
+      "quoted_text": "I like the idea of stopping there. Did you choose the tint because of the finish or because it felt easier to wear?",
+      "quoted_comment_id": "f890fd4e-314e-5f12-98da-e1552a73209a"
+    },
+    {
+      "id": "a9f9ea6a-8d28-5a81-b2e2-e6fa66727354",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Zoe",
+      "body": "I marked the upper lid area. When you soften an edge, are you using the same brush or a clean one? I cannot follow that step from a still photograph.",
+      "kind": "question",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "23326e8b-9018-5a63-9aae-f511800b8180",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM08",
+          "scenario_at": "2026-10-09T22:40:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "question",
+          "reference": "Selected image detail and the member’s starting wording",
+          "decision": "Removed the extra request for more steps; chose one question to discuss first.",
+          "original": "I get lost looking at the finished eye.",
+          "proposal": "I marked the upper lid area. When you soften an edge, are you using the same brush or a clean one? I cannot follow that step from a still photograph. What else should I try?"
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": {
+        "x": 0.67,
+        "y": 0.32,
+        "photo": "media-16"
+      },
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "032adea6-cd03-502a-99b1-cb97db1be44b",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Sam",
+      "body": "I use a clean brush for the edge so I am not adding more shadow while I soften it. That is how I work, rather than something this photograph proves.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "23326e8b-9018-5a63-9aae-f511800b8180",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM05",
+          "scenario_at": "2026-10-09T23:52:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Zoe"
+      },
+      "image_anchor": null,
+      "quoted_text": "I marked the upper lid area. When you soften an edge, are you using the same brush or a clean one? I cannot follow that step from a still photograph.",
+      "quoted_comment_id": "a9f9ea6a-8d28-5a81-b2e2-e6fa66727354"
+    },
+    {
+      "id": "b01e0043-0cca-5386-95e7-1386695c9d0f",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Zoe",
+      "body": "When you say a clean brush, do you mean a second one, or wiping the first? I only have one at the moment.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "23326e8b-9018-5a63-9aae-f511800b8180",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM08",
+          "scenario_at": "2026-10-10T00:46:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "quote",
+          "reference": "Sam: I use a clean brush for the edge so I am not adding more shadow while I soften it. That is how I work, rather than something this photograph proves.",
+          "decision": "Kept the original author and asked about one part of their experience; edited before publishing.",
+          "original": "Can you say more?",
+          "proposal": "When you say a clean brush, do you mean a second one, or wiping the first? I only have one at the moment."
+        },
+        "ai_simulated": true,
+        "quote_author": "Sam"
+      },
+      "image_anchor": null,
+      "quoted_text": "I use a clean brush for the edge so I am not adding more shadow while I soften it. That is how I work, rather than something this photograph proves.",
+      "quoted_comment_id": "032adea6-cd03-502a-99b1-cb97db1be44b"
+    },
+    {
+      "id": "307de0a3-77c5-53f6-891b-9f4c80d7a433",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Sam",
+      "body": "Either can be workable. I meant one with no extra colour on it; there is no need to buy a second brush just to join this discussion.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "23326e8b-9018-5a63-9aae-f511800b8180",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM05",
+          "scenario_at": "2026-10-10T01:40:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Zoe"
+      },
+      "image_anchor": null,
+      "quoted_text": "When you say a clean brush, do you mean a second one, or wiping the first? I only have one at the moment.",
+      "quoted_comment_id": "b01e0043-0cca-5386-95e7-1386695c9d0f"
+    },
+    {
+      "id": "6642b5d6-0ffc-54e6-8e46-e321ea97e434",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Lila",
+      "body": "I marked the darker outer edge. How do you keep it separate from the brighter lid? I would love one small step rather than the whole look.",
+      "kind": "question",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "9ab72111-c56a-51e2-a412-0eea43564606",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM10",
+          "scenario_at": "2026-10-10T10:28:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "question",
+          "reference": "Selected image detail and the member’s starting wording",
+          "decision": "Kept the selected detail and edited the suggestion into a question in her own voice.",
+          "original": "This bit is lovely but mine all merges.",
+          "proposal": "I marked the darker outer edge. How do you keep it separate from the brighter lid? I would love one small step rather than the whole look."
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": {
+        "x": 0.82,
+        "y": 0.58,
+        "photo": "media-19"
+      },
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "e80cc6ad-a2cc-5a79-acee-8004430cde83",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Tess",
+      "body": "I add the darker shade a little at a time and stop blending earlier than I think I should. That is my approach, not a description of how this reference look was made.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "9ab72111-c56a-51e2-a412-0eea43564606",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM11",
+          "scenario_at": "2026-10-10T11:40:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Lila"
+      },
+      "image_anchor": null,
+      "quoted_text": "I marked the darker outer edge. How do you keep it separate from the brighter lid? I would love one small step rather than the whole look.",
+      "quoted_comment_id": "6642b5d6-0ffc-54e6-8e46-e321ea97e434"
+    },
+    {
+      "id": "946e8b5a-69c0-52f2-a96e-d95b594475f1",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Lila",
+      "body": "Is the stopping point about keeping the two colours visible, rather than making the edge perfectly smooth?",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "9ab72111-c56a-51e2-a412-0eea43564606",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM10",
+          "scenario_at": "2026-10-10T12:34:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "quote",
+          "reference": "Tess: I add the darker shade a little at a time and stop blending earlier than I think I should. That is my approach, not a description of how this reference look was made.",
+          "decision": "Kept the original author and asked about one part of their experience; edited before publishing.",
+          "original": "Can you say more?",
+          "proposal": "Is the stopping point about keeping the two colours visible, rather than making the edge perfectly smooth?"
+        },
+        "ai_simulated": true,
+        "quote_author": "Tess"
+      },
+      "image_anchor": null,
+      "quoted_text": "I add the darker shade a little at a time and stop blending earlier than I think I should. That is my approach, not a description of how this reference look was made.",
+      "quoted_comment_id": "e80cc6ad-a2cc-5a79-acee-8004430cde83"
+    },
+    {
+      "id": "be3bedd0-c9d0-57ff-95df-620d11080dc5",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Tess",
+      "body": "For me, yes. A visible change between colours is part of what I like. Somebody else may prefer it softer.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "9ab72111-c56a-51e2-a412-0eea43564606",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM11",
+          "scenario_at": "2026-10-10T13:28:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Lila"
+      },
+      "image_anchor": null,
+      "quoted_text": "Is the stopping point about keeping the two colours visible, rather than making the edge perfectly smooth?",
+      "quoted_comment_id": "946e8b5a-69c0-52f2-a96e-d95b594475f1"
+    },
+    {
+      "id": "c305ad9f-6757-59fc-81f7-fd84a87e5913",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Zoe",
+      "body": "I marked the large rounded head near the front. What task might you use that shape for? I am trying to understand the shape, not identify its exact brand.",
+      "kind": "question",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "6659a583-486a-59c8-bde9-dbe90410e64f",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM08",
+          "scenario_at": "2026-10-11T02:29:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+            "https://community.sephora.com/t5/Trending-at-Sephora/Introduce-Yourself-New-Member-Monday/td-p/5074797"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "question",
+          "reference": "Selected image detail and the member’s starting wording",
+          "decision": "Removed the extra request for more steps; chose one question to discuss first.",
+          "original": "What is the large one for?",
+          "proposal": "I marked the large rounded head near the front. What task might you use that shape for? I am trying to understand the shape, not identify its exact brand. What else should I try?"
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": {
+        "x": 0.81,
+        "y": 0.76,
+        "photo": "media-30"
+      },
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "30eaca4d-4ef7-5879-91b1-feee9adc4afc",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Ari",
+      "body": "I might use a broad, soft brush for a light dusting of powder, but size, density and what you want to do matter more than its name.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "6659a583-486a-59c8-bde9-dbe90410e64f",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM04",
+          "scenario_at": "2026-10-11T03:41:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+            "https://community.sephora.com/t5/Trending-at-Sephora/Introduce-Yourself-New-Member-Monday/td-p/5074797"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Zoe"
+      },
+      "image_anchor": null,
+      "quoted_text": "I marked the large rounded head near the front. What task might you use that shape for? I am trying to understand the shape, not identify its exact brand.",
+      "quoted_comment_id": "c305ad9f-6757-59fc-81f7-fd84a87e5913"
+    },
+    {
+      "id": "d7974119-ba14-5971-85fb-7298b46a532d",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Zoe",
+      "body": "You mentioned density. Is that something I can judge by touching the brush I own?",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "6659a583-486a-59c8-bde9-dbe90410e64f",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM08",
+          "scenario_at": "2026-10-11T04:35:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+            "https://community.sephora.com/t5/Trending-at-Sephora/Introduce-Yourself-New-Member-Monday/td-p/5074797"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "quote",
+          "reference": "Ari: I might use a broad, soft brush for a light dusting of powder, but size, density and what you want to do matter more than its name.",
+          "decision": "Kept the original author and asked about one part of their experience; edited before publishing.",
+          "original": "Can you say more?",
+          "proposal": "You mentioned density. Is that something I can judge by touching the brush I own?"
+        },
+        "ai_simulated": true,
+        "quote_author": "Ari"
+      },
+      "image_anchor": null,
+      "quoted_text": "I might use a broad, soft brush for a light dusting of powder, but size, density and what you want to do matter more than its name.",
+      "quoted_comment_id": "30eaca4d-4ef7-5879-91b1-feee9adc4afc"
+    },
+    {
+      "id": "bb3d41ad-680d-5007-b25a-fd92048398a8",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Ari",
+      "body": "You can compare how firmly its hairs are packed and how it feels, gently. A photograph cannot settle that for us.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "6659a583-486a-59c8-bde9-dbe90410e64f",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM04",
+          "scenario_at": "2026-10-11T05:29:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+            "https://community.sephora.com/t5/Trending-at-Sephora/Introduce-Yourself-New-Member-Monday/td-p/5074797"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Zoe"
+      },
+      "image_anchor": null,
+      "quoted_text": "You mentioned density. Is that something I can judge by touching the brush I own?",
+      "quoted_comment_id": "d7974119-ba14-5971-85fb-7298b46a532d"
+    },
+    {
+      "id": "eea1df48-65cc-5a37-af98-a40901717bf9",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Emma",
+      "body": "I marked a rounded brush in the row. For a soft matte wash, what would you try with a rounded brush I already own before buying another?",
+      "kind": "question",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "5b372d06-c212-5692-9fd4-43e239c20d37",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM07",
+          "scenario_at": "2026-10-11T18:30:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "question",
+          "reference": "Selected image detail and the member’s starting wording",
+          "decision": "Kept the selected detail and edited the suggestion into a question in her own voice.",
+          "original": "The little rounded head, I think?",
+          "proposal": "I marked a rounded brush in the row. For a soft matte wash, what would you try with a rounded brush I already own before buying another?"
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": {
+        "x": 0.48,
+        "y": 0.53,
+        "photo": "media-36"
+      },
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "a7b6f83c-9cd2-52ec-8402-ebb7744c92c4",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Sam",
+      "body": "I would begin with a small amount and see where that brush puts it. If the edge is already how you like it, you can stop.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "5b372d06-c212-5692-9fd4-43e239c20d37",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM05",
+          "scenario_at": "2026-10-11T19:42:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Emma"
+      },
+      "image_anchor": null,
+      "quoted_text": "I marked a rounded brush in the row. For a soft matte wash, what would you try with a rounded brush I already own before buying another?",
+      "quoted_comment_id": "eea1df48-65cc-5a37-af98-a40901717bf9"
+    },
+    {
+      "id": "00d2d452-be86-563b-8456-f60e305208b0",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Emma",
+      "body": "That gives me something to notice. Do I need to sweep across the whole lid on the first pass?",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "5b372d06-c212-5692-9fd4-43e239c20d37",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM07",
+          "scenario_at": "2026-10-11T20:36:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "quote",
+          "reference": "Sam: I would begin with a small amount and see where that brush puts it. If the edge is already how you like it, you can stop.",
+          "decision": "Kept the original author and asked about one part of their experience; edited before publishing.",
+          "original": "Can you say more?",
+          "proposal": "That gives me something to notice. Do I need to sweep across the whole lid on the first pass?"
+        },
+        "ai_simulated": true,
+        "quote_author": "Sam"
+      },
+      "image_anchor": null,
+      "quoted_text": "I would begin with a small amount and see where that brush puts it. If the edge is already how you like it, you can stop.",
+      "quoted_comment_id": "a7b6f83c-9cd2-52ec-8402-ebb7744c92c4"
+    },
+    {
+      "id": "be6069e2-8f00-557c-8b03-687a9e53fa46",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Sam",
+      "body": "No need to cover it all at once. Add a little where you want colour, then look before deciding what to do next.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "5b372d06-c212-5692-9fd4-43e239c20d37",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM05",
+          "scenario_at": "2026-10-11T21:30:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Emma"
+      },
+      "image_anchor": null,
+      "quoted_text": "That gives me something to notice. Do I need to sweep across the whole lid on the first pass?",
+      "quoted_comment_id": "00d2d452-be86-563b-8456-f60e305208b0"
+    },
+    {
+      "id": "9b3948f5-9d31-50b4-8f76-3998405700d6",
+      "post_id": "A",
+      "room_id": "shared",
+      "display_name": "Iris",
+      "body": "I marked the loose powder as a reference for the product type. Does anyone powder only selected areas? What makes you decide to leave the rest alone?",
+      "kind": "question",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "b3486556-ae44-5a1b-991c-981ee26da61f",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM09",
+          "scenario_at": "2026-10-12T06:18:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Complexion-Club/Why-is-my-foundation-pilling/m-p/3581814",
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "question",
+          "reference": "Selected image detail and the member’s starting wording",
+          "decision": "Removed the extra request for more steps; chose one question to discuss first.",
+          "original": "I keep adding powder and cannot judge it.",
+          "proposal": "I marked the loose powder as a reference for the product type. Does anyone powder only selected areas? What makes you decide to leave the rest alone? What else should I try?"
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": {
+        "x": 0.48,
+        "y": 0.48,
+        "photo": "media-46"
+      },
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "dfa5a888-6329-59f8-863f-ec1be2dfc593",
+      "post_id": "A",
+      "room_id": "shared",
+      "display_name": "Hana",
+      "body": "I leave areas alone when I already like the finish. Powder everywhere is a preference, not a condition of doing base correctly.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "b3486556-ae44-5a1b-991c-981ee26da61f",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM20",
+          "scenario_at": "2026-10-12T07:30:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Complexion-Club/Why-is-my-foundation-pilling/m-p/3581814",
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Iris"
+      },
+      "image_anchor": null,
+      "quoted_text": "I marked the loose powder as a reference for the product type. Does anyone powder only selected areas? What makes you decide to leave the rest alone?",
+      "quoted_comment_id": "9b3948f5-9d31-50b4-8f76-3998405700d6"
+    },
+    {
+      "id": "e8c779d6-7b78-58bc-8f3a-735390a49880",
+      "post_id": "A",
+      "room_id": "shared",
+      "display_name": "Iris",
+      "body": "That preference part matters to me. Does a little shine still feel finished to you?",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "b3486556-ae44-5a1b-991c-981ee26da61f",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM09",
+          "scenario_at": "2026-10-12T08:24:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Complexion-Club/Why-is-my-foundation-pilling/m-p/3581814",
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "quote",
+          "reference": "Hana: I leave areas alone when I already like the finish. Powder everywhere is a preference, not a condition of doing base correctly.",
+          "decision": "Kept the original author and asked about one part of their experience; edited before publishing.",
+          "original": "Can you say more?",
+          "proposal": "That preference part matters to me. Does a little shine still feel finished to you?"
+        },
+        "ai_simulated": true,
+        "quote_author": "Hana"
+      },
+      "image_anchor": null,
+      "quoted_text": "I leave areas alone when I already like the finish. Powder everywhere is a preference, not a condition of doing base correctly.",
+      "quoted_comment_id": "dfa5a888-6329-59f8-863f-ec1be2dfc593"
+    },
+    {
+      "id": "35042868-934c-50b9-bd01-50d3d89eb44f",
+      "post_id": "A",
+      "room_id": "shared",
+      "display_name": "Hana",
+      "body": "Yes, for my everyday look. Someone wanting a different finish could reasonably choose more powder.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "b3486556-ae44-5a1b-991c-981ee26da61f",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM20",
+          "scenario_at": "2026-10-12T09:18:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Complexion-Club/Why-is-my-foundation-pilling/m-p/3581814",
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Iris"
+      },
+      "image_anchor": null,
+      "quoted_text": "That preference part matters to me. Does a little shine still feel finished to you?",
+      "quoted_comment_id": "e8c779d6-7b78-58bc-8f3a-735390a49880"
+    },
+    {
+      "id": "fa9b051a-d1d4-5c19-b646-3e77f3b58daa",
+      "post_id": "C",
+      "room_id": "shared",
+      "display_name": "Ava",
+      "body": "I marked the brighter part of the nail. Would a second angle, keeping the light steady, help explain the change without making it look like a different polish?",
+      "kind": "question",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "c37058b8-4ef7-54bc-abc9-829904787b05",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM12",
+          "scenario_at": "2026-10-12T18:06:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212",
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "question",
+          "reference": "Selected image detail and the member’s starting wording",
+          "decision": "Kept the selected detail and edited the suggestion into a question in her own voice.",
+          "original": "The bright bit changes. What should I show?",
+          "proposal": "I marked the brighter part of the nail. Would a second angle, keeping the light steady, help explain the change without making it look like a different polish?"
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": {
+        "x": 0.62,
+        "y": 0.34,
+        "photo": "media-61"
+      },
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "8f297ff5-ac52-5bc9-92e4-79b5f02eca91",
+      "post_id": "C",
+      "room_id": "shared",
+      "display_name": "Lea",
+      "body": "I would keep one thing steady and change the angle, with a note about that choice. Two images would still not tell us how it will look in every light.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "c37058b8-4ef7-54bc-abc9-829904787b05",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM03",
+          "scenario_at": "2026-10-12T19:18:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212",
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Ava"
+      },
+      "image_anchor": null,
+      "quoted_text": "I marked the brighter part of the nail. Would a second angle, keeping the light steady, help explain the change without making it look like a different polish?",
+      "quoted_comment_id": "fa9b051a-d1d4-5c19-b646-3e77f3b58daa"
+    },
+    {
+      "id": "6d3e2448-e8aa-503c-8fef-139b2bf961ed",
+      "post_id": "C",
+      "room_id": "shared",
+      "display_name": "Ava",
+      "body": "Would you keep a less flattering angle as well, rather than choose only the shiniest one?",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "c37058b8-4ef7-54bc-abc9-829904787b05",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM12",
+          "scenario_at": "2026-10-12T20:12:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212",
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "quote",
+          "reference": "Lea: I would keep one thing steady and change the angle, with a note about that choice. Two images would still not tell us how it will look in every light.",
+          "decision": "Kept the original author and asked about one part of their experience; edited before publishing.",
+          "original": "Can you say more?",
+          "proposal": "Would you keep a less flattering angle as well, rather than choose only the shiniest one?"
+        },
+        "ai_simulated": true,
+        "quote_author": "Lea"
+      },
+      "image_anchor": null,
+      "quoted_text": "I would keep one thing steady and change the angle, with a note about that choice. Two images would still not tell us how it will look in every light.",
+      "quoted_comment_id": "8f297ff5-ac52-5bc9-92e4-79b5f02eca91"
+    },
+    {
+      "id": "8e252279-c0e5-5de2-98dc-5f4fa353acda",
+      "post_id": "C",
+      "room_id": "shared",
+      "display_name": "Lea",
+      "body": "I would, if the purpose is a comparison. If it is an inspiration post, one favourite picture can be enough too.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "c37058b8-4ef7-54bc-abc9-829904787b05",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM03",
+          "scenario_at": "2026-10-12T21:06:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212",
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Ava"
+      },
+      "image_anchor": null,
+      "quoted_text": "Would you keep a less flattering angle as well, rather than choose only the shiniest one?",
+      "quoted_comment_id": "6d3e2448-e8aa-503c-8fef-139b2bf961ed"
+    },
+    {
+      "id": "8f61cd3b-45d4-51b1-8bd5-9c2d8dc22fde",
+      "post_id": "C",
+      "room_id": "shared",
+      "display_name": "Lila",
+      "body": "I marked the purple-green area. Which part of the colour change can this image show, and what would another angle still leave uncertain?",
+      "kind": "question",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "e239a28c-ac73-59b2-a961-a0e2011fc4b5",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM10",
+          "scenario_at": "2026-10-13T02:32:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "question",
+          "reference": "Selected image detail and the member’s starting wording",
+          "decision": "Removed the extra request for more steps; chose one question to discuss first.",
+          "original": "Which colour is this actually?",
+          "proposal": "I marked the purple-green area. Which part of the colour change can this image show, and what would another angle still leave uncertain? What else should I try?"
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": {
+        "x": 0.56,
+        "y": 0.43,
+        "photo": "media-64"
+      },
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "aae41c85-ca30-5c3d-9d94-51a83b5949f2",
+      "post_id": "C",
+      "room_id": "shared",
+      "display_name": "Jo",
+      "body": "An angle can make the shift easier to follow, but a hand swatch, a nail photo and a different screen are still different situations.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "e239a28c-ac73-59b2-a961-a0e2011fc4b5",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM06",
+          "scenario_at": "2026-10-13T03:44:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Lila"
+      },
+      "image_anchor": null,
+      "quoted_text": "I marked the purple-green area. Which part of the colour change can this image show, and what would another angle still leave uncertain?",
+      "quoted_comment_id": "8f61cd3b-45d4-51b1-8bd5-9c2d8dc22fde"
+    },
+    {
+      "id": "cab05d65-d5e9-5c5b-88a0-7fb2c9d7ac7c",
+      "post_id": "C",
+      "room_id": "shared",
+      "display_name": "Lila",
+      "body": "Does that mean the comparison is useful for noticing the shift, rather than deciding my exact shade?",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "e239a28c-ac73-59b2-a961-a0e2011fc4b5",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM10",
+          "scenario_at": "2026-10-13T04:38:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "quote",
+          "reference": "Jo: An angle can make the shift easier to follow, but a hand swatch, a nail photo and a different screen are still different situations.",
+          "decision": "Kept the original author and asked about one part of their experience; edited before publishing.",
+          "original": "Can you say more?",
+          "proposal": "Does that mean the comparison is useful for noticing the shift, rather than deciding my exact shade?"
+        },
+        "ai_simulated": true,
+        "quote_author": "Jo"
+      },
+      "image_anchor": null,
+      "quoted_text": "An angle can make the shift easier to follow, but a hand swatch, a nail photo and a different screen are still different situations.",
+      "quoted_comment_id": "aae41c85-ca30-5c3d-9d94-51a83b5949f2"
+    },
+    {
+      "id": "6f74c302-5910-58bc-912b-6ccd58f6ae54",
+      "post_id": "C",
+      "room_id": "shared",
+      "display_name": "Jo",
+      "body": "Exactly. It can give you a better question to take to a swatch comparison, without promising a shade match.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "e239a28c-ac73-59b2-a961-a0e2011fc4b5",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM06",
+          "scenario_at": "2026-10-13T05:32:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Lila"
+      },
+      "image_anchor": null,
+      "quoted_text": "Does that mean the comparison is useful for noticing the shift, rather than deciding my exact shade?",
+      "quoted_comment_id": "cab05d65-d5e9-5c5b-88a0-7fb2c9d7ac7c"
+    },
+    {
+      "id": "e7248fc6-5ba2-5fea-90c9-e6783a87c5f6",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Zoe",
+      "body": "I followed a related brush discussion and realised that knowing every brush name was not the missing step for me. Emma’s question about what her own brush could do made more sense. I am coming back here with one smaller question.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "23326e8b-9018-5a63-9aae-f511800b8180",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM08",
+          "scenario_at": "2026-10-10T22:40:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "route",
+          "reference": "Where would you start blending on this eye look?",
+          "decision": "Previewed a candidate, read the discussion and returned; no message was sent on the member’s behalf.",
+          "connection": {
+            "threadId": "5b372d06-c212-5692-9fd4-43e239c20d37",
+            "title": "Can someone explain these brush shapes without a shopping list?",
+            "reason": "The member previewed an eye-technique match and chose to read the brush conversation."
+          }
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": null,
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "fabd9fc8-5105-5b86-aba8-70443d4adfb7",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Rina",
+      "body": "That is a useful way to bring it back. The other conversation can give you a starting point without becoming a rule for this eye look.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "23326e8b-9018-5a63-9aae-f511800b8180",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM14",
+          "scenario_at": "2026-10-10T23:40:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Zoe"
+      },
+      "image_anchor": null,
+      "quoted_text": "I followed a related brush discussion and realised that knowing every brush name was not the missing step for me. Emma’s question about what her own brush could do made more sense. I am coming back here with one smaller question.",
+      "quoted_comment_id": "e7248fc6-5ba2-5fea-90c9-e6783a87c5f6"
+    },
+    {
+      "id": "f0badedd-a0c6-59fe-b633-6f8ba6b8e517",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Emma",
+      "body": "The suggested brush discussion was familiar territory, but I came back to Ari’s point about density. A row of brush shapes and a soft brown look ask slightly different questions. The link helped me separate them.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "6659a583-486a-59c8-bde9-dbe90410e64f",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM07",
+          "scenario_at": "2026-10-12T02:29:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+            "https://community.sephora.com/t5/Trending-at-Sephora/Introduce-Yourself-New-Member-Monday/td-p/5074797"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "route",
+          "reference": "Which brush question do you wish someone had answered sooner?",
+          "decision": "Previewed a candidate, read the discussion and returned; no message was sent on the member’s behalf.",
+          "connection": {
+            "threadId": "5b372d06-c212-5692-9fd4-43e239c20d37",
+            "title": "Can someone explain these brush shapes without a shopping list?",
+            "reason": "The member chose the brush-and-tool match, then returned with a difference between the two questions."
+          }
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": null,
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "2a5a80e6-7416-51a0-80fb-668cb45da44a",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Ari",
+      "body": "Yes. We can talk about what your brush feels like here and keep the application example in the other discussion.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "6659a583-486a-59c8-bde9-dbe90410e64f",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM04",
+          "scenario_at": "2026-10-12T03:29:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+            "https://community.sephora.com/t5/Trending-at-Sephora/Introduce-Yourself-New-Member-Monday/td-p/5074797"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Emma"
+      },
+      "image_anchor": null,
+      "quoted_text": "The suggested brush discussion was familiar territory, but I came back to Ari’s point about density. A row of brush shapes and a soft brown look ask slightly different questions. The link helped me separate them.",
+      "quoted_comment_id": "f0badedd-a0c6-59fe-b633-6f8ba6b8e517"
+    },
+    {
+      "id": "4a8e99f0-d375-5eba-a09a-fd59ccc0874b",
+      "post_id": "C",
+      "room_id": "shared",
+      "display_name": "Ava",
+      "body": "I opened the colour-change conversation from the related cards. Lila was trying to name a purple-green area; I was trying to decide what a second image should show. We noticed the same limitation without asking exactly the same question.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "c37058b8-4ef7-54bc-abc9-829904787b05",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM12",
+          "scenario_at": "2026-10-13T18:06:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212",
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "route",
+          "reference": "Purple shimmer: the part a single photo misses",
+          "decision": "Previewed a candidate, read the discussion and returned; no message was sent on the member’s behalf.",
+          "connection": {
+            "threadId": "e239a28c-ac73-59b2-a961-a0e2011fc4b5",
+            "title": "Where is the colour changing in this reference?",
+            "reason": "The member previewed a nail-colour match and retained its different purpose."
+          }
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": null,
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "3de0804e-0b20-5f5f-96e7-1bd41b13f030",
+      "post_id": "C",
+      "room_id": "shared",
+      "display_name": "Lea",
+      "body": "I like keeping those questions alongside each other. It leaves room for both a comparison photo and a picture shared just because it is lovely.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "c37058b8-4ef7-54bc-abc9-829904787b05",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM03",
+          "scenario_at": "2026-10-13T19:06:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212",
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Ava"
+      },
+      "image_anchor": null,
+      "quoted_text": "I opened the colour-change conversation from the related cards. Lila was trying to name a purple-green area; I was trying to decide what a second image should show. We noticed the same limitation without asking exactly the same question.",
+      "quoted_comment_id": "4a8e99f0-d375-5eba-a09a-fd59ccc0874b"
+    },
+    {
+      "id": "57ef75a6-d292-5daa-8645-9e29530bb0c4",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Lila",
+      "body": "Mia’s quiet-reader introduction came up in the suggestions. Reading it made a small question feel easier than a grand introduction. I came back to say hello here. I still like mostly reading.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "90b30f25-f6db-55e3-afd4-2502dfc4ca23",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM10",
+          "scenario_at": "2026-10-14T04:02:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Trending-at-Sephora/Introduce-Yourself-New-Member-Monday/td-p/5074797",
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "public_ai": {
+          "kind": "route",
+          "reference": "If your first post is a question, that is enough",
+          "decision": "Previewed a candidate, read the discussion and returned; no message was sent on the member’s behalf.",
+          "connection": {
+            "threadId": "first-post",
+            "title": "A quiet reader finally saying hello",
+            "reason": "The member chose a welcoming discussion; no author was ranked or contacted for her."
+          }
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": null,
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "491ecbca-9394-5764-b0a9-c7fc1b2dc54b",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Maya",
+      "body": "Mostly reading is welcome too. There is no next task waiting for you here.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "90b30f25-f6db-55e3-afd4-2502dfc4ca23",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM15",
+          "scenario_at": "2026-10-14T04:23:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Trending-at-Sephora/Introduce-Yourself-New-Member-Monday/td-p/5074797",
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Lila"
+      },
+      "image_anchor": null,
+      "quoted_text": "Mia’s quiet-reader introduction came up in the suggestions. Reading it made a small question feel easier than a grand introduction. I came back to say hello here. I still like mostly reading.",
+      "quoted_comment_id": "57ef75a6-d292-5daa-8645-9e29530bb0c4"
+    },
+    {
+      "id": "d92cddbb-3384-5bbd-a090-2864169a7e7c",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Zoe",
+      "body": "I wiped my brush before trying the edge again. I could see more clearly when I was adding colour and when I was just moving it. I am still practising; the edge was not suddenly perfect.",
+      "kind": "update",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "23326e8b-9018-5a63-9aae-f511800b8180",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM08",
+          "scenario_at": "2026-10-11T06:40:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "context": "Same brush, one practice session before going out.",
+        "limits": "One attempt; no comparison of tools or claim about the reference photo.",
+        "quote_author": "Sam"
+      },
+      "image_anchor": {
+        "x": 0.67,
+        "y": 0.32,
+        "photo": "media-16"
+      },
+      "quoted_text": "I use a clean brush for the edge so I am not adding more shadow while I soften it. That is how I work, rather than something this photograph proves.",
+      "quoted_comment_id": "032adea6-cd03-502a-99b1-cb97db1be44b"
+    },
+    {
+      "id": "7bf03fa0-93e5-5d93-a760-d6adeda5e492",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Iris",
+      "body": "I tried wiping mine and the edge still travelled further than I wanted. I am keeping that difference here rather than calling the idea a fix.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "23326e8b-9018-5a63-9aae-f511800b8180",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM09",
+          "scenario_at": "2026-10-11T07:40:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Zoe"
+      },
+      "image_anchor": null,
+      "quoted_text": "I wiped my brush before trying the edge again. I could see more clearly when I was adding colour and when I was just moving it. I am still practising; the edge was not suddenly perfect.",
+      "quoted_comment_id": "d92cddbb-3384-5bbd-a090-2864169a7e7c"
+    },
+    {
+      "id": "16b20cc5-597b-5aa1-befa-19620720302c",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Zoe",
+      "body": "What I noticed: I wiped my brush before trying the edge again. I could see more clearly when I was adding colour and when I was just moving it. I am still practising; the edge was not suddenly perfect.\nContext: Same brush, one practice session before going out.\nA contribution I kept (Sam): I use a clean brush for the edge so I am not adding more shadow while I soften it. That is how I work, rather than something this photograph proves.\nStill open: One attempt; no comparison of tools or claim about the reference photo.",
+      "kind": "album",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "23326e8b-9018-5a63-9aae-f511800b8180",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM08",
+          "scenario_at": "2026-10-11T08:40:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "album": {
+          "version": 1,
+          "title": "One clean brush question, not a new brush set",
+          "text": "What I noticed: I wiped my brush before trying the edge again. I could see more clearly when I was adding colour and when I was just moving it. I am still practising; the edge was not suddenly perfect.\nContext: Same brush, one practice session before going out.\nA contribution I kept (Sam): I use a clean brush for the edge so I am not adding more shadow while I soften it. That is how I work, rather than something this photograph proves.\nStill open: One attempt; no comparison of tools or claim about the reference photo.",
+          "limits": "One attempt; no comparison of tools or claim about the reference photo.",
+          "photo": "media-16",
+          "anchor": {
+            "x": 0.67,
+            "y": 0.32,
+            "photo": "media-16"
+          },
+          "quotedLine": "I use a clean brush for the edge so I am not adding more shadow while I soften it. That is how I work, rather than something this photograph proves.",
+          "authors": [
+            "Zoe",
+            "Sam"
+          ],
+          "sourceIds": [
+            "simulation-post:23326e8b-9018-5a63-9aae-f511800b8180",
+            "comment:032adea6-cd03-502a-99b1-cb97db1be44b",
+            "comment:d92cddbb-3384-5bbd-a090-2864169a7e7c"
+          ],
+          "updateId": "d92cddbb-3384-5bbd-a090-2864169a7e7c",
+          "at": "2026-10-11T08:40:00+00:00"
+        },
+        "title": "One clean brush question, not a new brush set",
+        "context": "Same brush, one practice session before going out.",
+        "limits": "One attempt; no comparison of tools or claim about the reference photo.",
+        "public_ai": {
+          "kind": "album",
+          "reference": "The actual return, conditions, Sam’s reply and the stated limits",
+          "decision": "Chose the materials, reviewed the arrangement and kept the uncertainty before publishing.",
+          "materials": [
+            "Member observation",
+            "Conditions",
+            "Named helper",
+            "Original image detail",
+            "Unresolved limits"
+          ]
+        },
+        "ai_simulated": true,
+        "quote_author": "Sam"
+      },
+      "image_anchor": {
+        "x": 0.67,
+        "y": 0.32,
+        "photo": "media-16"
+      },
+      "quoted_text": "I use a clean brush for the edge so I am not adding more shadow while I soften it. That is how I work, rather than something this photograph proves.",
+      "quoted_comment_id": "032adea6-cd03-502a-99b1-cb97db1be44b"
+    },
+    {
+      "id": "a167ce5a-02d6-53f1-be61-7a1f17b205d3",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Emma",
+      "body": "I used a small amount with the rounded brush I already own, looked at the first patch and stopped sooner. It gave me a less overwhelming way to practise, rather than a finished technique.",
+      "kind": "update",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "5b372d06-c212-5692-9fd4-43e239c20d37",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM07",
+          "scenario_at": "2026-10-13T02:30:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "context": "One morning with matte brown shadow and an existing brush.",
+        "limits": "The amount and stopping point both changed; I cannot attribute the difference to the brush.",
+        "quote_author": "Sam"
+      },
+      "image_anchor": {
+        "x": 0.48,
+        "y": 0.53,
+        "photo": "media-36"
+      },
+      "quoted_text": "I would begin with a small amount and see where that brush puts it. If the edge is already how you like it, you can stop.",
+      "quoted_comment_id": "a7b6f83c-9cd2-52ec-8402-ebb7744c92c4"
+    },
+    {
+      "id": "e3d6f7f7-c095-5590-b11d-03320118a759",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Sam",
+      "body": "That distinction is helpful. Knowing what you changed tells the next person more than a claim that one brush works.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "5b372d06-c212-5692-9fd4-43e239c20d37",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM05",
+          "scenario_at": "2026-10-13T03:30:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Emma"
+      },
+      "image_anchor": null,
+      "quoted_text": "I used a small amount with the rounded brush I already own, looked at the first patch and stopped sooner. It gave me a less overwhelming way to practise, rather than a finished technique.",
+      "quoted_comment_id": "a167ce5a-02d6-53f1-be61-7a1f17b205d3"
+    },
+    {
+      "id": "3742de14-958b-54b1-ae83-e862dc3fc5a9",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Emma",
+      "body": "What I noticed: I used a small amount with the rounded brush I already own, looked at the first patch and stopped sooner. It gave me a less overwhelming way to practise, rather than a finished technique.\nContext: One morning with matte brown shadow and an existing brush.\nA contribution I kept (Sam): I would begin with a small amount and see where that brush puts it. If the edge is already how you like it, you can stop.\nStill open: The amount and stopping point both changed; I cannot attribute the difference to the brush.",
+      "kind": "album",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "5b372d06-c212-5692-9fd4-43e239c20d37",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM07",
+          "scenario_at": "2026-10-13T04:30:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "album": {
+          "version": 1,
+          "title": "A small rounded brush was enough to start",
+          "text": "What I noticed: I used a small amount with the rounded brush I already own, looked at the first patch and stopped sooner. It gave me a less overwhelming way to practise, rather than a finished technique.\nContext: One morning with matte brown shadow and an existing brush.\nA contribution I kept (Sam): I would begin with a small amount and see where that brush puts it. If the edge is already how you like it, you can stop.\nStill open: The amount and stopping point both changed; I cannot attribute the difference to the brush.",
+          "limits": "The amount and stopping point both changed; I cannot attribute the difference to the brush.",
+          "photo": "media-36",
+          "anchor": {
+            "x": 0.48,
+            "y": 0.53,
+            "photo": "media-36"
+          },
+          "quotedLine": "I would begin with a small amount and see where that brush puts it. If the edge is already how you like it, you can stop.",
+          "authors": [
+            "Emma",
+            "Sam"
+          ],
+          "sourceIds": [
+            "simulation-post:5b372d06-c212-5692-9fd4-43e239c20d37",
+            "comment:a7b6f83c-9cd2-52ec-8402-ebb7744c92c4",
+            "comment:a167ce5a-02d6-53f1-be61-7a1f17b205d3"
+          ],
+          "updateId": "a167ce5a-02d6-53f1-be61-7a1f17b205d3",
+          "at": "2026-10-13T04:30:00+00:00"
+        },
+        "title": "A small rounded brush was enough to start",
+        "context": "One morning with matte brown shadow and an existing brush.",
+        "limits": "The amount and stopping point both changed; I cannot attribute the difference to the brush.",
+        "public_ai": {
+          "kind": "album",
+          "reference": "The actual return, conditions, Sam’s reply and the stated limits",
+          "decision": "Chose the materials, reviewed the arrangement and kept the uncertainty before publishing.",
+          "materials": [
+            "Member observation",
+            "Conditions",
+            "Named helper",
+            "Original image detail",
+            "Unresolved limits"
+          ]
+        },
+        "ai_simulated": true,
+        "quote_author": "Sam"
+      },
+      "image_anchor": {
+        "x": 0.48,
+        "y": 0.53,
+        "photo": "media-36"
+      },
+      "quoted_text": "I would begin with a small amount and see where that brush puts it. If the edge is already how you like it, you can stop.",
+      "quoted_comment_id": "a7b6f83c-9cd2-52ec-8402-ebb7744c92c4"
+    },
+    {
+      "id": "39b4a48c-5077-5163-b4ed-0ac1171f7ede",
+      "post_id": "A",
+      "room_id": "shared",
+      "display_name": "Iris",
+      "body": "I left some areas without extra powder because I liked their finish. It felt more like choosing what I wanted than correcting my whole face. I still added powder later in one area.",
+      "kind": "update",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "b3486556-ae44-5a1b-991c-981ee26da61f",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM09",
+          "scenario_at": "2026-10-13T14:18:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Complexion-Club/Why-is-my-foundation-pilling/m-p/3581814",
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "context": "An ordinary morning, with the products I already had.",
+        "limits": "One personal preference; no wear-time comparison or product recommendation.",
+        "quote_author": "Hana"
+      },
+      "image_anchor": {
+        "x": 0.48,
+        "y": 0.48,
+        "photo": "media-46"
+      },
+      "quoted_text": "I leave areas alone when I already like the finish. Powder everywhere is a preference, not a condition of doing base correctly.",
+      "quoted_comment_id": "dfa5a888-6329-59f8-863f-ec1be2dfc593"
+    },
+    {
+      "id": "7ead00e9-0338-5f18-87d5-0bd9eecebab1",
+      "post_id": "A",
+      "room_id": "shared",
+      "display_name": "Hana",
+      "body": "Glad the preference stayed in the account. My finish is not a standard somebody else has to meet.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "b3486556-ae44-5a1b-991c-981ee26da61f",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM20",
+          "scenario_at": "2026-10-13T15:18:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Complexion-Club/Why-is-my-foundation-pilling/m-p/3581814",
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Iris"
+      },
+      "image_anchor": null,
+      "quoted_text": "I left some areas without extra powder because I liked their finish. It felt more like choosing what I wanted than correcting my whole face. I still added powder later in one area.",
+      "quoted_comment_id": "39b4a48c-5077-5163-b4ed-0ac1171f7ede"
+    },
+    {
+      "id": "4e8ac61d-b173-56f4-8375-67113a67c091",
+      "post_id": "A",
+      "room_id": "shared",
+      "display_name": "Iris",
+      "body": "What I noticed: I left some areas without extra powder because I liked their finish. It felt more like choosing what I wanted than correcting my whole face. I still added powder later in one area.\nContext: An ordinary morning, with the products I already had.\nA contribution I kept (Hana): I leave areas alone when I already like the finish. Powder everywhere is a preference, not a condition of doing base correctly.\nStill open: One personal preference; no wear-time comparison or product recommendation.",
+      "kind": "album",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "b3486556-ae44-5a1b-991c-981ee26da61f",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM09",
+          "scenario_at": "2026-10-13T16:18:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Complexion-Club/Why-is-my-foundation-pilling/m-p/3581814",
+            "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "album": {
+          "version": 1,
+          "title": "Leaving a little shine was a choice",
+          "text": "What I noticed: I left some areas without extra powder because I liked their finish. It felt more like choosing what I wanted than correcting my whole face. I still added powder later in one area.\nContext: An ordinary morning, with the products I already had.\nA contribution I kept (Hana): I leave areas alone when I already like the finish. Powder everywhere is a preference, not a condition of doing base correctly.\nStill open: One personal preference; no wear-time comparison or product recommendation.",
+          "limits": "One personal preference; no wear-time comparison or product recommendation.",
+          "photo": "media-46",
+          "anchor": {
+            "x": 0.48,
+            "y": 0.48,
+            "photo": "media-46"
+          },
+          "quotedLine": "I leave areas alone when I already like the finish. Powder everywhere is a preference, not a condition of doing base correctly.",
+          "authors": [
+            "Iris",
+            "Hana"
+          ],
+          "sourceIds": [
+            "simulation-post:b3486556-ae44-5a1b-991c-981ee26da61f",
+            "comment:dfa5a888-6329-59f8-863f-ec1be2dfc593",
+            "comment:39b4a48c-5077-5163-b4ed-0ac1171f7ede"
+          ],
+          "updateId": "39b4a48c-5077-5163-b4ed-0ac1171f7ede",
+          "at": "2026-10-13T16:18:00+00:00"
+        },
+        "title": "Leaving a little shine was a choice",
+        "context": "An ordinary morning, with the products I already had.",
+        "limits": "One personal preference; no wear-time comparison or product recommendation.",
+        "public_ai": {
+          "kind": "album",
+          "reference": "The actual return, conditions, Hana’s reply and the stated limits",
+          "decision": "Chose the materials, reviewed the arrangement and kept the uncertainty before publishing.",
+          "materials": [
+            "Member observation",
+            "Conditions",
+            "Named helper",
+            "Original image detail",
+            "Unresolved limits"
+          ]
+        },
+        "ai_simulated": true,
+        "quote_author": "Hana"
+      },
+      "image_anchor": {
+        "x": 0.48,
+        "y": 0.48,
+        "photo": "media-46"
+      },
+      "quoted_text": "I leave areas alone when I already like the finish. Powder everywhere is a preference, not a condition of doing base correctly.",
+      "quoted_comment_id": "dfa5a888-6329-59f8-863f-ec1be2dfc593"
+    },
+    {
+      "id": "a7527c38-fd6c-5375-a1dc-7758dae2e28f",
+      "post_id": "C",
+      "room_id": "shared",
+      "display_name": "Ava",
+      "body": "I would keep a second angle alongside the favourite image and say what changed between them. I also want to keep space for inspiration photos that are not comparisons.",
+      "kind": "update",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "c37058b8-4ef7-54bc-abc9-829904787b05",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM12",
+          "scenario_at": "2026-10-14T02:06:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212",
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "context": "A plan for sharing shifting nail colour, not newly supplied before-and-after images.",
+        "limits": "This is a posting plan; no new photograph or cosmetic outcome is claimed.",
+        "quote_author": "Lea"
+      },
+      "image_anchor": {
+        "x": 0.62,
+        "y": 0.34,
+        "photo": "media-61"
+      },
+      "quoted_text": "I would keep one thing steady and change the angle, with a note about that choice. Two images would still not tell us how it will look in every light.",
+      "quoted_comment_id": "8f297ff5-ac52-5bc9-92e4-79b5f02eca91"
+    },
+    {
+      "id": "7331c19f-1b29-5e80-b50f-6853abc0e327",
+      "post_id": "C",
+      "room_id": "shared",
+      "display_name": "Tess",
+      "body": "Yes to keeping the inspiration side too. Sometimes a pretty image is the whole reason I am here.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "c37058b8-4ef7-54bc-abc9-829904787b05",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM11",
+          "scenario_at": "2026-10-14T03:06:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212",
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Ava"
+      },
+      "image_anchor": null,
+      "quoted_text": "I would keep a second angle alongside the favourite image and say what changed between them. I also want to keep space for inspiration photos that are not comparisons.",
+      "quoted_comment_id": "a7527c38-fd6c-5375-a1dc-7758dae2e28f"
+    },
+    {
+      "id": "6835ceca-0694-5fd1-b205-1c3ee1aa2c4b",
+      "post_id": "C",
+      "room_id": "shared",
+      "display_name": "Ava",
+      "body": "What I noticed: I would keep a second angle alongside the favourite image and say what changed between them. I also want to keep space for inspiration photos that are not comparisons.\nContext: A plan for sharing shifting nail colour, not newly supplied before-and-after images.\nA contribution I kept (Lea): I would keep one thing steady and change the angle, with a note about that choice. Two images would still not tell us how it will look in every light.\nStill open: This is a posting plan; no new photograph or cosmetic outcome is claimed.",
+      "kind": "album",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "c37058b8-4ef7-54bc-abc9-829904787b05",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM12",
+          "scenario_at": "2026-10-14T04:06:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212",
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "album": {
+          "version": 1,
+          "title": "Two angles can tell different parts of a colour story",
+          "text": "What I noticed: I would keep a second angle alongside the favourite image and say what changed between them. I also want to keep space for inspiration photos that are not comparisons.\nContext: A plan for sharing shifting nail colour, not newly supplied before-and-after images.\nA contribution I kept (Lea): I would keep one thing steady and change the angle, with a note about that choice. Two images would still not tell us how it will look in every light.\nStill open: This is a posting plan; no new photograph or cosmetic outcome is claimed.",
+          "limits": "This is a posting plan; no new photograph or cosmetic outcome is claimed.",
+          "photo": "media-61",
+          "anchor": {
+            "x": 0.62,
+            "y": 0.34,
+            "photo": "media-61"
+          },
+          "quotedLine": "I would keep one thing steady and change the angle, with a note about that choice. Two images would still not tell us how it will look in every light.",
+          "authors": [
+            "Ava",
+            "Lea"
+          ],
+          "sourceIds": [
+            "simulation-post:c37058b8-4ef7-54bc-abc9-829904787b05",
+            "comment:8f297ff5-ac52-5bc9-92e4-79b5f02eca91",
+            "comment:a7527c38-fd6c-5375-a1dc-7758dae2e28f"
+          ],
+          "updateId": "a7527c38-fd6c-5375-a1dc-7758dae2e28f",
+          "at": "2026-10-14T04:06:00+00:00"
+        },
+        "title": "Two angles can tell different parts of a colour story",
+        "context": "A plan for sharing shifting nail colour, not newly supplied before-and-after images.",
+        "limits": "This is a posting plan; no new photograph or cosmetic outcome is claimed.",
+        "public_ai": {
+          "kind": "album",
+          "reference": "The actual return, conditions, Lea’s reply and the stated limits",
+          "decision": "Chose the materials, reviewed the arrangement and kept the uncertainty before publishing.",
+          "materials": [
+            "Member observation",
+            "Conditions",
+            "Named helper",
+            "Original image detail",
+            "Unresolved limits"
+          ]
+        },
+        "ai_simulated": true,
+        "quote_author": "Lea"
+      },
+      "image_anchor": {
+        "x": 0.62,
+        "y": 0.34,
+        "photo": "media-61"
+      },
+      "quoted_text": "I would keep one thing steady and change the angle, with a note about that choice. Two images would still not tell us how it will look in every light.",
+      "quoted_comment_id": "8f297ff5-ac52-5bc9-92e4-79b5f02eca91"
+    },
+    {
+      "id": "9c2fba66-ba1b-5c01-9c26-59c68a6a535b",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Zoe",
+      "body": "I kept Sam’s distinction between moving colour and adding more. Here the dark edge and the shimmer may behave differently from my practice, so I would use that distinction as a question, not instructions for copying this look.",
+      "kind": "handoff",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "9ab72111-c56a-51e2-a412-0eea43564606",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM08",
+          "scenario_at": "2026-10-12T00:28:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "experience_source": {
+          "key": "album:16b20cc5-597b-5aa1-befa-19620720302c",
+          "threadId": "23326e8b-9018-5a63-9aae-f511800b8180",
+          "author": "Zoe",
+          "album": {
+            "version": 1,
+            "title": "One clean brush question, not a new brush set",
+            "text": "What I noticed: I wiped my brush before trying the edge again. I could see more clearly when I was adding colour and when I was just moving it. I am still practising; the edge was not suddenly perfect.\nContext: Same brush, one practice session before going out.\nA contribution I kept (Sam): I use a clean brush for the edge so I am not adding more shadow while I soften it. That is how I work, rather than something this photograph proves.\nStill open: One attempt; no comparison of tools or claim about the reference photo.",
+            "limits": "One attempt; no comparison of tools or claim about the reference photo.",
+            "photo": "media-16",
+            "anchor": {
+              "x": 0.67,
+              "y": 0.32,
+              "photo": "media-16"
+            },
+            "quotedLine": "I use a clean brush for the edge so I am not adding more shadow while I soften it. That is how I work, rather than something this photograph proves.",
+            "authors": [
+              "Zoe",
+              "Sam"
+            ],
+            "sourceIds": [
+              "simulation-post:23326e8b-9018-5a63-9aae-f511800b8180",
+              "comment:032adea6-cd03-502a-99b1-cb97db1be44b",
+              "comment:d92cddbb-3384-5bbd-a090-2864169a7e7c"
+            ],
+            "updateId": "d92cddbb-3384-5bbd-a090-2864169a7e7c",
+            "at": "2026-10-11T08:40:00+00:00"
+          },
+          "quoteAuthor": "Sam"
+        },
+        "public_ai": {
+          "kind": "pass",
+          "reference": "One clean brush question, not a new brush set · version 1 and the current conversation",
+          "decision": "Compared the earlier record with this question, supplied the difference and edited the draft; preserved original contributors and limits.",
+          "materials": [
+            "Source version 1",
+            "Original helper",
+            "Situation difference",
+            "Original limits"
+          ]
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": null,
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "b95f5c56-4561-590b-966c-2b7e9a4c045b",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Sam",
+      "body": "And Iris’s different result belongs with that too. A clear question is useful even when we do not arrive at one shared technique.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "9ab72111-c56a-51e2-a412-0eea43564606",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM05",
+          "scenario_at": "2026-10-12T01:28:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Zoe"
+      },
+      "image_anchor": null,
+      "quoted_text": "I kept Sam’s distinction between moving colour and adding more. Here the dark edge and the shimmer may behave differently from my practice, so I would use that distinction as a question, not instructions for copying this look.",
+      "quoted_comment_id": "9c2fba66-ba1b-5c01-9c26-59c68a6a535b"
+    },
+    {
+      "id": "acd27a25-1951-5005-a116-63dd6b738b3c",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Emma",
+      "body": "I had been asking what every brush was called. Sam helped me start with what I already owned; I kept the small practice record. That does not identify the large brush in this photograph, but it might make the first question less daunting.",
+      "kind": "handoff",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "6659a583-486a-59c8-bde9-dbe90410e64f",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM07",
+          "scenario_at": "2026-10-12T16:29:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+            "https://community.sephora.com/t5/Trending-at-Sephora/Introduce-Yourself-New-Member-Monday/td-p/5074797"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "experience_source": {
+          "key": "album:3742de14-958b-54b1-ae83-e862dc3fc5a9",
+          "threadId": "5b372d06-c212-5692-9fd4-43e239c20d37",
+          "author": "Emma",
+          "album": {
+            "version": 1,
+            "title": "A small rounded brush was enough to start",
+            "text": "What I noticed: I used a small amount with the rounded brush I already own, looked at the first patch and stopped sooner. It gave me a less overwhelming way to practise, rather than a finished technique.\nContext: One morning with matte brown shadow and an existing brush.\nA contribution I kept (Sam): I would begin with a small amount and see where that brush puts it. If the edge is already how you like it, you can stop.\nStill open: The amount and stopping point both changed; I cannot attribute the difference to the brush.",
+            "limits": "The amount and stopping point both changed; I cannot attribute the difference to the brush.",
+            "photo": "media-36",
+            "anchor": {
+              "x": 0.48,
+              "y": 0.53,
+              "photo": "media-36"
+            },
+            "quotedLine": "I would begin with a small amount and see where that brush puts it. If the edge is already how you like it, you can stop.",
+            "authors": [
+              "Emma",
+              "Sam"
+            ],
+            "sourceIds": [
+              "simulation-post:5b372d06-c212-5692-9fd4-43e239c20d37",
+              "comment:a7b6f83c-9cd2-52ec-8402-ebb7744c92c4",
+              "comment:a167ce5a-02d6-53f1-be61-7a1f17b205d3"
+            ],
+            "updateId": "a167ce5a-02d6-53f1-be61-7a1f17b205d3",
+            "at": "2026-10-13T04:30:00+00:00"
+          },
+          "quoteAuthor": "Sam"
+        },
+        "public_ai": {
+          "kind": "pass",
+          "reference": "A small rounded brush was enough to start · version 1 and the current conversation",
+          "decision": "Compared the earlier record with this question, supplied the difference and edited the draft; preserved original contributors and limits.",
+          "materials": [
+            "Source version 1",
+            "Original helper",
+            "Situation difference",
+            "Original limits"
+          ]
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": null,
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "dd9646ec-99c7-5ca2-a6d1-28f7d28260ee",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Zoe",
+      "body": "Reading the first question as well as your update helped. I was only seeing confident-looking brush collections before.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "6659a583-486a-59c8-bde9-dbe90410e64f",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM08",
+          "scenario_at": "2026-10-12T17:29:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+            "https://community.sephora.com/t5/Trending-at-Sephora/Introduce-Yourself-New-Member-Monday/td-p/5074797"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Emma"
+      },
+      "image_anchor": null,
+      "quoted_text": "I had been asking what every brush was called. Sam helped me start with what I already owned; I kept the small practice record. That does not identify the large brush in this photograph, but it might make the first question less daunting.",
+      "quoted_comment_id": "acd27a25-1951-5005-a116-63dd6b738b3c"
+    },
+    {
+      "id": "4be22701-649f-591a-82a0-f3a266aa459f",
+      "post_id": "A",
+      "room_id": "shared",
+      "display_name": "Iris",
+      "body": "The powder discussion helped me separate a finish I prefer from something I think I have to fix. I am bringing that thought here, but powder placement and pressing with a puff are different choices. My record cannot decide which tool is right for Mia.",
+      "kind": "handoff",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "d04d65a5-6501-5c2d-9da0-8aa4b21c6c02",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM09",
+          "scenario_at": "2026-10-13T16:05:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Complexion-Club/Why-is-my-foundation-pilling/m-p/3371721",
+            "https://community.sephora.com/t5/Complexion-Club/Foundation-Starts-to-peel/m-p/7011469"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "experience_source": {
+          "key": "album:4e8ac61d-b173-56f4-8375-67113a67c091",
+          "threadId": "b3486556-ae44-5a1b-991c-981ee26da61f",
+          "author": "Iris",
+          "album": {
+            "version": 1,
+            "title": "Leaving a little shine was a choice",
+            "text": "What I noticed: I left some areas without extra powder because I liked their finish. It felt more like choosing what I wanted than correcting my whole face. I still added powder later in one area.\nContext: An ordinary morning, with the products I already had.\nA contribution I kept (Hana): I leave areas alone when I already like the finish. Powder everywhere is a preference, not a condition of doing base correctly.\nStill open: One personal preference; no wear-time comparison or product recommendation.",
+            "limits": "One personal preference; no wear-time comparison or product recommendation.",
+            "photo": "media-46",
+            "anchor": {
+              "x": 0.48,
+              "y": 0.48,
+              "photo": "media-46"
+            },
+            "quotedLine": "I leave areas alone when I already like the finish. Powder everywhere is a preference, not a condition of doing base correctly.",
+            "authors": [
+              "Iris",
+              "Hana"
+            ],
+            "sourceIds": [
+              "simulation-post:b3486556-ae44-5a1b-991c-981ee26da61f",
+              "comment:dfa5a888-6329-59f8-863f-ec1be2dfc593",
+              "comment:39b4a48c-5077-5163-b4ed-0ac1171f7ede"
+            ],
+            "updateId": "39b4a48c-5077-5163-b4ed-0ac1171f7ede",
+            "at": "2026-10-13T16:18:00+00:00"
+          },
+          "quoteAuthor": "Hana"
+        },
+        "public_ai": {
+          "kind": "pass",
+          "reference": "Leaving a little shine was a choice · version 1 and the current conversation",
+          "decision": "Compared the earlier record with this question, supplied the difference and edited the draft; preserved original contributors and limits.",
+          "materials": [
+            "Source version 1",
+            "Original helper",
+            "Situation difference",
+            "Original limits"
+          ]
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": null,
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "ec0916fd-5a4f-51d4-ae16-ed0b2c3ab458",
+      "post_id": "A",
+      "room_id": "shared",
+      "display_name": "Mia",
+      "body": "That is a helpful distinction. I am not buying a puff just because I was unsure about a patchy day.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "d04d65a5-6501-5c2d-9da0-8aa4b21c6c02",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM01",
+          "scenario_at": "2026-10-13T17:05:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Complexion-Club/Why-is-my-foundation-pilling/m-p/3371721",
+            "https://community.sephora.com/t5/Complexion-Club/Foundation-Starts-to-peel/m-p/7011469"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Iris"
+      },
+      "image_anchor": null,
+      "quoted_text": "The powder discussion helped me separate a finish I prefer from something I think I have to fix. I am bringing that thought here, but powder placement and pressing with a puff are different choices. My record cannot decide which tool is right for Mia.",
+      "quoted_comment_id": "4be22701-649f-591a-82a0-f3a266aa459f"
+    },
+    {
+      "id": "28b804cb-9154-58cc-a584-e7e05ed53e48",
+      "post_id": "C",
+      "room_id": "shared",
+      "display_name": "Ava",
+      "body": "The nail-colour conversation helped me name what I wanted a second image to do. A shadow close-up needs different evidence about application. I would keep that difference alongside the idea, and still enjoy the close-up for its own sake.",
+      "kind": "handoff",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "aa84c719-2275-5d25-b764-bb052e8b7f84",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM12",
+          "scenario_at": "2026-10-12T08:03:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212",
+            "https://community.sephora.com/t5/Complexion-Club/Why-is-my-foundation-pilling/m-p/3581814"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "experience_source": {
+          "key": "album:6835ceca-0694-5fd1-b205-1c3ee1aa2c4b",
+          "threadId": "c37058b8-4ef7-54bc-abc9-829904787b05",
+          "author": "Ava",
+          "album": {
+            "version": 1,
+            "title": "Two angles can tell different parts of a colour story",
+            "text": "What I noticed: I would keep a second angle alongside the favourite image and say what changed between them. I also want to keep space for inspiration photos that are not comparisons.\nContext: A plan for sharing shifting nail colour, not newly supplied before-and-after images.\nA contribution I kept (Lea): I would keep one thing steady and change the angle, with a note about that choice. Two images would still not tell us how it will look in every light.\nStill open: This is a posting plan; no new photograph or cosmetic outcome is claimed.",
+            "limits": "This is a posting plan; no new photograph or cosmetic outcome is claimed.",
+            "photo": "media-61",
+            "anchor": {
+              "x": 0.62,
+              "y": 0.34,
+              "photo": "media-61"
+            },
+            "quotedLine": "I would keep one thing steady and change the angle, with a note about that choice. Two images would still not tell us how it will look in every light.",
+            "authors": [
+              "Ava",
+              "Lea"
+            ],
+            "sourceIds": [
+              "simulation-post:c37058b8-4ef7-54bc-abc9-829904787b05",
+              "comment:8f297ff5-ac52-5bc9-92e4-79b5f02eca91",
+              "comment:a7527c38-fd6c-5375-a1dc-7758dae2e28f"
+            ],
+            "updateId": "a7527c38-fd6c-5375-a1dc-7758dae2e28f",
+            "at": "2026-10-14T04:06:00+00:00"
+          },
+          "quoteAuthor": "Lea"
+        },
+        "public_ai": {
+          "kind": "pass",
+          "reference": "Two angles can tell different parts of a colour story · version 1 and the current conversation",
+          "decision": "Compared the earlier record with this question, supplied the difference and edited the draft; preserved original contributors and limits.",
+          "materials": [
+            "Source version 1",
+            "Original helper",
+            "Situation difference",
+            "Original limits"
+          ]
+        },
+        "ai_simulated": true
+      },
+      "image_anchor": null,
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "279c0557-3457-5760-a024-01a13e145fdc",
+      "post_id": "C",
+      "room_id": "shared",
+      "display_name": "Lea",
+      "body": "Exactly. The photo can be enjoyable and incomplete at the same time. Thank you for keeping both parts.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "aa84c719-2275-5d25-b764-bb052e8b7f84",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM03",
+          "scenario_at": "2026-10-12T09:03:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212",
+            "https://community.sephora.com/t5/Complexion-Club/Why-is-my-foundation-pilling/m-p/3581814"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "quote_author": "Ava"
+      },
+      "image_anchor": null,
+      "quoted_text": "The nail-colour conversation helped me name what I wanted a second image to do. A shadow close-up needs different evidence about application. I would keep that difference alongside the idea, and still enjoy the close-up for its own sake.",
+      "quoted_comment_id": "28b804cb-9154-58cc-a584-e7e05ed53e48"
+    },
+    {
+      "id": "b6aa2ce7-75f3-56de-bda0-77d1e1d875d5",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Tess",
+      "body": "The wording suggestion was more polished than I wanted for a pasta-and-lipstick post. Keeping my ramble. What did everyone actually make for dinner?",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "4ccc5c49-006f-58d9-99b7-254e66908a33",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM11",
+          "scenario_at": "2026-10-10T04:27:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Trending-at-Sephora/Monthly-Favorites-July-2025-Edition/td-p/7191968"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "ai_choice": "declined; original voice retained"
+      },
+      "image_anchor": null,
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "c8562313-e01b-5a8c-9cd6-568f94090afb",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Bea",
+      "body": "Soup. Absolutely no lipstick longevity study was conducted 😂",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "4ccc5c49-006f-58d9-99b7-254e66908a33",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM17",
+          "scenario_at": "2026-10-10T05:27:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Trending-at-Sephora/Monthly-Favorites-July-2025-Edition/td-p/7191968"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        }
+      },
+      "image_anchor": null,
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "6888f578-5b3d-5a03-a6da-5a52b456da38",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Nora",
+      "body": "I asked for related conversations and got a technically relevant brush topic, but I only wanted to enjoy the light in this photograph. I stayed here.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "0bf92fad-2056-5420-8fa7-58dafb1f3373",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM02",
+          "scenario_at": "2026-10-12T00:17:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "ai_choice": "route declined; aesthetic purpose retained"
+      },
+      "image_anchor": null,
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "f48578c7-c90a-54a4-8b75-b93bd5f8d2d3",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Tess",
+      "body": "Staying for the nice light is a completely good reason.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "0bf92fad-2056-5420-8fa7-58dafb1f3373",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM11",
+          "scenario_at": "2026-10-12T01:17:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+            "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        }
+      },
+      "image_anchor": null,
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "923b1d78-2a4b-5719-9d7d-e9b6f995a30e",
+      "post_id": "B",
+      "room_id": "shared",
+      "display_name": "Liv",
+      "body": "I have not used the AI help. I came back because somebody left room for a small answer and did not make it a lesson.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "90b30f25-f6db-55e3-afd4-2502dfc4ca23",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM16",
+          "scenario_at": "2026-10-14T10:20:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Trending-at-Sephora/Introduce-Yourself-New-Member-Monday/td-p/5074797",
+            "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        },
+        "ai_choice": "not requested"
+      },
+      "image_anchor": null,
+      "quoted_text": null,
+      "quoted_comment_id": null
+    },
+    {
+      "id": "16a3020c-ac23-5f4a-90c3-f2bc7348f6e4",
+      "post_id": "A",
+      "room_id": "shared",
+      "display_name": "Maya",
+      "body": "A small win for this week: Zoe came back with a question that somebody else could use. The credit is in the conversation, not a badge from a bot.",
+      "kind": "comment",
+      "metadata": {
+        "entity": "contribution",
+        "thread_id": "b19cf1ef-87f6-50b0-86e6-531aaa5ac12d",
+        "synthetic_seed": true,
+        "simulation": {
+          "batch_id": "embedded-practices-2026-10-15",
+          "character_id": "SIM15",
+          "scenario_at": "2026-10-14T04:46:00+00:00",
+          "sources": [
+            "https://community.sephora.com/t5/Trending-at-Sephora/Monthly-Favorites-July-2025-Edition/td-p/7191968",
+            "https://community.sephora.com/t5/Trending-at-Sephora/Introduce-Yourself-New-Member-Monday/td-p/5074797"
+          ],
+          "not_participant_evidence": true,
+          "text_treatment": "Authored branching scenario informed by the thesis; no claim of observed AI effects."
+        }
+      },
+      "image_anchor": null,
+      "quoted_text": null,
+      "quoted_comment_id": null
+    }
+  ],
+  "episodes": [
+    {
+      "id": "e0",
+      "postIndex": 0,
+      "mechanisms": [
+        "question",
+        "quote"
+      ],
+      "rows": [
+        "815fd215-d05b-5683-b6e6-4e49bd345bc6",
+        "7647b0b1-0990-5355-85a6-e02e30572b2a",
+        "f890fd4e-314e-5f12-98da-e1552a73209a"
+      ],
+      "question_id": "815fd215-d05b-5683-b6e6-4e49bd345bc6",
+      "helper_id": "7647b0b1-0990-5355-85a6-e02e30572b2a",
+      "followup_id": "f890fd4e-314e-5f12-98da-e1552a73209a"
+    },
+    {
+      "id": "e1",
+      "postIndex": 7,
+      "mechanisms": [
+        "question",
+        "quote"
+      ],
+      "rows": [
+        "a9f9ea6a-8d28-5a81-b2e2-e6fa66727354",
+        "032adea6-cd03-502a-99b1-cb97db1be44b",
+        "b01e0043-0cca-5386-95e7-1386695c9d0f"
+      ],
+      "question_id": "a9f9ea6a-8d28-5a81-b2e2-e6fa66727354",
+      "helper_id": "032adea6-cd03-502a-99b1-cb97db1be44b",
+      "followup_id": "b01e0043-0cca-5386-95e7-1386695c9d0f"
+    },
+    {
+      "id": "e2",
+      "postIndex": 10,
+      "mechanisms": [
+        "question",
+        "quote"
+      ],
+      "rows": [
+        "6642b5d6-0ffc-54e6-8e46-e321ea97e434",
+        "e80cc6ad-a2cc-5a79-acee-8004430cde83",
+        "946e8b5a-69c0-52f2-a96e-d95b594475f1"
+      ],
+      "question_id": "6642b5d6-0ffc-54e6-8e46-e321ea97e434",
+      "helper_id": "e80cc6ad-a2cc-5a79-acee-8004430cde83",
+      "followup_id": "946e8b5a-69c0-52f2-a96e-d95b594475f1"
+    },
+    {
+      "id": "e3",
+      "postIndex": 14,
+      "mechanisms": [
+        "question",
+        "quote"
+      ],
+      "rows": [
+        "c305ad9f-6757-59fc-81f7-fd84a87e5913",
+        "30eaca4d-4ef7-5879-91b1-feee9adc4afc",
+        "d7974119-ba14-5971-85fb-7298b46a532d"
+      ],
+      "question_id": "c305ad9f-6757-59fc-81f7-fd84a87e5913",
+      "helper_id": "30eaca4d-4ef7-5879-91b1-feee9adc4afc",
+      "followup_id": "d7974119-ba14-5971-85fb-7298b46a532d"
+    },
+    {
+      "id": "e4",
+      "postIndex": 18,
+      "mechanisms": [
+        "question",
+        "quote"
+      ],
+      "rows": [
+        "eea1df48-65cc-5a37-af98-a40901717bf9",
+        "a7b6f83c-9cd2-52ec-8402-ebb7744c92c4",
+        "00d2d452-be86-563b-8456-f60e305208b0"
+      ],
+      "question_id": "eea1df48-65cc-5a37-af98-a40901717bf9",
+      "helper_id": "a7b6f83c-9cd2-52ec-8402-ebb7744c92c4",
+      "followup_id": "00d2d452-be86-563b-8456-f60e305208b0"
+    },
+    {
+      "id": "e5",
+      "postIndex": 21,
+      "mechanisms": [
+        "question",
+        "quote"
+      ],
+      "rows": [
+        "9b3948f5-9d31-50b4-8f76-3998405700d6",
+        "dfa5a888-6329-59f8-863f-ec1be2dfc593",
+        "e8c779d6-7b78-58bc-8f3a-735390a49880"
+      ],
+      "question_id": "9b3948f5-9d31-50b4-8f76-3998405700d6",
+      "helper_id": "dfa5a888-6329-59f8-863f-ec1be2dfc593",
+      "followup_id": "e8c779d6-7b78-58bc-8f3a-735390a49880"
+    },
+    {
+      "id": "e6",
+      "postIndex": 24,
+      "mechanisms": [
+        "question",
+        "quote"
+      ],
+      "rows": [
+        "fa9b051a-d1d4-5c19-b646-3e77f3b58daa",
+        "8f297ff5-ac52-5bc9-92e4-79b5f02eca91",
+        "6d3e2448-e8aa-503c-8fef-139b2bf961ed"
+      ],
+      "question_id": "fa9b051a-d1d4-5c19-b646-3e77f3b58daa",
+      "helper_id": "8f297ff5-ac52-5bc9-92e4-79b5f02eca91",
+      "followup_id": "6d3e2448-e8aa-503c-8fef-139b2bf961ed"
+    },
+    {
+      "id": "e7",
+      "postIndex": 26,
+      "mechanisms": [
+        "question",
+        "quote"
+      ],
+      "rows": [
+        "8f61cd3b-45d4-51b1-8bd5-9c2d8dc22fde",
+        "aae41c85-ca30-5c3d-9d94-51a83b5949f2",
+        "cab05d65-d5e9-5c5b-88a0-7fb2c9d7ac7c"
+      ],
+      "question_id": "8f61cd3b-45d4-51b1-8bd5-9c2d8dc22fde",
+      "helper_id": "aae41c85-ca30-5c3d-9d94-51a83b5949f2",
+      "followup_id": "cab05d65-d5e9-5c5b-88a0-7fb2c9d7ac7c"
+    }
+  ],
+  "source_patterns": {
+    "base": "https://community.sephora.com/t5/Complexion-Club/Why-is-my-foundation-pilling/m-p/3371721",
+    "layer": "https://community.sephora.com/t5/Complexion-Club/Why-is-my-foundation-pilling/m-p/3581814",
+    "haus": "https://community.sephora.com/t5/Complexion-Club/Foundation-Starts-to-peel/m-p/7011469",
+    "swatch": "https://community.sephora.com/t5/Makeup-Is-Life/THE-SWATCH-REQUEST-THREAD/td-p/2223212",
+    "look": "https://community.sephora.com/t5/Beauty-Confidential/What-are-you-wearing-today-Pt2/td-p/5633300",
+    "welcome": "https://community.sephora.com/t5/Trending-at-Sephora/Introduce-Yourself-New-Member-Monday/td-p/5074797",
+    "navigate": "https://community.sephora.com/t5/Beauty-Confidential/How-Do-YOU-Navigate-through-Beauty-Insider-Community-BIC/m-p/5498043",
+    "faves": "https://community.sephora.com/t5/Trending-at-Sephora/Monthly-Favorites-July-2025-Edition/td-p/7191968",
+    "recommend": "https://www.reddit.com/r/glossier/comments/1qbnm1w/musttry_products_from_glossier/",
+    "haul": "https://www.reddit.com/r/glossier/comments/1txrs7h/glossihaul/",
+    "different": "https://www.reddit.com/r/glossier/comments/1tb8xab/decline_in_quality/",
+    "return": "https://r1.community.samsung.com/t5/solutions-tips/s25-ultra-camera/td-p/37933628"
+  },
+  "original_text_republished": false,
+  "counts": {
+    "rows": 66,
+    "kinds": {
+      "question": 8,
+      "comment": 46,
+      "update": 4,
+      "album": 4,
+      "handoff": 4
+    },
+    "ai_moments": {
+      "question": 8,
+      "quote": 8,
+      "route": 4,
+      "album": 4,
+      "pass": 4
+    }
+  }
+}

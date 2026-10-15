@@ -1,3 +1,7 @@
+## Latest release · 15 October 2026
+
+4.5.0 adds reference-preserving image questions, inspectable public AI roles and 66 branching community contributions. See [embedded community practices](docs/EMBEDDED_COMMUNITY_PRACTICES.md). Ordinary browsing has no repeated synthetic-member badges; provenance is retained in Community information and record metadata.
+
 # Beauty House — community research simulation
 
 ## Community background release 15 October 2026
