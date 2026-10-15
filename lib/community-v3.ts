@@ -1,14 +1,16 @@
 import type {WeekStudy} from './free-community';
+import {communityMedia,type SeedPhotoId} from './community-media.ts';
 export type Lang = 'en' | 'zh';
 export type Bi = [string, string];
 export const say = (l: Lang, b: Bi) => b[l === 'en' ? 0 : 1];
 export type StoryId = 'A' | 'B' | 'C';
-export type PhotoId = 'base' | 'blush' | 'swatches';
+export type PhotoId = 'base' | 'blush' | 'swatches' | SeedPhotoId;
 export type Mode = 'embedded' | 'separate';
-export const VERSION = '4.3.0-distinct-interactions';
-const COMPATIBLE_VERSIONS=[VERSION,'4.2.0-free-community','4.1.0-study-ready','4.0.0-ai-community-weave'];
+export const VERSION = '4.4.0-community-simulation-corpus';
+const COMPATIBLE_VERSIONS=[VERSION,'4.3.0-distinct-interactions','4.2.0-free-community','4.1.0-study-ready','4.0.0-ai-community-weave'];
 export const STORAGE = 'common-ground-v3';
 export const photos: Record<PhotoId, {src:string; alt:Bi}> = {
+  ...communityMedia,
   base:{src:'/v3/base.png',alt:['Fictional member pointing to her cheek in window light','虚构成员在窗边指向面颊的示意照片']},
   blush:{src:'/v3/blush.png',alt:['Fictional member demonstrating a blush brush at her cheek','虚构成员在面颊展示腮红刷位置的示意照片']},
   swatches:{src:'/v3/swatches.png',alt:['Generated hand swatches, blush pot and brush on linen','生成的手背试色、腮红与刷具示意照片']},

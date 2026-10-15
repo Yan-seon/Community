@@ -1,3 +1,5 @@
+import {SimulationMember} from "../components/simulation-member";
+import {SeedContext} from "../components/seed-context";
 "use client";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -113,7 +115,8 @@ type Modal =
   | "ecosystem"
   | "newpost"
   | "references"
-  | "notifications";
+  | "notifications"
+  | "member";
 const cleanWorks = () => ({ A: emptyWork("A"), B: emptyWork("B"), C: emptyWork("C") });
 const ratingLabels: Bi[] = [
   ["I felt able to ask a question in my own words.", "我觉得可以用自己的话开口提问。"],
@@ -200,6 +203,7 @@ export default function CommunityV3() {
   const [view, setView] = useState<View>("home");
   const [modal, setModal] = useState<Modal>("");
   const [notice, setNotice] = useState("");
+  const [memberName,setMemberName]=useState("Mia");
   const community = useCommunity();
   const [group, setGroup] = useState<StoryId | "">("");
   const [newTitle, setNewTitle] = useState(""),
@@ -401,7 +405,7 @@ export default function CommunityV3() {
               source: "#",
               origin: focus.seed
                 ? ([
-                    "Authored fictional community post. Images are generated simulation props.",
+                    "Authored fictional community post. Any licensed reference image is separately credited and does not depict the fictional member’s own result.",
                     "编写的虚构社区帖子，图片为生成的模拟道具。",
                   ] as Bi)
                 : ([
@@ -798,6 +802,7 @@ export default function CommunityV3() {
       search={searchTerm}
       onSearch={setSearchTerm}
       onOpen={openPost}
+      onMember={name=>{setMemberName(name);setModal("member");}}
       onCreate={() => setModal("newpost")}
       bookmarked={bookmarked}
       onBookmark={bookmarkPost}
@@ -1171,6 +1176,8 @@ export default function CommunityV3() {
       >
         <summary>{t("Why this suggestion?", "为什么出现这条建议？")}</summary>
         <p>{tx(st.origin)}</p>
+              <button className="cg-text-link" onClick={()=>setModal("member")}>Meet the simulated members</button>
+              <a href="/community-media/credits.json" target="_blank" rel="noreferrer">Image authors and licences</a>
         <p>{st.sourceIds.join(" · ")}</p>
         <a
           href={st.source === "#" ? stories[story].source : st.source}
@@ -1408,7 +1415,7 @@ export default function CommunityV3() {
       <div className="cg-disclosure">
         <button onClick={() => setModal("about")}>
           {t(
-            "Research simulation · scripted scenes + real test comments · AI uses presets",
+            "Research simulation · fictional members and seeded history · AI uses presets",
             "研究模拟 · 脚本情境与真实测试评论 · AI 使用预设",
           )}{" "}
           <span>ⓘ</span>
@@ -1623,7 +1630,7 @@ export default function CommunityV3() {
                   <h1>{tx(st.title)}</h1>
                   <p className="cg-post-time">
                     {focus?.seed
-                      ? t("Fictional scenario post", "虚构情境帖子")
+                      ? t(focus?.provenance?"Simulated member · scenario history":"Fictional scenario post", "虚构情境帖子")
                       : t("Member post", "成员帖子")}{" "}
                     ·{" "}
                     {focus?.createdAt
@@ -1638,6 +1645,7 @@ export default function CommunityV3() {
                     <span className="cg-role-chip">{t("COMMUNITY MEMBER", "社区成员")}</span>
                   </div>
                   <p className="cg-detail-copy">{tx(st.caption)}</p>
+                  <SeedContext post={focus}/>
                   {hasPhoto && (
                     <div className="cg-detail-images">
                       <button onClick={() => go("ask")}>
@@ -1836,7 +1844,7 @@ export default function CommunityV3() {
                   <h1>{tx(st.title)}</h1>
                   <p className="cg-post-time">
                     {focus?.seed
-                      ? t("Fictional scenario post", "虚构情境帖子")
+                      ? t(focus?.provenance?"Simulated member · scenario history":"Fictional scenario post", "虚构情境帖子")
                       : t("Member post", "成员帖子")}{" "}
                     ·{" "}
                     {focus?.createdAt
@@ -1851,6 +1859,7 @@ export default function CommunityV3() {
                     <span className="cg-role-chip">{t("COMMUNITY MEMBER", "社区成员")}</span>
                   </div>
                   <p className="cg-detail-copy">{tx(st.caption)}</p>
+                  <SeedContext post={focus}/>
                   <div className="cg-composer-divider" />
                   <div className="cg-composer-heading">
                     <span className="cg-avatar">{t("Y", "我")}</span>
@@ -2062,6 +2071,7 @@ export default function CommunityV3() {
                 </div>
                 <h1>{tx(st.title)}</h1>
                 <p className="cg-detail-copy">{tx(st.caption)}</p>
+                  <SeedContext post={focus}/>
                 {hasPhoto && (
                   <div className="cg-thread-photo">
                     <VisualRef id={st.photo} lang={lang} anchor={w.anchor} mini />
@@ -2745,6 +2755,7 @@ export default function CommunityV3() {
             {(
               {
                 about: t("About this space", "关于这个空间"),
+                member: "Member profile",
                 original: t("Original image & context", "原图与情境"),
                 assist: t("AI support, inside the community", "社区中的 AI 辅助"),
                 review: t("A page in our shared story", "共同故事中的一页"),
@@ -2764,15 +2775,18 @@ export default function CommunityV3() {
           <DialogDescription>
             {t("Common Ground · community research simulation", "Common Ground · 社区研究模拟")}
           </DialogDescription>
+          {modal === "member" && <SimulationMember name={memberName} posts={community.posts} onSelect={setMemberName} onOpen={p=>{setModal("");openPost(p);}}/>}
           {modal === "about" && (
             <div className="cg-stack">
               <p>
                 {t(
-                  "This is a desktop-web, case-informed research simulation, not Sephora’s service. It preserves documented image-led community practices while testing new AI interactions. Pictured people are generated fictional adults; member names and replies are scripted roles.",
+                  "This is a desktop-web, case-informed research simulation, not Sephora’s service. It preserves documented image-led community practices while testing new AI interactions. Member names and seeded replies are fictional roles. Images include generated study props and attributed, openly licensed reference photographs; the people pictured are not the fictional members.",
                   "这是基于案例构建的桌面 Web 研究模拟，并非 Sephora 的服务。它保留有据可查的图片型社区实践，用于测试新增 AI 交互。图片人物均为生成的虚构成年人；成员姓名和回应是脚本角色。",
                 )}
               </p>
               <p>{tx(st.origin)}</p>
+              <button className="cg-text-link" onClick={()=>setModal("member")}>Meet the simulated members</button>
+              <a href="/community-media/credits.json" target="_blank" rel="noreferrer">Image authors and licences</a>
               <p>
                 {t(
                   "Image meaning comes from the image, its context and what a member says. These props cannot demonstrate cosmetic results.",
@@ -3242,7 +3256,7 @@ export default function CommunityV3() {
               {newPhoto && <Photo id={newPhoto} lang={lang} />}
               <p className="cg-meta">
                 {t(
-                  "This post will be visible to other visitors. Available images are fictional study props.",
+                  "This post will be visible to other visitors. Available images are study props or credited reference photographs.",
                   "该帖子向其他访问者展示；可选图片是虚构研究道具。",
                 )}
               </p>

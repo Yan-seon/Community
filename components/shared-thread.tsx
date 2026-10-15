@@ -11,7 +11,7 @@ import {
   type CommentRow,
 } from "@/lib/online";
 import { LoadingImage } from "./loading-image";
-import { threadOf, isTestContribution } from "../lib/free-community";
+import { threadOf, isTestContribution, seedProvenance } from "../lib/free-community";
 import { photos, say, type Anchor, type Lang, type StoryId, type Study } from "@/lib/community-v3";
 import { Button } from "@/components/ui/button";
 
@@ -86,7 +86,7 @@ export function SharedThread({
       if (!showTests && isTestContribution(row)) return;
       setRows((old) =>
         [...old.filter((r) => r.id !== row.id), row].sort(
-          (a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id),
+          (a, b) => (seedProvenance(a.metadata)?.scenarioAt||a.created_at).localeCompare(seedProvenance(b.metadata)?.scenarioAt||b.created_at) || a.id.localeCompare(b.id),
         ),
       );
     };
@@ -225,8 +225,9 @@ export function SharedThread({
               <header>
                 <span className="cg-avatar">{row.display_name[0]}</span>
                 <strong>{row.display_name}</strong>
+                {row.metadata.synthetic_seed===true&&<small className="sc-member">Simulated member</small>}
                 <time dateTime={row.created_at}>
-                  {new Date(row.created_at).toLocaleString(lang === "en" ? "en-GB" : "zh-CN")}
+                  {new Date(seedProvenance(row.metadata)?.scenarioAt||row.created_at).toLocaleString(lang === "en" ? "en-GB" : "zh-CN")}
                 </time>
                 <small>
                   {t(
