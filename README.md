@@ -1,5 +1,10 @@
 # Beauty House — community research simulation
 
+## Community background release 15 October 2026
+
+The deployed English simulation now includes 20 labelled fictional characters, 35 additional conversations and 32 attributed real reference photographs. The 136 seeded discussion contributions and 18 scripted appreciations are community background, not participant research results. See [the dataset and provenance notes](docs/SIMULATED_COMMUNITY_BACKGROUND.md). New visitor comments remain persistent and shared.
+
+
 A case-informed desktop Web simulation of an image-led beauty community, retaining recognisable community navigation and conversation patterns. This release uses English only. Not affiliated with Sephora.
 
 The five assistance moments (question wording, previewing and entering related discussions, sentence-context follow-up, experience structuring, and comparing an experience before passing it on) use deterministic presets, **not a live AI model**. Scenario members and images are fictional research props. Visitor comments are real contributions stored in Supabase.
