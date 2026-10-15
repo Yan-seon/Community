@@ -401,6 +401,11 @@ export default function CommunityV3() {
         photo: focus.photo || stories[story].photo,
         ...(!focus.id.startsWith("case:")
           ? {
+              tag: ["COMMUNITY CONVERSATION", "社区讨论"] as Bi,
+              task: ["If you have something to add, describe what you tried or noticed in this conversation. Context and open questions are optional.", "如果愿意补充，可以描述在当前讨论中尝试或注意到的事情。情境与未解决的问题均可不填。"] as Bi,
+              prompt: ["What detail or context would help someone respond to this post?", "什么细节或情境有助于他人回应这个帖子？"] as Bi,
+              newcomer: ["Which parts of this experience might apply elsewhere, and what could differ?", "这份经验的哪些部分可能适用于其他情境，哪些可能不同？"] as Bi,
+              reply: ["The member contributions below keep their own authors and context. Consider those details before deciding what fits your situation.", "下方成员贡献保留各自作者与情境，请结合这些信息判断是否适合你的情况。"] as Bi,
               sourceIds: ["community-post:" + focus.id],
               source: "#",
               origin: focus.seed
@@ -1724,7 +1729,7 @@ export default function CommunityV3() {
                   )}
                   <div className="cg-detail-tags">
                     <span>{tx(st.tag)}</span>
-                    <span>{tx(caseTopics[story].product)}</span>
+                    <span>{tx(custom?groupNames[story]:caseTopics[story].product)}</span>
                   </div>
                   <div className="cg-detail-actions">
                     <button
